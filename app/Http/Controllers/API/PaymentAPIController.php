@@ -16,7 +16,6 @@ use App\Models\Tenants\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PaymentAPIController extends AppBaseController
@@ -226,118 +225,6 @@ class PaymentAPIController extends AppBaseController
         }
 
         return $this->sendSuccess('Balances deleted successfully');
-    }
-
-    public function ipn(Request $request)
-    {
-        $params = $request->query->all();
-        $order = @file_get_contents('php://input');
-        $order = json_decode($order, true);
-        $token = env('MERCADO_PAGO_ACCESS_TOKEN');
-
-        if (! empty($params)) {
-            if (array_key_exists('topic', $params)) {
-                if ($params['topic'] === 'merchant_order') {
-                    $response = Http::withToken($token)->get("https://api.mercadolibre.com/merchant_orders/{$params['id']}");
-                    $response = json_decode($response->body());
-
-                    $payment = Payment::where('preference_id', $response->preference_id)->first();
-
-                    if (empty($payment)) {
-                        return $this->sendError('Payment not found');
-                    }
-
-                    $payment->status = $response->status;
-                    $payment->amount = $response->total_amount;
-                    $payment->merchant_order_id = $params['id'];
-                    $payment->update();
-
-                    return response()->json([
-                        'success' => true,
-                        'data' => $payment,
-                        'message' => 'Orden Actualizada',
-                    ], 200);
-                }
-
-                if ($params['topic'] === 'payment') {
-                    $response = Http::withToken($token)->get("https://api.mercadolibre.com/collections/notifications/{$params['id']}");
-                    $response = json_decode($response->body());
-
-                    $payment = Payment::where('merchant_order_id', $response->collection->merchant_order_id)->first();
-
-                    if (empty($payment)) {
-                        return $this->sendError('Payment not found');
-                    }
-
-                    $payment->status = $response->collection->status;
-                    $payment->payment_method = $response->collection->payment_type;
-                    $payment->amount = $response->collection->total_paid_amount;
-                    $payment->merchant_order_id = $response->collection->merchant_order_id;
-                    $payment->update();
-
-                    return response()->json([
-                        'success' => true,
-                        'data' => $payment,
-                        'message' => 'Orden Actualizada',
-                    ], 200);
-                }
-            }
-
-            if (array_key_exists('type', $params)) {
-                if ($params['type'] === 'payment') {
-                    $response = Http::withToken($token)->get("https://api.mercadopago.com/v1/payments/{$request->data_id}");
-                    $response = json_decode($response->body());
-
-                    $payment = Payment::where('merchant_order_id', $response->order->id)->first();
-
-                    if (empty($payment)) {
-                        return $this->sendError('Payment not found');
-                    }
-
-                    $payment->payment_method = $response->payment_method->type;
-                    $payment->status = $response->status;
-                    $payment->payment_id = $request->data_id;
-                    $payment->update();
-
-                    return response()->json([
-                        'success' => true,
-                        'data' => $payment,
-                        'message' => 'Orden Actualizada',
-                    ], 200);
-                }
-            }
-
-            if ($order['action'] === 'payment.updated') {
-                $orderId = $order['data']['id'];
-                $payment = Payment::where('preference_id', $orderId)->first();
-
-                if (empty($payment)) {
-                    return $this->sendError('Payment not found');
-                }
-
-                $payment->status = 'paid';
-                $payment->update();
-
-                $student = Student::where('id', $payment->student_id)->first();
-
-                if (empty($student)) {
-                    return $this->sendError('Student not found');
-                }
-
-                $student->active = true;
-                $student->update();
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Orden actualizada.',
-                ], 200);
-            }
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'No hay nada que actualizar',
-        ], 200);
     }
 
     public function export()

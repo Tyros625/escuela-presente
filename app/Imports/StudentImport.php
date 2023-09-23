@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class StudentImport implements ToCollection, WithHeadingRow, WithBatchInserts, WithChunkReading, WithValidation, SkipsOnError
+class StudentImport implements SkipsOnError, ToCollection, WithBatchInserts, WithChunkReading, WithHeadingRow, WithValidation
 {
     use Importable;
 

@@ -19,8 +19,6 @@ import clickRipple from "@/directives/clickRipple";
 import * as bootstrap from "bootstrap";
 window.bootstrap = bootstrap;
 
-import VueGoogleMaps from "@fawmi/vue-google-maps";
-
 // Craft new application
 const app = createApp(App);
 
@@ -34,12 +32,17 @@ app.directive("click-ripple", clickRipple);
 app.directive("uppercase", (el) => {
   el.value = el.value.toUpperCase();
 });
+app.directive("user-can", {
+  mounted(el, binding) {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const permissions = JSON.parse(localStorage.getItem("permissions"));
+    const { value } = binding;
 
-app.use(VueGoogleMaps, {
-  load: {
-    key: import.meta.env.VITE_APP_GOOGLE_MAPS_API,
-    language: "es",
-    libraries: "places",
+    if (user.role === "Super Admin" || permissions.includes(value)) {
+      return;
+    }
+
+    el.parentNode && el.parentNode.removeChild(el);
   },
 });
 

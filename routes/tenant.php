@@ -29,7 +29,6 @@ use App\Jobs\EmailPaymentJob;
 use App\Models\Tenants\AcademicGroup;
 use App\Models\Tenants\Grade;
 use App\Models\Tenants\Student;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -247,34 +246,6 @@ Route::prefix('api')->middleware([
                 });
 
                 return response()->json('Datos Actualizados');
-            });
-
-            Route::get('/mp-payment-methods', function () {
-                $token = env('MERCADO_PAGO_ACCESS_TOKEN');
-                $response = Http::withToken($token)->get('https://api.mercadopago.com/v1/payment_methods');
-
-                return response()->json(json_decode($response->body()));
-            });
-
-            Route::get('/mp-payment-status', function ($id) {
-                $token = env('MERCADO_PAGO_ACCESS_TOKEN');
-                $response = Http::withToken($token)->get("https://api.mercadopago.com/v1/payments/{$id}");
-
-                return response()->json(json_decode($response->body()));
-            });
-
-            Route::get('/mp-reference', function ($id) {
-                $token = env('MERCADO_PAGO_ACCESS_TOKEN');
-                $response = Http::withToken($token)->get("https://api.mercadopago.com/checkout/preferences/{$id}");
-
-                return response()->json(json_decode($response->body()));
-            });
-
-            Route::get('/mp-merchant-order', function ($id) {
-                $token = env('MERCADO_PAGO_ACCESS_TOKEN');
-                $response = Http::withToken($token)->get("https://api.mercadolibre.com/merchant_orders/{$id}");
-
-                return response()->json(json_decode($response->body()));
             });
         });
     });

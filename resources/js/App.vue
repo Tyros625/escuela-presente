@@ -1,8 +1,9 @@
 <template>
-    <RouterView />
+	<RouterView />
 </template>
 
 <style lang="scss">
+$enable-dark-mode: false;
 // Main Stylesheet
 @import "@/assets/scss/main";
 

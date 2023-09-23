@@ -113,7 +113,7 @@ class Student extends Model
         'federal_entity' => 'required|string',
         'home_phone' => 'required|between:8,12',
         'email' => 'required|email|indisposable',
-        'photo' => 'required|string',
+        'photo' => 'nullable|string',
         'academic_group_id' => 'nullable',
         'academic' => 'required',
         'academic.udeei' => 'nullable',
@@ -155,6 +155,7 @@ class Student extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::addGlobalScope(new ActiveScope);
     }
 

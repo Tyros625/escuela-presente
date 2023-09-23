@@ -2,46 +2,48 @@ import { defineConfig, loadEnv } from "vite";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import fs from "fs";
-import laravel from "laravel-vite-plugin";
 import os from "os";
+import laravel from "laravel-vite-plugin";
 import vue from "@vitejs/plugin-vue";
+
+function configureHttps(host) {
+  if (host && host.includes("test") && os.platform() === "win32") {
+    return {
+      key: fs.readFileSync("C:/laragon/etc/ssl/laragon.key"),
+      cert: fs.readFileSync("C:/laragon/etc/ssl/laragon.crt"),
+    };
+  }
+  return true;
+}
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const host = env.APP_URL_BASE;
-  const key =
-    os.platform() === "linux"
-      ? `/etc/apache2/ssl/tschool.key`
-      : `C:/laragon/etc/ssl/laragon.key`;
-  const cert =
-    os.platform() === "linux"
-      ? `/etc/apache2/ssl/tschool.crt`
-      : `C:/laragon/etc/ssl/laragon.crt`;
+  const https = configureHttps(host);
 
-  if (host.includes("test")) {
-    https = {
-      key: fs.readFileSync(key),
-      cert: fs.readFileSync(cert),
-    };
-  } else {
-    https = true;
+  const serverOptions = {
+    host,
+    https,
+    cors: true,
+    hmr: {
+      host,
+      overlay: true,
+    },
+  };
+
+  const laravelPluginOptions = {
+    input: "resources/js/main.js",
+    refresh: true,
+  };
+
+  if (os.platform() === "darwin") {
+    laravelPluginOptions.detectTls = host;
   }
 
   return {
-    server: {
-      host,
-      hmr: {
-        host: host,
-        overlay: false,
-      },
-      https: https,
-      cors: true,
-    },
+    server: serverOptions,
     plugins: [
-      laravel({
-        input: "resources/js/main.js",
-        refresh: true,
-      }),
+      laravel(laravelPluginOptions),
       vue({
         template: {
           transformAssetUrls: {
@@ -79,7 +81,7 @@ export default defineConfig(({ command, mode }) => {
       }),
     ],
     optimizeDeps: {
-      include: ["@fawmi/vue-google-maps", "fast-deep-equal"],
+      include: ["fast-deep-equal"],
     },
   };
 });

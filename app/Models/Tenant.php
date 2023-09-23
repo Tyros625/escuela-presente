@@ -11,7 +11,7 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
-    use HasFactory, HasDatabase, HasDomains;
+    use HasDatabase, HasDomains, HasFactory;
 
     public static function booted()
     {

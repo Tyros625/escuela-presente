@@ -1,0 +1,1 @@
+import{o as e,c as s,p as t,b as o}from"./main-0b7199ae.js";const a={class:t("spinner-border text-primary"),role:"status"},r=o("span",{class:"visually-hidden"},"Loading...",-1),i=[r],d={__name:"LoaderView",props:{type:{type:String,default:"text-primary",description:"The url of the image to show"}},setup(n){return(c,p)=>(e(),s("div",a,i))}};export{d as _};

@@ -4,8 +4,6 @@ import { Chart, registerables } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import _ from "underscore";
 import { changeTimeZone } from "@/services/timezone";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 
 onMounted(async () => {
   await getGrades();
@@ -159,9 +157,7 @@ function printChart() {
         <!-- Pending Orders -->
         <BaseBlock class="d-flex flex-column h-100 mb-0">
           <template #content>
-            <div
-              class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-            >
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
               <dl class="mb-0">
                 <dt class="fs-3 fw-bold">{{ records.students }}</dt>
                 <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
@@ -175,12 +171,9 @@ function printChart() {
             <div class="bg-body-light rounded-bottom">
               <router-link :to="{ name: `students` }">
                 <a
-                  class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                >
+                  class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between">
                   <span>Ver todos estudiantes</span>
-                  <i
-                    class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                  ></i>
+                  <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                 </a>
               </router-link>
             </div>
@@ -192,9 +185,7 @@ function printChart() {
         <!-- New Customers -->
         <BaseBlock class="d-flex flex-column h-100 mb-0">
           <template #content>
-            <div
-              class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-            >
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
               <dl class="mb-0">
                 <dt class="fs-3 fw-bold">{{ records.teachers }}</dt>
                 <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
@@ -208,12 +199,9 @@ function printChart() {
             <div class="bg-body-light rounded-bottom">
               <router-link :to="{ name: `teachers` }">
                 <a
-                  class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                >
+                  class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between">
                   <span>Ver todos profesores</span>
-                  <i
-                    class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                  ></i>
+                  <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
                 </a>
               </router-link>
             </div>
@@ -225,9 +213,7 @@ function printChart() {
         <!-- Messages -->
         <BaseBlock class="d-flex flex-column h-100 mb-0">
           <template #content>
-            <div
-              class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-            >
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
               <dl class="mb-0">
                 <dt class="fs-3 fw-bold">{{ records.incidents }}</dt>
                 <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
@@ -239,14 +225,10 @@ function printChart() {
               </div>
             </div>
             <div class="bg-body-light rounded-bottom">
-              <a
-                class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                href="javascript:void(0)"
-              >
+              <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                href="javascript:void(0)">
                 <span>Ver todas incidencias</span>
-                <i
-                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                ></i>
+                <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
               </a>
             </div>
           </template>
@@ -257,9 +239,7 @@ function printChart() {
         <!-- Conversion Rate -->
         <BaseBlock class="d-flex flex-column h-100 mb-0">
           <template #content>
-            <div
-              class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center"
-            >
+            <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
               <dl class="mb-0">
                 <dt class="fs-3 fw-bold">4.5%</dt>
                 <dd class="fs-sm fw-medium fs-sm fw-medium text-muted mb-0">
@@ -271,14 +251,10 @@ function printChart() {
               </div>
             </div>
             <div class="bg-body-light rounded-bottom">
-              <a
-                class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
-                href="javascript:void(0)"
-              >
+              <a class="block-content block-content-full block-content-sm fs-sm fw-medium d-flex align-items-center justify-content-between"
+                href="javascript:void(0)">
                 <span>View statistics</span>
-                <i
-                  class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"
-                ></i>
+                <i class="fa fa-arrow-alt-circle-right ms-1 opacity-25 fs-base"></i>
               </a>
             </div>
           </template>
@@ -290,10 +266,7 @@ function printChart() {
     <div class="row">
       <div class="col-xl-12 d-flex flex-column">
         <!-- Reporte Asistencias -->
-        <BaseBlock
-          title="Reporte Asistencias"
-          class="flex-grow-1 d-flex flex-column"
-        >
+        <BaseBlock title="Reporte Asistencias" class="flex-grow-1 d-flex flex-column">
           <template #options>
             <button type="button" class="btn-block-option" @click="printChart">
               <i class="fa-solid fa-print"></i>
@@ -305,20 +278,11 @@ function printChart() {
               <div class="row">
                 <div class="col-md-6">
                   <label class="form-label">Fecha</label>
-                  <input
-                    type="date"
-                    class="form-control"
-                    v-model="form.date_start"
-                    @change="getAssists"
-                  />
+                  <input type="date" class="form-control" v-model="form.date_start" @change="getAssists" />
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Grado</label>
-                  <select
-                    class="form-select"
-                    v-model="form.grade"
-                    @change="getAssists"
-                  >
+                  <select class="form-select" v-model="form.grade" @change="getAssists">
                     <option v-for="item in grades" :value="item.description">
                       {{ item.description }}
                     </option>
@@ -326,14 +290,8 @@ function printChart() {
                 </div>
               </div>
             </div>
-            <div
-              class="block-content block-content-full flex-grow-1 d-flex align-items-center"
-            >
-              <BarChart
-                :chart-data="earningsData"
-                :options="earningsOptions"
-                class="w-100"
-              />
+            <div class="block-content block-content-full flex-grow-1 d-flex align-items-center">
+              <BarChart :chart-data="earningsData" :options="earningsOptions" class="w-100" />
             </div>
           </template>
         </BaseBlock>

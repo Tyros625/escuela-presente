@@ -30,7 +30,10 @@ class StudentAPIController extends AppBaseController
             $query->where('enrollment', $enrollment);
         })->get();
 
-        return $this->sendResponse(StudentResource::collection($students), 'Students retrieved successfully');
+        return $this->sendResponse(
+            StudentResource::collection($students),
+            'Students retrieved successfully'
+        );
     }
 
     public function store(CreateStudentAPIRequest $request): JsonResponse
@@ -45,6 +48,7 @@ class StudentAPIController extends AppBaseController
         }
 
         DB::beginTransaction();
+
         try {
             $student = Student::create($request->all());
             $student->academic()->create($request->academic);
@@ -60,7 +64,10 @@ class StudentAPIController extends AppBaseController
             $user = User::find(1);
             $user->notify(new NewRegisteredStudentNotification($student));
 
-            return $this->sendResponse(new StudentResource($student), 'Student saved successfully');
+            return $this->sendResponse(
+                new StudentResource($student),
+                'Student saved successfully'
+            );
         } catch (\Exception $e) {
             DB::rollback();
 
