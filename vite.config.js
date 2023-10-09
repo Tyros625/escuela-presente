@@ -24,11 +24,11 @@ export default defineConfig(({ command, mode }) => {
   const serverOptions = {
     host,
     https,
-    cors: true,
     hmr: {
       host,
       overlay: true,
     },
+    cors: true,
   };
 
   const laravelPluginOptions = {
