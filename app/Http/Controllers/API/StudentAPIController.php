@@ -113,6 +113,12 @@ class StudentAPIController extends AppBaseController
             return $this->sendError('Student not found');
         }
 
+        $user = User::where('student_id', $student->id)->first();
+
+        if ($user) {
+            $user->delete();
+        }
+
         $student->delete();
 
         return $this->sendSuccess('Student deleted successfully');

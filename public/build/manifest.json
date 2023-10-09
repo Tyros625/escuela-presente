@@ -7,58 +7,58 @@
     "file": "assets/IndexView-1272c412.css",
     "src": "IndexView.css"
   },
-  "_ErrorsView-d8a78f66.js": {
-    "file": "assets/ErrorsView-d8a78f66.js",
+  "_ErrorsView-9efdd09e.js": {
+    "file": "assets/ErrorsView-9efdd09e.js",
     "imports": [
       "resources/js/main.js"
     ]
   },
-  "_IndexTenantView-64424ad9.js": {
+  "_IndexTenantView-d10c8820.js": {
     "css": [
       "assets/IndexTenantView-93f10a72.css"
     ],
-    "file": "assets/IndexTenantView-64424ad9.js",
+    "file": "assets/IndexTenantView-d10c8820.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ]
   },
-  "_IndexView-94e97970.js": {
+  "_IndexView-fad3bd5e.js": {
     "css": [
       "assets/IndexView-1272c412.css"
     ],
-    "file": "assets/IndexView-94e97970.js",
+    "file": "assets/IndexView-fad3bd5e.js",
     "imports": [
       "resources/js/main.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_moment-with-locales-f82e6e88.js"
+      "_vue-dataset.es-951337d8.js",
+      "_moment-with-locales-d1ad888a.js"
     ]
   },
-  "_LoaderView-af8e990e.js": {
-    "file": "assets/LoaderView-af8e990e.js",
+  "_LoaderView-3ff5fb8e.js": {
+    "file": "assets/LoaderView-3ff5fb8e.js",
     "imports": [
       "resources/js/main.js"
     ]
   },
-  "_Tab6-7f83dd8b.js": {
-    "file": "assets/Tab6-7f83dd8b.js",
+  "_Tab6-f6585099.js": {
+    "file": "assets/Tab6-f6585099.js",
     "imports": [
       "resources/js/main.js",
-      "_LoaderView-af8e990e.js"
+      "_LoaderView-3ff5fb8e.js"
     ]
   },
-  "_index-ea73ec5c.js": {
-    "file": "assets/index-ea73ec5c.js",
+  "_index-961c5e2c.js": {
+    "file": "assets/index-961c5e2c.js",
     "imports": [
       "resources/js/main.js"
     ]
   },
-  "_map-dfbad8df.js": {
-    "file": "assets/map-dfbad8df.js",
+  "_map-d3b0dcc9.js": {
+    "file": "assets/map-d3b0dcc9.js",
     "imports": [
       "resources/js/main.js"
     ]
@@ -66,8 +66,8 @@
   "_moment-fbc5633a.js": {
     "file": "assets/moment-fbc5633a.js"
   },
-  "_moment-with-locales-f82e6e88.js": {
-    "file": "assets/moment-with-locales-f82e6e88.js",
+  "_moment-with-locales-d1ad888a.js": {
+    "file": "assets/moment-with-locales-d1ad888a.js",
     "imports": [
       "resources/js/main.js"
     ]
@@ -75,14 +75,14 @@
   "_timezone-07fff2ce.js": {
     "file": "assets/timezone-07fff2ce.js"
   },
-  "_vue-dataset.es-b58f9352.js": {
-    "file": "assets/vue-dataset.es-b58f9352.js",
+  "_vue-dataset.es-951337d8.js": {
+    "file": "assets/vue-dataset.es-951337d8.js",
     "imports": [
       "resources/js/main.js"
     ]
   },
-  "_vue-select.es-2905954b.js": {
-    "file": "assets/vue-select.es-2905954b.js",
+  "_vue-select.es-6837b2b6.js": {
+    "file": "assets/vue-select.es-6837b2b6.js",
     "imports": [
       "resources/js/main.js"
     ]
@@ -194,39 +194,39 @@
       "resources/js/views/errors/500View.vue",
       "resources/js/views/errors/503View.vue"
     ],
-    "file": "assets/main-0b7199ae.js",
+    "file": "assets/main-25867db8.js",
     "isEntry": true,
     "src": "resources/js/main.js"
   },
   "resources/js/views/auth/ReminderView.vue": {
-    "file": "assets/ReminderView-fd746ea1.js",
+    "file": "assets/ReminderView-99a534b1.js",
     "imports": [
       "resources/js/main.js",
-      "_index-ea73ec5c.js"
+      "_index-961c5e2c.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/auth/ReminderView.vue"
   },
   "resources/js/views/auth/SignIn3View.vue": {
-    "file": "assets/SignIn3View-af289f44.js",
+    "file": "assets/SignIn3View-f227ef9f.js",
     "imports": [
       "resources/js/main.js",
-      "_index-ea73ec5c.js"
+      "_index-961c5e2c.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/auth/SignIn3View.vue"
   },
   "resources/js/views/auth/SignUpView.vue": {
-    "file": "assets/SignUpView-f3b138a3.js",
+    "file": "assets/SignUpView-0355d376.js",
     "imports": [
       "resources/js/main.js",
-      "_index-ea73ec5c.js"
+      "_index-961c5e2c.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/auth/SignUpView.vue"
   },
   "resources/js/views/backend/pages/generic/BlankBlockView.vue": {
-    "file": "assets/BlankBlockView-f6064cc9.js",
+    "file": "assets/BlankBlockView-d48178f2.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -234,7 +234,7 @@
     "src": "resources/js/views/backend/pages/generic/BlankBlockView.vue"
   },
   "resources/js/views/backend/pages/generic/ProfileView.vue": {
-    "file": "assets/ProfileView-495fd88f.js",
+    "file": "assets/ProfileView-53fa2af7.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -242,7 +242,7 @@
     "src": "resources/js/views/backend/pages/generic/ProfileView.vue"
   },
   "resources/js/views/central/DashboardView.vue": {
-    "file": "assets/DashboardView-cc858c4b.js",
+    "file": "assets/DashboardView-2fb5e900.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -250,7 +250,7 @@
     "src": "resources/js/views/central/DashboardView.vue"
   },
   "resources/js/views/central/LandingView.vue": {
-    "file": "assets/LandingView-4407812c.js",
+    "file": "assets/LandingView-f79c1015.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -258,10 +258,10 @@
     "src": "resources/js/views/central/LandingView.vue"
   },
   "resources/js/views/central/LoginView.vue": {
-    "file": "assets/LoginView-db096e1e.js",
+    "file": "assets/LoginView-3f6bd3a4.js",
     "imports": [
       "resources/js/main.js",
-      "_index-ea73ec5c.js"
+      "_index-961c5e2c.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/central/LoginView.vue"
@@ -274,20 +274,20 @@
     "css": [
       "assets/IndexTenantView-93f10a72.css"
     ],
-    "file": "assets/TenantView-a2fd76c7.js",
+    "file": "assets/TenantView-2f15f57d.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_moment-with-locales-f82e6e88.js",
-      "_map-dfbad8df.js"
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_moment-with-locales-d1ad888a.js",
+      "_map-d3b0dcc9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/central/tenants/TenantView.vue"
   },
   "resources/js/views/errors/400View.vue": {
-    "file": "assets/400View-c0ae606e.js",
+    "file": "assets/400View-4206de86.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -295,7 +295,7 @@
     "src": "resources/js/views/errors/400View.vue"
   },
   "resources/js/views/errors/401View.vue": {
-    "file": "assets/401View-00f70311.js",
+    "file": "assets/401View-b69a4c55.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -303,7 +303,7 @@
     "src": "resources/js/views/errors/401View.vue"
   },
   "resources/js/views/errors/403View.vue": {
-    "file": "assets/403View-7a257611.js",
+    "file": "assets/403View-658838b8.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -311,7 +311,7 @@
     "src": "resources/js/views/errors/403View.vue"
   },
   "resources/js/views/errors/404View.vue": {
-    "file": "assets/404View-74ef6518.js",
+    "file": "assets/404View-da2e62bc.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -319,7 +319,7 @@
     "src": "resources/js/views/errors/404View.vue"
   },
   "resources/js/views/errors/500View.vue": {
-    "file": "assets/500View-0cd9845d.js",
+    "file": "assets/500View-85f12514.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -327,7 +327,7 @@
     "src": "resources/js/views/errors/500View.vue"
   },
   "resources/js/views/errors/503View.vue": {
-    "file": "assets/503View-94e02e20.js",
+    "file": "assets/503View-2fdcff3a.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -335,16 +335,16 @@
     "src": "resources/js/views/errors/503View.vue"
   },
   "resources/js/views/roles/RoleAdd.vue": {
-    "file": "assets/RoleAdd-0f07b7c4.js",
+    "file": "assets/RoleAdd-ecd73930.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js"
+      "_ErrorsView-9efdd09e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/roles/RoleAdd.vue"
   },
   "resources/js/views/roles/RoleDetail.vue": {
-    "file": "assets/RoleDetail-a232c620.js",
+    "file": "assets/RoleDetail-77a3077a.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -352,27 +352,27 @@
     "src": "resources/js/views/roles/RoleDetail.vue"
   },
   "resources/js/views/roles/RoleEdit.vue": {
-    "file": "assets/RoleEdit-776c6fdf.js",
+    "file": "assets/RoleEdit-d0ff07ec.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js"
+      "_ErrorsView-9efdd09e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/roles/RoleEdit.vue"
   },
   "resources/js/views/roles/RoleIndex.vue": {
-    "file": "assets/RoleIndex-64e697a0.js",
+    "file": "assets/RoleIndex-632881e4.js",
     "imports": [
-      "_IndexView-94e97970.js",
+      "_IndexView-fad3bd5e.js",
       "resources/js/main.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_moment-with-locales-f82e6e88.js"
+      "_vue-dataset.es-951337d8.js",
+      "_moment-with-locales-d1ad888a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/roles/RoleIndex.vue"
   },
   "resources/js/views/starter/AccountConfig.vue": {
-    "file": "assets/AccountConfig-870fa006.js",
+    "file": "assets/AccountConfig-c7101412.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -380,7 +380,7 @@
     "src": "resources/js/views/starter/AccountConfig.vue"
   },
   "resources/js/views/starter/DashboardTenant.vue": {
-    "file": "assets/DashboardTenant-18106075.js",
+    "file": "assets/DashboardTenant-d2fec86c.js",
     "imports": [
       "resources/js/main.js",
       "_timezone-07fff2ce.js"
@@ -389,7 +389,7 @@
     "src": "resources/js/views/starter/DashboardTenant.vue"
   },
   "resources/js/views/starter/LandingView.vue": {
-    "file": "assets/LandingView-5102e28c.js",
+    "file": "assets/LandingView-1527a1b8.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -404,12 +404,12 @@
     "css": [
       "assets/StudentRegisterView-00796ebb.css"
     ],
-    "file": "assets/StudentRegisterView-11d49587.js",
+    "file": "assets/StudentRegisterView-0a207af7.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_Tab6-7f83dd8b.js",
-      "_LoaderView-af8e990e.js"
+      "_ErrorsView-9efdd09e.js",
+      "_Tab6-f6585099.js",
+      "_LoaderView-3ff5fb8e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/starter/StudentRegisterView.vue"
@@ -422,17 +422,17 @@
     "css": [
       "assets/GeneralConfig-4da468df.css"
     ],
-    "file": "assets/GeneralConfig-bacd157c.js",
+    "file": "assets/GeneralConfig-612768c5.js",
     "imports": [
       "resources/js/main.js",
-      "_LoaderView-af8e990e.js",
-      "_vue-select.es-2905954b.js"
+      "_LoaderView-3ff5fb8e.js",
+      "_vue-select.es-6837b2b6.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/GeneralConfig.vue"
   },
   "resources/js/views/tenants/PaymentFailureView.vue": {
-    "file": "assets/PaymentFailureView-af844759.js",
+    "file": "assets/PaymentFailureView-b74ddcf0.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -440,7 +440,7 @@
     "src": "resources/js/views/tenants/PaymentFailureView.vue"
   },
   "resources/js/views/tenants/PaymentPendingView.vue": {
-    "file": "assets/PaymentPendingView-d8eb82e4.js",
+    "file": "assets/PaymentPendingView-0b5d853e.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -448,7 +448,7 @@
     "src": "resources/js/views/tenants/PaymentPendingView.vue"
   },
   "resources/js/views/tenants/PaymentSuccessView.vue": {
-    "file": "assets/PaymentSuccessView-3ebb0b62.js",
+    "file": "assets/PaymentSuccessView-66c3be48.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -456,21 +456,21 @@
     "src": "resources/js/views/tenants/PaymentSuccessView.vue"
   },
   "resources/js/views/tenants/academic-groups/AcademicGroupView.vue": {
-    "file": "assets/AcademicGroupView-ef5bdb5e.js",
+    "file": "assets/AcademicGroupView-1b12c641.js",
     "imports": [
       "resources/js/main.js",
-      "_IndexTenantView-64424ad9.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_IndexTenantView-d10c8820.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/academic-groups/AcademicGroupView.vue"
   },
   "resources/js/views/tenants/assists/AssistDinner.vue": {
-    "file": "assets/AssistDinner-16d67b7c.js",
+    "file": "assets/AssistDinner-68565977.js",
     "imports": [
       "resources/js/main.js",
       "_moment-fbc5633a.js"
@@ -479,7 +479,7 @@
     "src": "resources/js/views/tenants/assists/AssistDinner.vue"
   },
   "resources/js/views/tenants/assists/AssistView.vue": {
-    "file": "assets/AssistView-0c10c30c.js",
+    "file": "assets/AssistView-38323b1b.js",
     "imports": [
       "resources/js/main.js",
       "_moment-fbc5633a.js"
@@ -488,7 +488,7 @@
     "src": "resources/js/views/tenants/assists/AssistView.vue"
   },
   "resources/js/views/tenants/assists/PrintAssist.vue": {
-    "file": "assets/PrintAssist-43fc410e.js",
+    "file": "assets/PrintAssist-09779d26.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -496,7 +496,7 @@
     "src": "resources/js/views/tenants/assists/PrintAssist.vue"
   },
   "resources/js/views/tenants/dinner/IndexView.vue": {
-    "file": "assets/IndexView-e5bf79c8.js",
+    "file": "assets/IndexView-2cfb9847.js",
     "imports": [
       "resources/js/main.js",
       "_moment-fbc5633a.js"
@@ -505,14 +505,14 @@
     "src": "resources/js/views/tenants/dinner/IndexView.vue"
   },
   "resources/js/views/tenants/grades/GradeView.vue": {
-    "file": "assets/GradeView-693d0224.js",
+    "file": "assets/GradeView-cdc81027.js",
     "imports": [
-      "_IndexTenantView-64424ad9.js",
+      "_IndexTenantView-d10c8820.js",
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
@@ -526,17 +526,17 @@
     "css": [
       "assets/GeneralConfig-4da468df.css"
     ],
-    "file": "assets/IncidentReportAdd-684bf03b.js",
+    "file": "assets/IncidentReportAdd-f4c48ead.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-select.es-2905954b.js"
+      "_ErrorsView-9efdd09e.js",
+      "_vue-select.es-6837b2b6.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/incident-reports/IncidentReportAdd.vue"
   },
   "resources/js/views/tenants/incident-reports/IncidentReportIndex.vue": {
-    "file": "assets/IncidentReportIndex-c41e2810.js",
+    "file": "assets/IncidentReportIndex-34c7a7c9.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -544,35 +544,35 @@
     "src": "resources/js/views/tenants/incident-reports/IncidentReportIndex.vue"
   },
   "resources/js/views/tenants/incidents/IncidentView.vue": {
-    "file": "assets/IncidentView-7970b81e.js",
+    "file": "assets/IncidentView-876da73e.js",
     "imports": [
-      "_IndexTenantView-64424ad9.js",
+      "_IndexTenantView-d10c8820.js",
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/incidents/IncidentView.vue"
   },
   "resources/js/views/tenants/payments/PaymentView.vue": {
-    "file": "assets/PaymentView-2496c271.js",
+    "file": "assets/PaymentView-b316da5c.js",
     "imports": [
-      "_IndexTenantView-64424ad9.js",
+      "_IndexTenantView-d10c8820.js",
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/payments/PaymentView.vue"
   },
   "resources/js/views/tenants/reports/AssistsReport.vue": {
-    "file": "assets/AssistsReport-2efc57ab.js",
+    "file": "assets/AssistsReport-5f61e7a2.js",
     "imports": [
       "resources/js/main.js",
       "_timezone-07fff2ce.js"
@@ -581,54 +581,54 @@
     "src": "resources/js/views/tenants/reports/AssistsReport.vue"
   },
   "resources/js/views/tenants/school-cycles/SchoolCycleView.vue": {
-    "file": "assets/SchoolCycleView-232a4fbc.js",
+    "file": "assets/SchoolCycleView-1797c625.js",
     "imports": [
-      "_IndexTenantView-64424ad9.js",
+      "_IndexTenantView-d10c8820.js",
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/school-cycles/SchoolCycleView.vue"
   },
   "resources/js/views/tenants/sections/SectionView.vue": {
-    "file": "assets/SectionView-218d68d5.js",
+    "file": "assets/SectionView-7e27cda5.js",
     "imports": [
-      "_IndexTenantView-64424ad9.js",
+      "_IndexTenantView-d10c8820.js",
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/sections/SectionView.vue"
   },
   "resources/js/views/tenants/specialties/SpecialtyView.vue": {
-    "file": "assets/SpecialtyView-18fde2ae.js",
+    "file": "assets/SpecialtyView-d9cbd1cd.js",
     "imports": [
-      "_IndexTenantView-64424ad9.js",
+      "_IndexTenantView-d10c8820.js",
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/specialties/SpecialtyView.vue"
   },
   "resources/js/views/tenants/students/StudentAdd.vue": {
-    "file": "assets/StudentAdd-6a28a64b.js",
+    "file": "assets/StudentAdd-a13d5bd1.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_Tab6-7f83dd8b.js",
-      "_LoaderView-af8e990e.js"
+      "_ErrorsView-9efdd09e.js",
+      "_Tab6-f6585099.js",
+      "_LoaderView-3ff5fb8e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/students/StudentAdd.vue"
@@ -641,7 +641,7 @@
     "css": [
       "assets/StudentDetail-2b527cda.css"
     ],
-    "file": "assets/StudentDetail-56eed38a.js",
+    "file": "assets/StudentDetail-ec13c69b.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -656,18 +656,18 @@
     "css": [
       "assets/GeneralConfig-4da468df.css"
     ],
-    "file": "assets/StudentEdit-6745be21.js",
+    "file": "assets/StudentEdit-5c61bd8b.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js",
-      "_Tab6-7f83dd8b.js",
-      "_LoaderView-af8e990e.js"
+      "_ErrorsView-9efdd09e.js",
+      "_Tab6-f6585099.js",
+      "_LoaderView-3ff5fb8e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/students/StudentEdit.vue"
   },
   "resources/js/views/tenants/students/StudentIncident.vue": {
-    "file": "assets/StudentIncident-34167a95.js",
+    "file": "assets/StudentIncident-a6688753.js",
     "imports": [
       "resources/js/main.js"
     ],
@@ -675,53 +675,53 @@
     "src": "resources/js/views/tenants/students/StudentIncident.vue"
   },
   "resources/js/views/tenants/students/StudentIndex.vue": {
-    "file": "assets/StudentIndex-57eba7f3.js",
+    "file": "assets/StudentIndex-99a68858.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js"
+      "_ErrorsView-9efdd09e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/students/StudentIndex.vue"
   },
   "resources/js/views/tenants/teachers/TeacherView.vue": {
-    "file": "assets/TeacherView-80b50b76.js",
+    "file": "assets/TeacherView-34d6add9.js",
     "imports": [
       "resources/js/main.js",
-      "_IndexTenantView-64424ad9.js",
-      "_ErrorsView-d8a78f66.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_vue-select.es-2905954b.js",
-      "_map-dfbad8df.js",
+      "_IndexTenantView-d10c8820.js",
+      "_ErrorsView-9efdd09e.js",
+      "_vue-dataset.es-951337d8.js",
+      "_vue-select.es-6837b2b6.js",
+      "_map-d3b0dcc9.js",
       "_moment-fbc5633a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/tenants/teachers/TeacherView.vue"
   },
   "resources/js/views/users/UserAdd.vue": {
-    "file": "assets/UserAdd-9a037166.js",
+    "file": "assets/UserAdd-92a3cd46.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js"
+      "_ErrorsView-9efdd09e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/users/UserAdd.vue"
   },
   "resources/js/views/users/UserEdit.vue": {
-    "file": "assets/UserEdit-7d8cd414.js",
+    "file": "assets/UserEdit-7e8bd351.js",
     "imports": [
       "resources/js/main.js",
-      "_ErrorsView-d8a78f66.js"
+      "_ErrorsView-9efdd09e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/users/UserEdit.vue"
   },
   "resources/js/views/users/UserIndex.vue": {
-    "file": "assets/UserIndex-e493e741.js",
+    "file": "assets/UserIndex-cc7d388f.js",
     "imports": [
-      "_IndexView-94e97970.js",
+      "_IndexView-fad3bd5e.js",
       "resources/js/main.js",
-      "_vue-dataset.es-b58f9352.js",
-      "_moment-with-locales-f82e6e88.js"
+      "_vue-dataset.es-951337d8.js",
+      "_moment-with-locales-d1ad888a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/users/UserIndex.vue"

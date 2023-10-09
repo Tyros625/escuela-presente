@@ -49,7 +49,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => env('PREFIX'),
+        'prefix' => env('DB_DATABASE_PREFIX'),
         'suffix' => '',
 
         /**
@@ -97,7 +97,7 @@ return [
         /**
          * Each disk listed in the 'disks' array will be suffixed by the suffix_base, followed by the tenant_id.
          */
-        'suffix_base' => env('PREFIX'),
+        'suffix_base' => env('DB_DATABASE_PREFIX'),
         'disks' => [
             'local',
             'public',
@@ -146,7 +146,7 @@ return [
      * either using the Redis facade or by injecting it as a dependency.
      */
     'redis' => [
-        'prefix_base' => env('PREFIX'), // Each key in Redis will be prepended by this prefix_base, followed by the tenant id.
+        'prefix_base' => env('DB_DATABASE_PREFIX'), // Each key in Redis will be prepended by this prefix_base, followed by the tenant id.
         'prefixed_connections' => [ // Redis connections whose keys are prefixed, to separate one tenant's keys from another.
             // 'default',
         ],

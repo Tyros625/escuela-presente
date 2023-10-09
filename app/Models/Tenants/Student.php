@@ -208,6 +208,9 @@ class Student extends Model
             $student->health()->delete();
             $student->relative()->delete();
             $student->socioeconomic()->delete();
+            $student->payments()->delete();
+            $student->assists()->delete();
+            $student->incidentReports()->delete();
         });
     }
 
@@ -239,6 +242,21 @@ class Student extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class, 'student_id');
+    }
+
+    public function assists()
+    {
+        return $this->hasMany(Assist::class, 'student_id');
+    }
+
+    public function incidentReports()
+    {
+        return $this->hasMany(IncidentReport::class, 'student_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getAgeAttribute()
