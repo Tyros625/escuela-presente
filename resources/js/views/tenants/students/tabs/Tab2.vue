@@ -3,14 +3,6 @@ import { useStudentStore } from "@/stores/student";
 import options from "@/data/studentOptions";
 
 const studentStore = useStudentStore();
-const route = useRoute();
-
-function searchSection() {
-	let studentsFilter = studentStore.groups.filter(
-		(a) => a.grade === studentStore.form.grade
-	);
-	studentStore.form.academic_group_id = studentsFilter[0].id;
-}
 </script>
 
 <template>
@@ -33,10 +25,7 @@ function searchSection() {
 				<label class="form-label">Grado</label>
 			</div>
 
-			<div
-				class="form-floating mb-4"
-				v-else-if="route.name === 'students.add' || route.name === 'students.edit'"
-			>
+			<div class="form-floating mb-4">
 				<select
 					class="form-select"
 					:class="{
@@ -50,22 +39,6 @@ function searchSection() {
 					</option>
 				</select>
 				<label class="form-label">Grado/Grupo</label>
-			</div>
-			<div class="form-floating mb-4" v-else>
-				<select
-					class="form-select"
-					:class="{
-						'is-invalid': !studentStore.form.grade,
-					}"
-					v-model="studentStore.form.grade"
-					:disabled="studentStore.isLoading"
-					@change="searchSection"
-				>
-					<option v-for="item in studentStore.grades" :value="item.description">
-						{{ `${item.description}` }}
-					</option>
-				</select>
-				<label class="form-label">Grado</label>
 			</div>
 		</div>
 		<!-- <div class="col-md-12">

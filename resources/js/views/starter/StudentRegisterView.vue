@@ -73,42 +73,13 @@ function onTabBeforeChange() {
 
 const errors = ref([]);
 
-const payMP = async () => {
-	const { data } = await api.post(`/payments/preference/${studentStore.paymentType}`, {
-		id: studentStore.studentId,
-	});
-
-	const mp = new MercadoPago(import.meta.env.VITE_MERCADO_PAGO_PUBLIC_KEY, {
-		locale: "es-MX",
-	});
-
-	const checkout = mp.checkout({
-		preference: {
-			id: data,
-		},
-	});
-
-	checkout.open();
-};
-
 const wizardCompleted = async () => {
 	studentStore.isLoading = true;
 
 	try {
-		if (studentStore.paymentType === "NUEVO INGRESO") {
-			const { data } = await api.post(`/payments/save`, studentStore.form);
-			studentStore.studentId = data.id;
-			await payMP();
-			studentStore.isLoading = false;
-		} else {
-			const { data } = await api.post(
-				`/payments/update/${studentStore.paymentType}`,
-				studentStore.form
-			);
-			studentStore.studentId = data.id;
-			await payMP();
-			studentStore.isLoading = false;
-		}
+		const { data } = await api.post(`/students`, studentStore.form);
+		studentStore.studentId = data.id;
+		studentStore.isLoading = false;
 	} catch (error) {
 		errors.value = [];
 		studentStore.isLoading = false;

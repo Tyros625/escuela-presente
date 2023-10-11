@@ -97,6 +97,8 @@ Route::prefix('api')->middleware([
         Route::get('students/assists/{id}', [AssistAPIController::class, 'id']);
         Route::get('students/incidents/{id}', [IncidentReportAPIController::class, 'id']);
 
+        Route::post('students', [StudentAPIController::class, 'store']);
+
         Route::middleware('auth:api')->group(function () {
             Route::post('logout', [TenantLoginController::class, 'logout']);
             Route::get('dashboard', [DashboardAPIController::class, 'index']);
@@ -106,7 +108,6 @@ Route::prefix('api')->middleware([
 
             //Students
             Route::get('students', [StudentAPIController::class, 'index']);
-            Route::post('students', [StudentAPIController::class, 'store']);
             Route::get('students/{enrollment}', [StudentAPIController::class, 'show']);
             Route::put('students/{enrollment}', [StudentAPIController::class, 'update']);
             Route::delete('students/{enrollment}', [StudentAPIController::class, 'destroy']);
