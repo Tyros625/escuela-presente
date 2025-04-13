@@ -1,1 +1,0 @@
-const o=t=>{let a=new Date().toLocaleString("en-US",{timeZone:t}),e=new Date(a),l=e.getFullYear(),n=("0"+(e.getMonth()+1)).slice(-2),c=("0"+e.getDate()).slice(-2);return l+"-"+n+"-"+c};export{o as c};
