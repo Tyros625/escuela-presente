@@ -3,33 +3,47 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import fs from "fs";
 import os from "os";
+import path from 'path'
 import laravel from "laravel-vite-plugin";
 import vue from "@vitejs/plugin-vue";
 
 function configureHttps(host) {
-  if (host && host.includes("test") && os.platform() === "win32") {
+  if (os.platform() === 'win32' && host.includes('test')) {
     return {
-      key: fs.readFileSync("C:/laragon/etc/ssl/laragon.key"),
-      cert: fs.readFileSync("C:/laragon/etc/ssl/laragon.crt"),
-    };
+      key: fs.readFileSync('C:/laragon/etc/ssl/laragon.key'),
+      cert: fs.readFileSync('C:/laragon/etc/ssl/laragon.crt')
+    }
   }
-  return true;
+
+  if (os.platform() === 'darwin') {
+    const certBase = path.join(
+      os.homedir(),
+      'Library/Application Support/Herd/config/valet/Certificates',
+      host
+    )
+
+    return {
+      key: fs.readFileSync(`${certBase}.key`),
+      cert: fs.readFileSync(`${certBase}.crt`)
+    }
+  }
+
+  return true // fallback: let Vite decide
 }
 
 export default defineConfig(({ command, mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
-  const host = env.APP_URL_BASE;
-  const https = configureHttps(host);
+  const env = loadEnv(mode, process.cwd(), '')
+  const host = env.APP_URL_BASE || 'localhost'
 
   const serverOptions = {
     host,
-    https,
+    https: configureHttps(host),
+    cors: true,
     hmr: {
       host,
-      overlay: true,
-    },
-    cors: true,
-  };
+      overlay: true
+    }
+  }
 
   const laravelPluginOptions = {
     input: "resources/js/main.js",
