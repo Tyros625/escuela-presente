@@ -140,7 +140,7 @@ class StudentAPIController extends AppBaseController
         if ($file = $request->file('file')) {
             $name = $file->getClientOriginalName();
 
-            $import = new StudentImport();
+            $import = new StudentImport;
             $import->import($file);
 
             return new JsonResponse(

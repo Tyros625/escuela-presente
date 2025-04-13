@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             'password' => '123456',
         ]);
 
-        //$this->createTenant();
+        // $this->createTenant();
     }
 
     protected function createTenant()

@@ -31,9 +31,9 @@ class IncidentReportAPIController extends AppBaseController
     public function store(CreateIncidentReportAPIRequest $request): JsonResponse
     {
         $input = $request->all();
-        //$photo = $request->file('photo');
-        //$path = Helper::saveFileInLocal($photo, 'reports');
-        //$input['photo'] = $path;
+        // $photo = $request->file('photo');
+        // $path = Helper::saveFileInLocal($photo, 'reports');
+        // $input['photo'] = $path;
 
         $incidentReport = IncidentReport::create($input);
 

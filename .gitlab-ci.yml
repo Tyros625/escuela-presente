@@ -1,0 +1,30 @@
+deploy_main:
+  image: ubuntu
+  stage: deploy
+  script:
+    - "which sshpass || (apt-get update -y && apt-get install sshpass -y)"
+    - mkdir -p ~/.ssh
+    - ssh-keyscan ${SERVER_IP} >> ~/.ssh/known_hosts
+    - set -x
+    - |
+      sshpass -p "${SERVER_PASSWORD}" ssh ${SERVER_USER}@${SERVER_IP} "
+        cd /var/www/escuela-presente &&
+        git config --global --add safe.directory /var/www/escuela-presente &&
+        php artisan down || true &&
+        git reset --hard &&
+        git clean -fd &&
+        git pull origin main &&
+        composer install --no-interaction --prefer-dist --optimize-autoloader &&
+        npm ci --legacy-peer-deps &&
+        npm run build &&
+        php artisan migrate --force &&
+        php artisan optimize:clear &&
+        php artisan up &&
+        chown -R www-data:www-data . &&
+        echo '✅ ¡Despliegue completado correctamente!'
+      "
+  only:
+    - main
+
+stages:
+  - deploy

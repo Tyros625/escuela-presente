@@ -13,8 +13,8 @@ class DefaultTenantsSeeder extends Seeder
 {
     public function run()
     {
-        //$this->createDefaultUsers();
-        //$this->createMoreData();
+        // $this->createDefaultUsers();
+        // $this->createMoreData();
         $this->schoolData();
     }
 

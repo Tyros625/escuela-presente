@@ -36,7 +36,7 @@ class Role extends RoleBase
     public function getAclAttribute()
     {
         return [
-            //'show' => auth()->user()->can(self::P_READ),
+            // 'show' => auth()->user()->can(self::P_READ),
             'update' => auth()->user()->can(self::P_UPDATE),
             'delete' => auth()->user()->can(self::P_DELETE),
         ];

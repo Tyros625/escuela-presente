@@ -84,7 +84,7 @@ class TeacherAPIController extends AppBaseController
         if ($file = $request->file('file')) {
             $name = $file->getClientOriginalName();
 
-            $import = new TeacherImport();
+            $import = new TeacherImport;
             $import->import($file);
 
             return response()->json(

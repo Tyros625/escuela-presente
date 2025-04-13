@@ -71,27 +71,27 @@ Route::prefix('api')->middleware([
         Route::post('register', [TenantLoginController::class, 'register']);
         Route::put('change-password', [TenantLoginController::class, 'changePassword']);
 
-        //Payments
+        // Payments
         Route::get('payments', [PaymentAPIController::class, 'index']);
         Route::post('payments/save', [PaymentAPIController::class, 'store']);
         Route::post('payments/update/{type}', [PaymentAPIController::class, 'update']);
         Route::delete('payments/{id}', [PaymentAPIController::class, 'destroy']);
         Route::get('payments/export', [PaymentAPIController::class, 'export']);
 
-        //MercadoPago
+        // MercadoPago
         Route::post('payments/preference/{type}', [PaymentAPIController::class, 'preferenceMP']);
         Route::post('payments/ipn', [PaymentAPIController::class, 'ipn']);
         Route::post('payments/webhook', [PaymentAPIController::class, 'ipn']);
         Route::post('payments/update', [PaymentAPIController::class, 'updatePayment']);
 
-        //Lists
+        // Lists
         Route::get('lists/{type}', [SelectListController::class, 'index']);
         Route::get('lists/{type}/{id}', [SelectListController::class, 'show']);
 
-        //Upload
+        // Upload
         Route::post('upload-file', [FileController::class, 'uploadFile']);
 
-        //APP APIS
+        // APP APIS
         Route::get('students/by-curp/{curp}', [StudentAPIController::class, 'curp']);
         Route::get('students/by-id/{id}', [StudentAPIController::class, 'id']);
         Route::get('students/assists/{id}', [AssistAPIController::class, 'id']);
@@ -103,28 +103,28 @@ Route::prefix('api')->middleware([
             Route::post('logout', [TenantLoginController::class, 'logout']);
             Route::get('dashboard', [DashboardAPIController::class, 'index']);
 
-            //Users
+            // Users
             Route::apiResource('users', UserAPIController::class);
 
-            //Students
+            // Students
             Route::get('students', [StudentAPIController::class, 'index']);
             Route::get('students/{enrollment}', [StudentAPIController::class, 'show']);
             Route::put('students/{enrollment}', [StudentAPIController::class, 'update']);
             Route::delete('students/{enrollment}', [StudentAPIController::class, 'destroy']);
             Route::post('students/import', [StudentAPIController::class, 'import']);
 
-            //Balances
+            // Balances
             Route::get('balances', [BalancesAPIController::class, 'index']);
             Route::post('balances', [BalancesAPIController::class, 'store']);
             Route::get('balances/{enrollment}', [BalancesAPIController::class, 'show']);
 
-            //Assists
+            // Assists
             Route::get('assists', [AssistAPIController::class, 'index']);
             Route::post('assists/{enrollment}', [AssistAPIController::class, 'store']);
             Route::get('assists/{enrollment}', [AssistAPIController::class, 'show']);
             Route::post('assists/export/pdf', [AssistAPIController::class, 'exportPDF']);
 
-            //Incidents
+            // Incidents
             Route::get('incident-reports', [IncidentReportAPIController::class, 'index']);
             Route::post('incident-reports', [IncidentReportAPIController::class, 'store']);
             Route::get('incident-reports/{enrollment}', [IncidentReportAPIController::class, 'show']);
@@ -136,7 +136,7 @@ Route::prefix('api')->middleware([
             Route::apiResource('academic-groups', AcademicGroupAPIController::class);
             Route::apiResource('payment-prices', PaymentPriceAPIController::class);
 
-            //Teachers
+            // Teachers
             Route::apiResource('teachers', TeacherAPIController::class);
             Route::post('teachers/import', [TeacherAPIController::class, 'import']);
 
@@ -144,16 +144,16 @@ Route::prefix('api')->middleware([
 
             Route::apiResource('incidents', IncidentAPIController::class);
 
-            //Roles
+            // Roles
             Route::apiResource('roles', RoleController::class);
             Route::patch('roles/{role}/permissions', [RoleController::class, 'updatePermissions']);
             Route::get('roles/{role}/users', [RoleController::class, 'userList']);
 
-            //Account Configuration
+            // Account Configuration
             Route::get('account-configuration/{user}', [AccountConfigurationController::class, 'index']);
             Route::post('account-configuration/{user}', [AccountConfigurationController::class, 'update']);
 
-            //General Configuration
+            // General Configuration
             Route::get('general-configuration', [GeneralConfigurationController::class, 'index']);
             Route::post('general-configuration', [GeneralConfigurationController::class, 'update']);
         });
@@ -205,7 +205,7 @@ Route::prefix('api')->middleware([
                         ->with('grade', 'section', 'schoolCycle')
                         ->first();
 
-                    //$student->academic_group_id = $grade->
+                    // $student->academic_group_id = $grade->
                     $student->academic->grade = $grade->description;
                     $student->academic->save();
                 });

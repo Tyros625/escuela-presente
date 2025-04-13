@@ -30,7 +30,7 @@ class TenantController extends AppBaseController
         ]);
 
         $tenant->createDomain(['domain' => $input['domain']]);
-        //$this->createWebhookConekta($input['domain']);
+        // $this->createWebhookConekta($input['domain']);
 
         return response()->json($tenant);
     }

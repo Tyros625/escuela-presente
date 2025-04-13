@@ -73,7 +73,7 @@ class FileController extends Controller
     {
         $uploadedFileUrl = Cloudinary::uploadFile($file->getRealPath())->getSecurePath();
 
-        $upload = new File();
+        $upload = new File;
         $upload->name = $file->getClientOriginalName();
         $upload->path = $uploadedFileUrl;
         $upload->user_id = Auth::id();
@@ -90,7 +90,7 @@ class FileController extends Controller
     {
         $path = Helper::saveFileInLocal($file, 'photos');
 
-        $upload = new File();
+        $upload = new File;
         $upload->name = $file->getClientOriginalName();
         $upload->path = $path;
         $upload->user_id = Auth::id();

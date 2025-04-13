@@ -61,7 +61,7 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
 
     public function prepareForValidation($data)
     {
-        //dd($data);
+        // dd($data);
 
         $data['nombres'] = Helper::unaccent($data['nombres']);
         $data['apellidos'] = Helper::unaccent($data['apellidos']);
@@ -72,7 +72,7 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
         $data['direccion'] = Helper::unaccent($data['direccion']);
         $data['especialidad'] = Helper::unaccent($data['especialidad']);
 
-        //dd($data);
+        // dd($data);
 
         return $data;
     }

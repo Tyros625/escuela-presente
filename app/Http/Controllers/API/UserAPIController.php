@@ -35,7 +35,7 @@ class UserAPIController extends Controller
 
     public function store(UserRequest $request)
     {
-        $user = new User();
+        $user = new User;
         $user->fill($request->all());
         $roles = Role::find($request['role_id']);
         $user->save();

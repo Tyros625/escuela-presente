@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return 'API SCHOOL';
+    return 'API ESCUELA PRESENTE';
 });
 
 Route::post('login', [CentralLoginController::class, 'login']);

@@ -56,10 +56,10 @@ class PaymentAPIController extends AppBaseController
                 break;
         }
 
-        $order = new MercadoPagoPayment();
+        $order = new MercadoPagoPayment;
         $id = $order->createPreference($item);
 
-        $payment = new Payment();
+        $payment = new Payment;
         $payment->preference_id = $id;
         $payment->status = 'pending';
         $payment->student_id = $request->id;
@@ -87,7 +87,7 @@ class PaymentAPIController extends AppBaseController
             'email' => $request->email,
         ];
 
-        $order = new MercadoPagoPayment();
+        $order = new MercadoPagoPayment;
         $customer = $order->createCustomer($customer);
 
         $mailData = [
@@ -100,7 +100,7 @@ class PaymentAPIController extends AppBaseController
         DB::beginTransaction();
         try {
             if (isset($customer)) {
-                //Create and Register Student
+                // Create and Register Student
                 $student = Student::create($request->all());
                 $student->academic()->create($request->academic);
                 $student->relative()->create($request->relatives);
@@ -159,7 +159,7 @@ class PaymentAPIController extends AppBaseController
         ];
 
         if (! isset($student->mercado_pago_id)) {
-            $order = new MercadoPagoPayment();
+            $order = new MercadoPagoPayment;
             $customer = $order->createCustomer($customer);
 
             $student->mercado_pago_id = $customer->id;

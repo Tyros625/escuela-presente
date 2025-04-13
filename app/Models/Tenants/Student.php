@@ -94,7 +94,7 @@ class Student extends Model
         'last_name_mother' => 'required|string',
         'nationality' => 'required|string',
         'curp' => 'required|string|size:18|unique:students',
-        //'curp' => 'required|string|size:18|unique:students,curp,' . $this->id,
+        // 'curp' => 'required|string|size:18|unique:students,curp,' . $this->id,
         'date_birth' => 'required',
         'place_birth' => 'required|string',
         'sex' => 'required|string',
@@ -271,7 +271,7 @@ class Student extends Model
             ->format('%y years, %m months and %d days');
     }
 
-    //Querys
+    // Querys
     public static function actives()
     {
         return Student::where('active', true)->get();
@@ -282,7 +282,7 @@ class Student extends Model
         return Student::withoutGlobalScope('active');
     }
 
-    //Scopes
+    // Scopes
     public function scopeActive($query)
     {
         return $query->where('active', true);
