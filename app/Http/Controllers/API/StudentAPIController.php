@@ -14,6 +14,7 @@ use App\Notifications\NewRegisteredStudentNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class StudentAPIController extends AppBaseController
@@ -40,38 +41,39 @@ class StudentAPIController extends AppBaseController
     {
         $config = GeneralConfiguration::first();
 
-        if ($config->plan['name'] === 'Gratis' && Student::count() > $config->plan['limit']) {
-            return response()->json([
-                'success' => true,
-                'message' => "Llegó al límite de {$config->plan['limit']} alumnos registrados.",
-            ], 200);
+        // Validación de límite de plan gratuito
+        if ($config->plan['name'] === 'Gratis' && Student::count() >= $config->plan['limit']) {
+            return $this->sendError("Llegó al límite de {$config->plan['limit']} alumnos registrados.");
         }
 
         DB::beginTransaction();
 
         try {
-            $student = Student::create($request->all());
-            $student->academic()->create($request->academic);
-            $student->relative()->create($request->relatives);
-            $student->socioeconomic()->create($request->socioeconomics);
-            $student->health()->create($request->healths);
-            $config = GeneralConfiguration::first();
-            $config->last_enrollment = intval($config->last_enrollment) + 1;
-            $config->update();
+            // Crear estudiante y sus relaciones
+            $student = Student::create($request->validated());
+
+            $student->academic()->create($request->input('academic'));
+            $student->relative()->create($request->input('relatives'));
+            $student->socioeconomic()->create($request->input('socioeconomics'));
+            $student->health()->create($request->input('healths'));
+
+            // Actualizar correlativo de matrícula
+            $config->increment('last_enrollment');
 
             DB::commit();
 
-            $user = User::find(1);
-            $user->notify(new NewRegisteredStudentNotification($student));
+            // Notificar al usuario (hardcoded por ahora)
+            User::find(1)?->notify(new NewRegisteredStudentNotification($student));
 
             return $this->sendResponse(
                 new StudentResource($student),
                 'Student saved successfully'
             );
-        } catch (\Exception $e) {
-            DB::rollback();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error al registrar estudiante', ['error' => $e->getMessage()]);
 
-            return $e->getMessage();
+            return $this->sendError('Ocurrió un error al registrar al estudiante.');
         }
     }
 

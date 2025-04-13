@@ -9,7 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('students', function (Blueprint $table) {
-            $table->boolean('active')->default(false)->after('photo');
+            $table->boolean('active')->default(true)->after('photo');
         });
     }
 

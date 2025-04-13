@@ -75,20 +75,26 @@ const errors = ref([]);
 
 const wizardCompleted = async () => {
 	studentStore.isLoading = true;
+	errors.value = [];
 
 	try {
 		const { data } = await api.post(`/students`, studentStore.form);
 		studentStore.studentId = data.id;
-		studentStore.isLoading = false;
-	} catch (error) {
-		errors.value = [];
-		studentStore.isLoading = false;
 
-		Object.getOwnPropertyNames(error.data.errors).forEach(function (val) {
-			error.data.errors[val].forEach((element) => {
-				errors.value.push(element);
-			});
+		Toast.fire('success', 'Registro completado correctamente.');
+	} catch (error) {
+		const validationErrors = error?.data?.errors ?? {};
+
+		for (const field in validationErrors) {
+			errors.value.push(...validationErrors[field]);
+		}
+
+		Toast.fire({
+			icon: 'error',
+			title: 'Ocurrió un error al registrar',
 		});
+	} finally {
+		studentStore.isLoading = false;
 	}
 };
 

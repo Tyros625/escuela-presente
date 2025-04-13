@@ -8,6 +8,9 @@ use App\Scopes\ActiveScope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Request;
 
@@ -214,57 +217,57 @@ class Student extends Model
         });
     }
 
-    public function academic()
+    public function academic(): HasOne
     {
         return $this->hasOne(StudentAcademic::class);
     }
 
-    public function health()
+    public function health(): HasOne
     {
         return $this->hasOne(StudentHealth::class);
     }
 
-    public function relative()
+    public function relative(): HasOne
     {
         return $this->hasOne(StudentRelative::class);
     }
 
-    public function socioeconomic()
+    public function socioeconomic(): HasOne
     {
         return $this->hasOne(StudentSocioeconomic::class);
     }
 
-    public function academicGroup()
+    public function academicGroup(): BelongsTo
     {
         return $this->belongsTo(AcademicGroup::class, 'academic_group_id');
     }
 
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class, 'student_id');
     }
 
-    public function assists()
+    public function assists(): HasMany
     {
         return $this->hasMany(Assist::class, 'student_id');
     }
 
-    public function incidentReports()
+    public function incidentReports(): HasMany
     {
         return $this->hasMany(IncidentReport::class, 'student_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function getAgeAttribute()
+    public function getAgeAttribute(): int
     {
         return Carbon::parse($this->date_birth)->age;
     }
 
-    public function getAgeDiffAttribute()
+    public function getAgeDiffAttribute(): string
     {
         return Carbon::parse($this->date_birth)
             ->diff(Carbon::now())
@@ -277,37 +280,37 @@ class Student extends Model
         return Student::where('active', true)->get();
     }
 
-    public static function inactives()
+    public static function inactives(): Student
     {
         return Student::withoutGlobalScope('active');
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopeActive($query): mixed
     {
         return $query->where('active', true);
     }
 
-    public function scopeInactive($query)
+    public function scopeInactive($query): mixed
     {
         return $query->where('active', false);
     }
 
-    public function scopeGrade($query, $grade)
+    public function scopeGrade($query, $grade): mixed
     {
         return $query->whereHas('academicGroup.grade', function ($q) use ($grade) {
             $q->where('description', $grade);
         });
     }
 
-    public function scopeGroup($query, $group)
+    public function scopeGroup($query, $group): mixed
     {
         return $query->whereHas('academicGroup.section', function ($q) use ($group) {
             $q->where('description', $group);
         });
     }
 
-    public function scopeName($query, $name)
+    public function scopeName($query, $name): mixed
     {
         return $query->where('name', 'like', '%'.$name.'%')
             ->orWhere('last_name_father', 'like', '%'.$name.'%')
