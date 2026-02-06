@@ -23,12 +23,12 @@ const Error503 = () => import("@/views/errors/503View.vue");
 
 const requireAuth = async (to, from, next) => {
   const centralStore = useCentralStore();
-  let isAuth = centralStore.isLoggedIn;
+  const isAuth = centralStore.isLoggedIn;
 
   if (!isAuth) {
-    next("/login");
+    next({ name: "login" });
+    return;
   }
-
   next();
 };
 

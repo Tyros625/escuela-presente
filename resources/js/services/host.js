@@ -1,5 +1,14 @@
 export const isSubdomain = () => {
   let url = window.location.host;
+  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  // Local development: only "localhost" or "127.0.0.1" (no subdomain) = central app
+  // So "secundaria87.localhost" or "secundaria87.localhost:8000" = tenant app
+  if ((hostname === "localhost" || hostname === "127.0.0.1") && !hostname.includes(".")) {
+    return false;
+  }
+  if (url === "localhost" || url === "127.0.0.1" || url.startsWith("127.0.0.1:") || url.startsWith("localhost:")) {
+    return false;
+  }
   // IF THERE, REMOVE WHITE SPACE FROM BOTH ENDS
   url = url.replace(new RegExp(/^\s+/), ""); // START
   url = url.replace(new RegExp(/\s+$/), ""); // END
@@ -22,6 +31,11 @@ export const isSubdomain = () => {
     // REMOVES '.??' or '.???' or '.????' FROM END - e.g. '.US', '.COM', '.INFO', '.ONLINE'
   } else if (url.match(new RegExp(/\.[a-z]{2,6}$/i))) {
     url = url.replace(new RegExp(/\.[a-z]{2,6}$/i), "");
+  }
+
+  // IP address (e.g. 127.0.0.1): not a subdomain
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(url)) {
+    return false;
   }
 
   // CHECK TO SEE IF THERE IS A DOT '.' LEFT IN THE STRING

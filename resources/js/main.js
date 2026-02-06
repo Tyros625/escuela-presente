@@ -22,6 +22,12 @@ window.bootstrap = bootstrap;
 // Craft new application
 const app = createApp(App);
 
+// Log errors in console to debug white screen
+app.config.errorHandler = (err, instance, info) => {
+  console.error("Vue Error:", err);
+  console.error("Info:", info);
+};
+
 // Register global components
 app.component("BaseBlock", BaseBlock);
 app.component("BaseBackground", BaseBackground);
@@ -34,14 +40,18 @@ app.directive("uppercase", (el) => {
 });
 app.directive("user-can", {
   mounted(el, binding) {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const permissions = JSON.parse(localStorage.getItem("permissions"));
-    const { value } = binding;
-
-    if (user.role === "Super Admin" || permissions.includes(value)) {
+    let user, permissions;
+    try {
+      user = JSON.parse(localStorage.getItem("user") || "null");
+      permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+    } catch (_) {
       return;
     }
-
+    if (!user || !user.role) return;
+    const { value } = binding;
+    if (user.role === "Super Admin" || (Array.isArray(permissions) && permissions.includes(value))) {
+      return;
+    }
     el.parentNode && el.parentNode.removeChild(el);
   },
 });
