@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Controllers\TenantController;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterTenantRequest extends FormRequest
@@ -16,9 +17,9 @@ class RegisterTenantRequest extends FormRequest
         return [
             'domain' => 'required|string|max:255|unique:domains',
             'school_name' => 'required|string|max:255',
-            'cct' => 'required|string||size:10',
+            'cct' => 'required|string|size:10',
             'email' => 'required|email|max:255|indisposable',
-            'password' => 'string|confirmed|min:6|max:200',
+            'password' => 'required|string|confirmed|min:6|max:200',
             'country_code' => 'required',
             'phone' => 'required',
         ];
@@ -26,8 +27,24 @@ class RegisterTenantRequest extends FormRequest
 
     public function prepareForValidation()
     {
-        $this->merge([
-            'domain' => $this->domain.'.'.config('tenancy.central_domains')[0],
-        ]);
+        $baseDomain = config('tenancy.central_domains')[0] ?? 'localhost';
+        $subdomain = $this->extractSubdomain($this->domain ?? '');
+        $domain = $subdomain ? $subdomain . '.' . $baseDomain : $this->domain;
+
+        $this->merge(['domain' => $domain]);
+    }
+
+    /**
+     * Extract subdomain from input. Accepts:
+     * - "hikaru" -> "hikaru"
+     * - "hikaru.localhost" -> "hikaru"
+     * - "https://hikaru.localhost:8000" -> "hikaru"
+     */
+    protected function extractSubdomain(string $input): string
+    {
+        $host = TenantController::normalizeDomainForTenancy($input);
+        $parts = explode('.', $host);
+
+        return strtolower(trim($parts[0] ?? $host)) ?: $host;
     }
 }

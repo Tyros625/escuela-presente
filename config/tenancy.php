@@ -16,7 +16,7 @@ return [
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
     'central_domains' => [
-        env('APP_URL_BASE'),
+        env('APP_URL_BASE', 'localhost'),
         '127.0.0.1',
         'localhost',
     ],

@@ -87,6 +87,7 @@ const formSchema = [
     label: "Nombre Dominio",
     model: "domain",
     class: "col-md-12",
+    placeholder: "hikaru (subdomain only; local: hikaru.localhost)",
   },
   {
     type: "input",

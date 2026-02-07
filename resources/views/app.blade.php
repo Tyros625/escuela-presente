@@ -25,7 +25,11 @@
             to continue.</strong>
     </noscript>
 
-    <div id="app"></div>
+    <div id="app">
+        <div style="padding: 2rem; text-align: center; font-family: system-ui, sans-serif; color: #64748b;">
+            Cargando Escuela Presente…
+        </div>
+    </div>
 
     @vite('resources/js/main.js')
 </body>

@@ -8,6 +8,10 @@ import laravel from "laravel-vite-plugin";
 import vue from "@vitejs/plugin-vue";
 
 function configureHttps(host) {
+  // Windows + localhost: use http to avoid ERR_CONNECTION_REFUSED
+  if (os.platform() === 'win32' && (host === 'localhost' || host === '127.0.0.1')) {
+    return false;
+  }
   if (os.platform() === 'win32' && host.includes('test')) {
     return {
       key: fs.readFileSync('C:/laragon/etc/ssl/laragon.key'),

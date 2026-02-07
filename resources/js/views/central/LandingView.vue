@@ -11,6 +11,7 @@ const initialForm = {
   domain: "",
   email: null,
   password: null,
+  password_confirmation: null,
   country_code: 52,
   phone: null,
 };
@@ -72,158 +73,139 @@ const slugify = (str) =>
 
 <template>
   <div>
-    <div id="one-vue-versions" class="bg-body-light">
-      <div class="content content-full">
-        <div class="py-5">
-          <div class="row mb-5">
-            <div class="col-md-12 text-center">
-              <h2 class="h1 fw-bold mb-2">
-                Sistema de Administración de Escuelas en la nube
-              </h2>
-              <p class="fs-lg fw-medium text-muted mb-0">
-                Crea una cuenta gratis en el siguiente formulario
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <BaseBlock transparent class="bg-flat-lighter">
-              <form @submit.prevent="onSubmit">
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="form-floating mb-4">
-                      <input
-                        type="text"
-                        class="form-control"
-                        :class="{
-                          'is-invalid': !form.cct,
-                        }"
-                        v-model="form.cct"
-                      />
-                      <label>CCT</label>
-                    </div>
+    <!-- Full-screen hero with background + registration form on side -->
+    <div class="central-landing-hero">
+      <div class="central-landing-hero__overlay"></div>
+      <div class="central-landing-hero__content">
+        <div class="central-landing-hero__container">
+          <div class="row align-items-center g-4 py-5">
+          <!-- Left: registration form card -->
+          <div class="col-lg-5 col-xl-4">
+            <div class="central-landing-form-card">
+              <div class="central-landing-form-card__header">
+                <h2 class="central-landing-form-card__title">Crear cuenta gratuita</h2>
+                <p class="central-landing-form-card__subtitle">Complete los datos de su institución</p>
+              </div>
+              <div class="central-landing-form-card__body">
+                <form @submit.prevent="onSubmit" class="central-landing-form">
+                  <div class="form-floating central-landing-form__field">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid': !form.cct }"
+                      v-model="form.cct"
+                      placeholder=" "
+                    />
+                    <label>CCT</label>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-floating mb-4">
-                      <input
-                        type="text"
-                        class="form-control"
-                        :class="{
-                          'is-invalid': !form.school_name,
-                        }"
-                        v-model="form.school_name"
-                      />
-                      <label>¿Cómo se llama su colegio?</label>
-                    </div>
+                  <div class="form-floating central-landing-form__field">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid': !form.school_name }"
+                      v-model="form.school_name"
+                      placeholder=" "
+                    />
+                    <label>¿Cómo se llama su colegio?</label>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-floating mb-4">
-                      <input
-                        type="text"
-                        class="form-control"
-                        :class="{
-                          'is-invalid': !domain,
-                        }"
-                        v-model="domain"
-                        readonly
-                      />
-                      <label>Su dominio será:</label>
-                    </div>
+                  <div class="form-floating central-landing-form__field">
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{ 'is-invalid': !domain }"
+                      v-model="domain"
+                      readonly
+                      placeholder=" "
+                    />
+                    <label>Su dominio será:</label>
                   </div>
-                  <div class="col-md-12">
-                    <div class="form-floating mb-4">
-                      <input
-                        type="email"
-                        class="form-control"
-                        :class="{
-                          'is-invalid': !form.email,
-                        }"
-                        v-model="form.email"
-                      />
-                      <label>Correo Electrónico</label>
-                    </div>
+                  <div class="form-floating central-landing-form__field">
+                    <input
+                      type="email"
+                      class="form-control"
+                      :class="{ 'is-invalid': !form.email }"
+                      v-model="form.email"
+                      placeholder=" "
+                    />
+                    <label>Correo Electrónico</label>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-floating mb-4">
+                  <div class="central-landing-form__row">
+                    <div class="form-floating central-landing-form__field">
                       <input
                         type="password"
                         class="form-control"
-                        :class="{
-                          'is-invalid': !form.password,
-                        }"
+                        :class="{ 'is-invalid': !form.password }"
                         v-model="form.password"
+                        placeholder=" "
                       />
                       <label>Contraseña</label>
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-floating mb-4">
+                    <div class="form-floating central-landing-form__field">
                       <input
                         type="password"
                         class="form-control"
-                        :class="{
-                          'is-invalid': !form.password_confirmation,
-                        }"
+                        :class="{ 'is-invalid': !form.password_confirmation }"
                         v-model="form.password_confirmation"
+                        placeholder=" "
                       />
-                      <label>Confirma Contraseña</label>
+                      <label>Confirmar</label>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-floating mb-4">
-                      <select
-                        class="form-select"
-                        :class="{
-                          'is-invalid': !form.country_code,
-                        }"
-                        v-model="form.country_code"
-                      >
-                        <option v-for="item in options" :value="item.value">
-                          {{ `(+${item.value}) ${item.label}` }}
-                        </option>
-                      </select>
-                      <label>Código</label>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-floating mb-4">
-                      <input
-                        type="number"
-                        class="form-control"
-                        :class="{
-                          'is-invalid': !form.phone,
-                        }"
-                        v-model="form.phone"
-                      />
-                      <label>Número de WhatsApp</label>
-                    </div>
-                  </div>
-                  <div class="col-md-12 text-center mb-4">
-                    <button
-                      type="submit"
-                      class="btn btn-outline-primary"
-                      :disabled="
-                        !form.cct &&
-                        !form.school_name &&
-                        !form.email &&
-                        !form.password &&
-                        !form.phone
-                      "
+                  <div class="form-floating central-landing-form__field">
+                    <select
+                      class="form-select"
+                      :class="{ 'is-invalid': !form.country_code }"
+                      v-model="form.country_code"
                     >
-                      Crear Cuenta Gratuita
-                    </button>
+                      <option v-for="item in options" :key="item.value" :value="item.value">
+                        {{ `(+${item.value}) ${item.label}` }}
+                      </option>
+                    </select>
+                    <label>País/Country</label>
                   </div>
-                </div>
-              </form>
-            </BaseBlock>
-          </div>
-          <div class="col-md-6">
-            <BaseBlock transparent class="bg-danger-light">
-              <div class="py-4 py-md-7 text-center">
-                <i class="fab fa-fw fa-5x fa-laravel text-city"></i>
+                  <div class="form-floating central-landing-form__field">
+                    <input
+                      type="tel"
+                      class="form-control"
+                      :class="{ 'is-invalid': !form.phone }"
+                      v-model="form.phone"
+                      placeholder=" "
+                    />
+                    <label>Número de WhatsApp</label>
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn central-landing-form__submit"
+                    :disabled="
+                      !form.cct ||
+                      !form.school_name ||
+                      !form.email ||
+                      !form.password ||
+                      !form.phone
+                    "
+                  >
+                    <i class="fa-solid fa-user-plus me-2"></i>
+                    Crear Cuenta Gratuita
+                  </button>
+                </form>
               </div>
-            </BaseBlock>
+            </div>
+          </div>
+          <!-- Right: hero text -->
+          <div class="col-lg-6 col-xl-6 offset-lg-1 offset-xl-1 central-landing-hero__text">
+            <div class="text-center text-lg-start hero-text-offset">
+              <div class="central-landing-hero__badge mb-3">
+                <i class="fa-solid fa-cloud me-2"></i>
+                <span>Multi-tenant platform</span>
+              </div>
+              <h1 class="central-landing-hero__title mb-3">
+                Cloud-based School Management System
+              </h1>
+              <p class="central-landing-hero__subtitle mb-0">
+                Create a free account and manage your educational institution securely.
+              </p>
+            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -1375,3 +1357,448 @@ const slugify = (str) =>
     <!-- END Footer -->
   </div>
 </template>
+
+<style scoped>
+.central-landing-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-image: url("/assets/fonts/image/landing-back.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.central-landing-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.88) 0%,
+    rgba(30, 41, 59, 0.15) 45%,
+    rgba(30, 41, 59, 0.15) 55%,
+    rgba(15, 23, 42, 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.central-landing-hero__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.central-landing-hero__container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.central-landing-hero__text {
+  color: #fff;
+}
+
+.hero-text-offset {
+  transform: translateX(0);
+}
+
+.central-landing-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.central-landing-hero__title {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+}
+
+.central-landing-hero__subtitle {
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.65;
+  max-width: 100%;
+  margin: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Compact form card on the side */
+.central-landing-form-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.central-landing-form-card__header {
+  padding: 1.25rem 1.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.central-landing-form-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.central-landing-form-card__subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.central-landing-form-card__body {
+  padding: 1.25rem 1.75rem 1.5rem;
+}
+
+.central-landing-form__field {
+  margin-bottom: 0.85rem;
+}
+
+.central-landing-form__field .form-control,
+.central-landing-form__field .form-select {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  padding: 1.5rem 0.875rem 0.5rem;
+  min-height: 3.5rem;
+  color: #1e293b;
+}
+
+.central-landing-form__field label {
+  font-size: 0.75rem;
+  padding: 0.875rem 0.875rem;
+  color: rgba(30, 41, 59, 0.7);
+  line-height: 1.2;
+}
+
+.central-landing-form__field .form-floating > label {
+  transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+.central-landing-form__field .form-floating > .form-control:focus ~ label,
+.central-landing-form__field .form-floating > .form-control:not(:placeholder-shown) ~ label,
+.central-landing-form__field .form-floating > .form-select ~ label {
+  opacity: 0.75;
+  transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+.central-landing-form__field .form-control:focus,
+.central-landing-form__field .form-select:focus {
+  border-color: #0ea5e9;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25);
+}
+
+.central-landing-form__field .form-select {
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+.central-landing-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.85rem;
+}
+
+.central-landing-form__submit {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.7rem 1.25rem;
+  font-weight: 600;
+  font-size: 1rem;
+  background: #0ea5e9;
+  border: none;
+  border-radius: 0.5rem;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.central-landing-form__submit:hover:not(:disabled) {
+  background: #0284c7;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.45);
+}
+
+.central-landing-form__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (min-width: 1400px) {
+  .central-landing-hero__container {
+    max-width: 1600px;
+    padding: 0 3rem;
+  }
+  .hero-text-offset {
+    transform: translateX(450px) !important;
+    max-width: 420px !important;
+  }
+  .central-landing-hero__title {
+    max-width: 420px !important;
+    font-size: 2.5rem !important;
+    line-height: 1.2 !important;
+  }
+  .central-landing-hero__subtitle {
+    max-width: 420px !important;
+    font-size: 1.1rem !important;
+    line-height: 1.5 !important;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .central-landing-hero__container {
+    max-width: 1400px;
+    padding: 0 2.5rem;
+  }
+  .hero-text-offset {
+    transform: translateX(390px) !important;
+    max-width: 380px !important;
+  }
+  .central-landing-hero__title {
+    max-width: 380px !important;
+    font-size: 2.2rem !important;
+    line-height: 1.2 !important;
+  }
+  .central-landing-hero__subtitle {
+    max-width: 380px !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .hero-text-offset {
+    transform: translateX(320px) !important;
+    max-width: 340px !important;
+  }
+  .central-landing-hero__title {
+    max-width: 340px !important;
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+  .central-landing-hero__subtitle {
+    max-width: 340px !important;
+    font-size: 0.95rem !important;
+    line-height: 1.5 !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .hero-text-offset {
+    margin-left: 0;
+  }
+  .central-landing-form-card {
+    max-width: 540px;
+  }
+  .central-landing-hero__container {
+    padding: 0 1rem;
+  }
+  .central-landing-hero__title {
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .central-landing-hero__subtitle {
+    font-size: 1rem;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .central-landing-hero__text {
+    text-align: center;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .central-landing-form__row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .central-landing-form-card__body {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+  .central-landing-hero__container {
+    padding: 0 0.75rem;
+  }
+}
+</style>
+
+<style>
+/* Add side margins to all sections for consistent layout - override content-full */
+#one-vue-hero .content-full,
+#one-vue-hero-after .content-full,
+#one-vue-versions .content-full,
+#one-vue-power-of-vite .content-full,
+#one-vue-trusted-by .content-full,
+#one-vue-features .content-full,
+#one-vue-reviews .content-full,
+#one-vue-call-to-action .content-full,
+#page-footer .content {
+  max-width: 1320px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+
+@media (min-width: 1400px) {
+  #one-vue-hero .content-full,
+  #one-vue-hero-after .content-full,
+  #one-vue-versions .content-full,
+  #one-vue-power-of-vite .content-full,
+  #one-vue-trusted-by .content-full,
+  #one-vue-features .content-full,
+  #one-vue-reviews .content-full,
+  #one-vue-call-to-action .content-full,
+  #page-footer .content {
+    max-width: 1400px !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #one-vue-hero .content-full,
+  #one-vue-hero-after .content-full,
+  #one-vue-versions .content-full,
+  #one-vue-power-of-vite .content-full,
+  #one-vue-trusted-by .content-full,
+  #one-vue-features .content-full,
+  #one-vue-reviews .content-full,
+  #one-vue-call-to-action .content-full,
+  #page-footer .content {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #one-vue-hero .content-full,
+  #one-vue-hero-after .content-full,
+  #one-vue-versions .content-full,
+  #one-vue-power-of-vite .content-full,
+  #one-vue-trusted-by .content-full,
+  #one-vue-features .content-full,
+  #one-vue-reviews .content-full,
+  #one-vue-call-to-action .content-full,
+  #page-footer .content {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+/* Global adjustments for demo sections below - make them more compact like original */
+#one-vue-hero .fs-2 {
+  font-size: 1.75rem !important;
+}
+
+#one-vue-hero .fs-5 {
+  font-size: 1.05rem !important;
+}
+
+#one-vue-hero .pt-7 {
+  padding-top: 3rem !important;
+}
+
+#one-vue-hero .pb-9 {
+  padding-bottom: 4rem !important;
+}
+
+#one-vue-versions .h1,
+#one-vue-power-of-vite .h1,
+#one-vue-features .h1,
+#one-vue-trusted-by .h1,
+#one-vue-reviews .h1,
+#one-vue-call-to-action .h1 {
+  font-size: 1.75rem !important;
+}
+
+#one-vue-versions .py-5,
+#one-vue-power-of-vite .py-5,
+#one-vue-features .py-5 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+#one-vue-versions h4,
+#one-vue-power-of-vite h4,
+#one-vue-features h4 {
+  font-size: 1rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+#one-vue-versions .fs-lg,
+#one-vue-power-of-vite .fs-lg,
+#one-vue-features .fs-lg {
+  font-size: 1rem !important;
+}
+
+#one-vue-trusted-by .py-6 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+#one-vue-trusted-by .py-5 {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+#one-vue-reviews .items-push > div {
+  margin-bottom: 2rem !important;
+}
+
+#one-vue-call-to-action .py-5 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+#one-vue-call-to-action .py-md-8 {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
+
+#page-footer .py-5 {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* Card sizes in versions section */
+.block-content {
+  padding: 1rem !important;
+}
+
+.item.item-rounded {
+  width: 3rem !important;
+  height: 3rem !important;
+  font-size: 1.25rem !important;
+}
+</style>

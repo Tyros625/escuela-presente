@@ -148,6 +148,7 @@
                   :type="el.inputType"
                   v-model="form[el.model]"
                   class="form-control"
+                  :placeholder="el.placeholder"
                   :disabled="isLoading"
                 />
                 <VueSelect

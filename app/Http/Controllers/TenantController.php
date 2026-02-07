@@ -8,6 +8,20 @@ use Illuminate\Http\Request;
 
 class TenantController extends AppBaseController
 {
+    /**
+     * Tenancy identifies tenants by hostname only (no scheme, no port).
+     * Normalize so "https://secundaria87.localhost:8000" → "secundaria87.localhost".
+     */
+    public static function normalizeDomainForTenancy(string $domain): string
+    {
+        $host = $domain;
+        $host = preg_replace('#^https?://#i', '', $host);
+        $host = preg_replace('#:\d+$#', '', $host);
+        $host = trim($host, " \t\n\r\0\x0B/");
+
+        return strtolower($host) ?: $domain;
+    }
+
     public function index(Request $request)
     {
         return Tenant::all();
@@ -16,20 +30,21 @@ class TenantController extends AppBaseController
     public function store(RegisterTenantRequest $request)
     {
         $input = $request->validated();
-        $subdomain = explode('.', $input['domain'])[0];
+        $domainNormalized = self::normalizeDomainForTenancy($input['domain']);
+        $subdomain = explode('.', $domainNormalized)[0];
 
         $tenant = Tenant::create([
             'id' => $subdomain,
             'school_name' => $input['school_name'],
             'cct' => $input['cct'],
-            'domain' => $input['domain'],
+            'domain' => $domainNormalized,
             'email' => $input['email'],
             'password' => $input['password'],
             'country_code' => $input['country_code'],
             'phone' => $input['phone'],
         ]);
 
-        $tenant->createDomain(['domain' => $input['domain']]);
+        $tenant->createDomain(['domain' => $domainNormalized]);
         // $this->createWebhookConekta($input['domain']);
 
         return response()->json($tenant);

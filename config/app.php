@@ -54,7 +54,15 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => (function () {
+        $base = env('APP_URL_BASE', 'localhost');
+        $url = env('APP_URL');
+        if ($url === null || $url === '') {
+            return 'http://' . $base;
+        }
+        $url = preg_replace('/\$\{APP_URL_BASE\}/i', $base, $url);
+        return str_contains($url, '$') ? 'http://' . $base : $url;
+    })(),
 
     'asset_url' => env('ASSET_URL'),
 

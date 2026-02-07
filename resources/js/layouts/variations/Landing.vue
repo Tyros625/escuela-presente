@@ -1,11 +1,11 @@
 <script setup>
 import { useTemplateStore } from "@/stores/template";
+import { onMounted, onUnmounted } from "vue";
 
 import BaseLayout from "@/layouts/BaseLayout.vue";
 
 // Main store
 const store = useTemplateStore();
-const showButton = ref(false);
 
 // Set default elements for this layout
 store.setLayout({
@@ -17,50 +17,105 @@ store.setLayout({
 
 // Set various template options for this layout variation
 store.headerStyle({ mode: "dark" });
-store.mainContent({ mode: "boxed" });
+store.mainContent({ mode: "" });
+
+const bodyClass = "layout-landing";
+onMounted(() => {
+  document.body.classList.add(bodyClass);
+});
+onUnmounted(() => {
+  document.body.classList.remove(bodyClass);
+});
 </script>
 
 <template>
   <BaseLayout>
     <!-- Header Content Left -->
-    <!-- Using the available v-slot, we can override the default Side Overlay content from layouts/partials/Header.vue -->
     <template #header-content-left>
-      <div class="d-flex align-items-center">
-        <!-- Logo -->
+      <div class="landing-header__left d-flex align-items-center gap-3">
         <RouterLink
           :to="{ name: 'landing' }"
-          class="fw-bold fs-lg tracking-wider text-dual me-2"
+          class="landing-header__logo"
         >
           Escuela
-          <span class="fw-normal">Presente</span>
+          <span class="landing-header__logo--light">Presente</span>
         </RouterLink>
-        <!-- END Logo -->
-
-        <!-- Version -->
-        <div
-          class="fs-xs fw-medium py-1 px-3 rounded-pill bg-body-dark text-dark"
-        >
-          v{{ store.app.version }}
-        </div>
+        <span class="landing-header__version">v{{ store.app.version }}</span>
       </div>
     </template>
-    <!-- END Header Content Left -->
 
     <!-- Header Content Right -->
-    <!-- Using the available v-slot, we can override the default Side Overlay content from layouts/partials/Header.vue -->
     <template #header-content-right>
-      <router-link :to="{ name: 'dashboard' }">
-        <button
-          type="button"
-          class="btn btn-success"
-          v-click-ripple
-          v-if="showButton"
-        >
-          <i class="fa-solid fa-arrow-right-to-bracket"></i>
-          <span class="d-none d-sm-inline-block ms-2">Iniciar Sesión</span>
-        </button>
-      </router-link>
+      <RouterLink :to="{ name: 'login' }" class="landing-header__login">
+        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>
+        <span class="d-none d-sm-inline">Iniciar Sesión</span>
+      </RouterLink>
     </template>
-    <!-- END Header Content Right -->
   </BaseLayout>
 </template>
+
+<style scoped>
+/* Landing header: transparent over hero, only when this layout is active */
+:deep(#page-header) {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+:deep(#page-header .content-header) {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.landing-header__logo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff !important;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.landing-header__logo:hover {
+  color: #fff !important;
+  opacity: 0.92;
+}
+
+.landing-header__logo--light {
+  font-weight: 400;
+  opacity: 0.95;
+}
+
+.landing-header__version {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.landing-header__login {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.landing-header__login:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+</style>

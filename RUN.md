@@ -36,13 +36,19 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-**.env에서 DB 비밀번호 확인** (WAMP root 비밀번호에 맞게):
+**.env에서 확인할 항목:**
 
 ```
 DB_DATABASE=school
 DB_USERNAME=root
 DB_PASSWORD=여기에_WAMP_MySQL_비밀번호
+
+# 로컬에서 등록 시 자동 처리(DB 생성, 시드, 관리자)를 위해 반드시 설정:
+APP_URL_BASE=localhost
+APP_URL=http://localhost
 ```
+
+`APP_URL_BASE=localhost` 이어야 등록 시 도메인이 `hikaru.localhost` 형태로 저장됩니다.
 
 ---
 
@@ -62,6 +68,24 @@ npm run dev
 ```
 
 `npm run dev`는 **켜 둔 채** 두세요 (Vite 개발 서버).
+
+### 수정되는 대로 결과 보기 (빌드 없이)
+
+- **개발 중에는 `npm run build`를 하지 마세요.** 대신 **`npm run dev`를 한 번 실행한 뒤 그대로 켜 두세요.**
+- 터미널 1: `npm run dev` → Vite 개발 서버 (HMR)
+- 터미널 2: `php artisan serve` → Laravel 서버
+- 브라우저에서 http://127.0.0.1:8000 (또는 테넌트 주소) 접속
+- 이제 **Vue/JS/CSS 파일을 저장하면 브라우저가 자동으로 갱신**됩니다. (전체 새로고침 없이 컴포넌트만 바뀌는 경우도 많습니다.)
+- 작업이 끝나고 배포할 때만 `npm run build` 한 번 실행하면 됩니다.
+
+**한 번에 두 서버 띄우기 (선택):** 터미널 하나에서 Vite + Laravel 둘 다 실행하려면:
+
+```bash
+npm install   # 최초 1회, concurrently 설치됨
+npm run dev:all
+```
+
+실행 후 브라우저에서 http://127.0.0.1:8000 접속하면 됩니다.
 
 ---
 
@@ -180,3 +204,44 @@ mysql -u root -p escuelapresente_secundaria87 < DB/escuela_presente_secundaria87
 | 2 | 중앙 DB에 테넌트 id `secundaria87` + 도메인 `secundaria87.localhost` 등록 |
 | 3 | 테넌트 DB `escuelapresente_secundaria87` 존재 여부 확인 (없으면 생성·마이그레이션 또는 덤프 복원) |
 | 4 | `php artisan serve` + `npm run dev` 실행 후 **http://secundaria87.localhost:8000** 접속 |
+
+### 이미 관리자 패널에 도메인이 등록되어 있는데 접속이 안 될 때
+
+테넌트 식별은 **호스트만** 사용합니다. DB에 `https://secundaria87.localhost:8000` 처럼 **프로토콜·포트**가 들어 있으면 매칭되지 않습니다.
+
+**DB를 직접 건드리지 않고, 프로젝트 폴더에서 아래 명령어만 실행하세요:**
+
+```bash
+php artisan tenants:fix-domain secundaria87
+```
+
+- `secundaria87` 대신 다른 학교(테넌트) ID를 쓰면 그 테넌트 도메인만 수정됩니다.
+- 성공하면 "이전 / 이후" 값이 출력되고, **http://secundaria87.localhost:8000** 으로 다시 접속하면 됩니다.
+
+앞으로 새로 등록하는 도메인은 저장 시 자동으로 호스트만 저장되도록 되어 있습니다.
+
+### "Database escuela_presente_secundaria87 does not exist" 오류가 날 때
+
+도메인은 등록됐지만 **테넌트 전용 DB**가 없을 때 나는 오류입니다. 아래 명령으로 DB를 만들고 마이그레이션까지 한 번에 실행하세요.
+
+```bash
+php artisan tenants:create-database secundaria87
+```
+
+- 테넌트 DB가 이미 있으면 마이그레이션만 다시 실행됩니다.
+- 완료 후 **http://secundaria87.localhost:8000** (또는 등록한 도메인)으로 접속하면 됩니다.
+
+### 테넌트(학교) 로그인 — 비밀번호를 모를 때
+
+학교 주소(예: http://secundaria87.localhost:8000)의 로그인 화면에서는 **해당 학교 전용 계정**으로 로그인합니다.
+
+- **이메일:** 관리자 패널에 등록한 그 학교의 이메일 (예: `secundaria87@gmail.com`).
+- **비밀번호:** 관리자 패널에서 그 학교(고객)를 **추가할 때 입력한 비밀번호**입니다.
+
+DB만 만들고 시드를 안 돌린 경우(예: `tenants:create-database`만 실행한 경우)에는 **테넌트 DB에 사용자가 없을 수 있습니다.** 그때는 아래를 실행한 뒤, 위 이메일/비밀번호로 로그인하세요.
+
+```bash
+php artisan tenants:create-admin secundaria87
+```
+
+이 명령은 해당 테넌트 DB에 역할·권한을 넣고, **중앙에 등록된 이메일/비밀번호**로 관리자 계정을 하나 만듭니다. 로그인 시 사용하는 비밀번호는 **고객(학교) 등록 시 입력한 그 비밀번호**입니다.
