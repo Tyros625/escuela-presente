@@ -196,13 +196,13 @@ const slugify = (str) =>
             <div class="text-center text-lg-start hero-text-offset">
               <div class="central-landing-hero__badge mb-3">
                 <i class="fa-solid fa-cloud me-2"></i>
-                <span>Multi-tenant platform</span>
+                <span>Plataforma multitenant</span>
               </div>
               <h1 class="central-landing-hero__title mb-3">
-                Cloud-based School Management System
+                Sistema de Gestión Escolar en la Nube
               </h1>
               <p class="central-landing-hero__subtitle mb-0">
-                Create a free account and manage your educational institution securely.
+                Crea una cuenta gratuita y gestiona tu institución educativa de forma segura.
               </p>
             </div>
           </div>
@@ -1368,6 +1368,8 @@ const slugify = (str) =>
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .central-landing-hero__overlay {
@@ -1450,6 +1452,7 @@ const slugify = (str) =>
   overflow: hidden;
   max-width: 100%;
   margin: 0 auto;
+  margin-top: 80px;
 }
 
 .central-landing-form-card__header {
