@@ -1537,24 +1537,27 @@ const slugify = (str) =>
   padding: 0.7rem 1.25rem;
   font-weight: 600;
   font-size: 1rem;
-  background: #0ea5e9;
+  background: #0369a1;
   border: none;
   border-radius: 0.5rem;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.5);
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 
 .central-landing-form__submit:hover:not(:disabled) {
   background: #0284c7;
-  color: #fff;
+  color: #fff !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(14, 165, 233, 0.45);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.55);
 }
 
 .central-landing-form__submit:disabled {
-  opacity: 0.65;
+  opacity: 0.7;
   cursor: not-allowed;
+  background: #64748b;
+  color: #fff !important;
 }
 
 @media (min-width: 1400px) {
