@@ -128,16 +128,31 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(14, 165, 233, 0.5);
 }
 
-/* Responsive logo sizes */
+/* Responsive: mobile/tablet only - logo size and header padding */
 @media (max-width: 991.98px) {
   .landing-header__logo-img {
-    height: 56px;
+    height: 148px;
+  }
+
+  :deep(#page-header .content-header) {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .landing-header__left {
+    margin-left: 0;
+    margin-right: auto;
   }
 }
 
 @media (max-width: 575.98px) {
   .landing-header__logo-img {
-    height: 48px;
+    height: 122px;
+  }
+
+  :deep(#page-header .content-header) {
+    padding-left: 0rem;
+    padding-right: 2.4rem;
   }
 
   .landing-header__version {

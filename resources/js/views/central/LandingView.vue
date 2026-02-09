@@ -73,139 +73,151 @@ const slugify = (str) =>
 
 <template>
   <div>
-    <!-- Full-screen hero with background + registration form on side -->
-    <div class="central-landing-hero">
-      <div class="central-landing-hero__overlay"></div>
-      <div class="central-landing-hero__content">
+    <!-- Wrapper: hero (background + text) + form section (outside background on mobile) -->
+    <div class="central-landing-wrapper">
+      <!-- Hero: only background + text (on mobile). On desktop, form-outer overlaps left. -->
+      <div class="central-landing-hero">
+        <div class="central-landing-hero__overlay"></div>
+        <div class="central-landing-hero__content">
+          <div class="central-landing-hero__container">
+            <div class="row align-items-center g-4 py-5 central-landing-hero__row">
+              <!-- Spacer on desktop so text doesn't sit under form -->
+              <div class="col-lg-5 col-xl-4 d-none d-lg-block"></div>
+              <!-- Hero text only (offset on desktop = original position) -->
+              <div class="col-12 col-lg-6 col-xl-6 offset-lg-1 offset-xl-1 central-landing-hero__text">
+                <div class="text-center text-lg-start hero-text-offset">
+                  <div class="central-landing-hero__badge mb-3">
+                    <i class="fa-solid fa-cloud me-2"></i>
+                    <span>Plataforma multitenant</span>
+                  </div>
+                  <h1 class="central-landing-hero__title mb-3">
+                    Sistema de Gestión Escolar en la Nube
+                  </h1>
+                  <p class="central-landing-hero__subtitle mb-0">
+                    Crea una cuenta gratuita y gestiona tu institución educativa de forma segura.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form: inside hero on desktop (absolute), below hero on mobile (own section, no background) -->
+      <div class="central-landing-form-outer">
         <div class="central-landing-hero__container">
-          <div class="row align-items-center g-4 py-5">
-          <!-- Left: registration form card -->
-          <div class="col-lg-5 col-xl-4">
-            <div class="central-landing-form-card">
-              <div class="central-landing-form-card__header">
-                <h2 class="central-landing-form-card__title">Crear cuenta gratuita</h2>
-                <p class="central-landing-form-card__subtitle">Complete los datos de su institución</p>
-              </div>
-              <div class="central-landing-form-card__body">
-                <form @submit.prevent="onSubmit" class="central-landing-form">
-                  <div class="form-floating central-landing-form__field">
-                    <input
-                      type="text"
-                      class="form-control"
-                      :class="{ 'is-invalid': !form.cct }"
-                      v-model="form.cct"
-                      placeholder=" "
-                    />
-                    <label>CCT</label>
-                  </div>
-                  <div class="form-floating central-landing-form__field">
-                    <input
-                      type="text"
-                      class="form-control"
-                      :class="{ 'is-invalid': !form.school_name }"
-                      v-model="form.school_name"
-                      placeholder=" "
-                    />
-                    <label>¿Cómo se llama su colegio?</label>
-                  </div>
-                  <div class="form-floating central-landing-form__field">
-                    <input
-                      type="text"
-                      class="form-control"
-                      :class="{ 'is-invalid': !domain }"
-                      v-model="domain"
-                      readonly
-                      placeholder=" "
-                    />
-                    <label>Su dominio será:</label>
-                  </div>
-                  <div class="form-floating central-landing-form__field">
-                    <input
-                      type="email"
-                      class="form-control"
-                      :class="{ 'is-invalid': !form.email }"
-                      v-model="form.email"
-                      placeholder=" "
-                    />
-                    <label>Correo Electrónico</label>
-                  </div>
-                  <div class="central-landing-form__row">
+          <div class="row">
+            <div class="col-12 col-lg-5 col-xl-4">
+              <div class="central-landing-form-card">
+                <div class="central-landing-form-card__header">
+                  <h2 class="central-landing-form-card__title">Crear cuenta gratuita</h2>
+                  <p class="central-landing-form-card__subtitle">Complete los datos de su institución</p>
+                </div>
+                <div class="central-landing-form-card__body">
+                  <form @submit.prevent="onSubmit" class="central-landing-form">
                     <div class="form-floating central-landing-form__field">
                       <input
-                        type="password"
+                        type="text"
                         class="form-control"
-                        :class="{ 'is-invalid': !form.password }"
-                        v-model="form.password"
+                        :class="{ 'is-invalid': !form.cct }"
+                        v-model="form.cct"
                         placeholder=" "
                       />
-                      <label>Contraseña</label>
+                      <label>CCT</label>
                     </div>
                     <div class="form-floating central-landing-form__field">
                       <input
-                        type="password"
+                        type="text"
                         class="form-control"
-                        :class="{ 'is-invalid': !form.password_confirmation }"
-                        v-model="form.password_confirmation"
+                        :class="{ 'is-invalid': !form.school_name }"
+                        v-model="form.school_name"
                         placeholder=" "
                       />
-                      <label>Confirmar</label>
+                      <label>¿Cómo se llama su colegio?</label>
                     </div>
-                  </div>
-                  <div class="form-floating central-landing-form__field">
-                    <select
-                      class="form-select"
-                      :class="{ 'is-invalid': !form.country_code }"
-                      v-model="form.country_code"
+                    <div class="form-floating central-landing-form__field">
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="{ 'is-invalid': !domain }"
+                        v-model="domain"
+                        readonly
+                        placeholder=" "
+                      />
+                      <label>Su dominio será:</label>
+                    </div>
+                    <div class="form-floating central-landing-form__field">
+                      <input
+                        type="email"
+                        class="form-control"
+                        :class="{ 'is-invalid': !form.email }"
+                        v-model="form.email"
+                        placeholder=" "
+                      />
+                      <label>Correo Electrónico</label>
+                    </div>
+                    <div class="central-landing-form__row">
+                      <div class="form-floating central-landing-form__field">
+                        <input
+                          type="password"
+                          class="form-control"
+                          :class="{ 'is-invalid': !form.password }"
+                          v-model="form.password"
+                          placeholder=" "
+                        />
+                        <label>Contraseña</label>
+                      </div>
+                      <div class="form-floating central-landing-form__field">
+                        <input
+                          type="password"
+                          class="form-control"
+                          :class="{ 'is-invalid': !form.password_confirmation }"
+                          v-model="form.password_confirmation"
+                          placeholder=" "
+                        />
+                        <label>Confirmar</label>
+                      </div>
+                    </div>
+                    <div class="form-floating central-landing-form__field">
+                      <select
+                        class="form-select"
+                        :class="{ 'is-invalid': !form.country_code }"
+                        v-model="form.country_code"
+                      >
+                        <option v-for="item in options" :key="item.value" :value="item.value">
+                          {{ `(+${item.value}) ${item.label}` }}
+                        </option>
+                      </select>
+                      <label>País/Country</label>
+                    </div>
+                    <div class="form-floating central-landing-form__field">
+                      <input
+                        type="tel"
+                        class="form-control"
+                        :class="{ 'is-invalid': !form.phone }"
+                        v-model="form.phone"
+                        placeholder=" "
+                      />
+                      <label>Número de WhatsApp</label>
+                    </div>
+                    <button
+                      type="submit"
+                      class="btn central-landing-form__submit"
+                      :disabled="
+                        !form.cct ||
+                        !form.school_name ||
+                        !form.email ||
+                        !form.password ||
+                        !form.phone
+                      "
                     >
-                      <option v-for="item in options" :key="item.value" :value="item.value">
-                        {{ `(+${item.value}) ${item.label}` }}
-                      </option>
-                    </select>
-                    <label>País/Country</label>
-                  </div>
-                  <div class="form-floating central-landing-form__field">
-                    <input
-                      type="tel"
-                      class="form-control"
-                      :class="{ 'is-invalid': !form.phone }"
-                      v-model="form.phone"
-                      placeholder=" "
-                    />
-                    <label>Número de WhatsApp</label>
-                  </div>
-                  <button
-                    type="submit"
-                    class="btn central-landing-form__submit"
-                    :disabled="
-                      !form.cct ||
-                      !form.school_name ||
-                      !form.email ||
-                      !form.password ||
-                      !form.phone
-                    "
-                  >
-                    <i class="fa-solid fa-user-plus me-2"></i>
-                    Crear Cuenta Gratuita
-                  </button>
-                </form>
+                      <i class="fa-solid fa-user-plus me-2"></i>
+                      Crear Cuenta Gratuita
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-          <!-- Right: hero text -->
-          <div class="col-lg-6 col-xl-6 offset-lg-1 offset-xl-1 central-landing-hero__text">
-            <div class="text-center text-lg-start hero-text-offset">
-              <div class="central-landing-hero__badge mb-3">
-                <i class="fa-solid fa-cloud me-2"></i>
-                <span>Plataforma multitenant</span>
-              </div>
-              <h1 class="central-landing-hero__title mb-3">
-                Sistema de Gestión Escolar en la Nube
-              </h1>
-              <p class="central-landing-hero__subtitle mb-0">
-                Crea una cuenta gratuita y gestiona tu institución educativa de forma segura.
-              </p>
-            </div>
-          </div>
           </div>
         </div>
       </div>
@@ -1359,6 +1371,11 @@ const slugify = (str) =>
 </template>
 
 <style scoped>
+/* Wrapper: desktop = form overlaps hero; mobile = form section below hero */
+.central-landing-wrapper {
+  position: relative;
+}
+
 .central-landing-hero {
   position: relative;
   min-height: 100vh;
@@ -1369,6 +1386,15 @@ const slugify = (str) =>
   background-position: center;
   background-repeat: no-repeat;
   padding-top: 0;
+  margin-top: 0;
+}
+
+/* Form: on desktop positioned inside hero (left); on mobile below hero in its own section */
+.central-landing-form-outer {
+  /* mobile: default flow below hero */
+}
+
+.central-landing-form-outer .central-landing-form-card {
   margin-top: 0;
 }
 
@@ -1422,6 +1448,8 @@ const slugify = (str) =>
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 9999px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+   -webkit-text-stroke: 1px #0ea5e9;
+  paint-order: stroke fill;
 }
 
 .central-landing-hero__title {
@@ -1432,6 +1460,8 @@ const slugify = (str) =>
   line-height: 1.25;
   text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
   max-width: 100%;
+  -webkit-text-stroke: 1px #0ea5e9;
+  paint-order: stroke fill;
 }
 
 .central-landing-hero__subtitle {
@@ -1441,6 +1471,8 @@ const slugify = (str) =>
   max-width: 100%;
   margin: 0;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  -webkit-text-stroke: 1px #22b8f3;
+  paint-order: stroke fill;
 }
 
 /* Compact form card on the side */
@@ -1560,6 +1592,28 @@ const slugify = (str) =>
   color: #fff !important;
 }
 
+/* Desktop: form overlaps hero on the left */
+@media (min-width: 992px) {
+  .central-landing-form-outer {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .central-landing-form-outer .central-landing-hero__container,
+  .central-landing-form-outer .row,
+  .central-landing-form-outer .col-12,
+  .central-landing-form-outer .central-landing-form-card {
+    pointer-events: auto;
+  }
+  .central-landing-form-outer .central-landing-form-card {
+    margin-top: 80px;
+  }
+}
+
 @media (min-width: 1400px) {
   .central-landing-hero__container {
     max-width: 1600px;
@@ -1620,11 +1674,53 @@ const slugify = (str) =>
 }
 
 @media (max-width: 991.98px) {
+  /* Mobile: hero = full viewport height so background fills entire screen; form below on scroll */
+  .central-landing-hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+    align-items: center;
+    padding-top: 14rem !important;
+    padding-bottom: 3rem !important;
+    box-sizing: border-box;
+  }
+  .central-landing-hero__content {
+    align-items: center;
+    flex: 1;
+  }
+  .central-landing-hero__row {
+    align-items: center;
+    width: 100%;
+  }
+  .central-landing-hero__text {
+    text-align: top;
+    margin-bottom: 0;
+  }
+  /* Form section: outside hero, own background so hero image is fully visible above */
+  .central-landing-form-outer {
+    padding: 1.5rem 0 2.5rem;
+    background: #cff3f8;
+  }
+  .central-landing-form-outer .central-landing-form-card {
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    background: rgba(49, 63, 71, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  }
+  .central-landing-form-outer .central-landing-form-card__header {
+    background: rgba(54, 255, 245, 0.6);
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+  .central-landing-form-outer .central-landing-form-card__title {
+    color: #f8f8f8;
+    text-shadow: none;
+  }
+  .central-landing-form-outer .central-landing-form-card__subtitle {
+    color: #ffffff;
+    text-shadow: none;
+  }
   .hero-text-offset {
     margin-left: 0;
-  }
-  .central-landing-form-card {
-    max-width: 540px;
   }
   .central-landing-hero__container {
     padding: 0 1rem;
@@ -1641,12 +1737,16 @@ const slugify = (str) =>
     margin-left: auto;
     margin-right: auto;
   }
-  .central-landing-hero__text {
-    text-align: center;
-  }
 }
 
 @media (max-width: 575.98px) {
+  .central-landing-hero {
+    padding-top: 19rem !important;
+    padding-bottom: 3rem !important;
+  }
+  .central-landing-form-outer {
+    padding: 1.25rem 0 2rem;
+  }
   .central-landing-form__row {
     grid-template-columns: 1fr;
     gap: 0;
