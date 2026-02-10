@@ -37,7 +37,14 @@ class TenantController extends AppBaseController
                 return $query->orderByRaw('CASE WHEN active = 1 THEN 0 ELSE 1 END');
             })
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($tenant) {
+                // Cast active to boolean for frontend (MySQL returns 0/1, JS needs true/false)
+                if (property_exists($tenant, 'active')) {
+                    $tenant->active = (bool) $tenant->active;
+                }
+                return $tenant;
+            });
 
         return $tenants;
     }

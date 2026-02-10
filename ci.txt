@@ -1,0 +1,5 @@
+cd /e/escuela-presente
+git add .
+git commit -m "Fix tenant active: cast to boolean for Vue compatibility"
+git push origin main
+./deploy-remote.sh root 69.62.98.214 /var/www/escuela-presente
