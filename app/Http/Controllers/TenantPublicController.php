@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterTenantRequest;
-use App\Jobs\SendTenantWelcomeEmailJob;
+use App\Mail\EmailForQueue;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Notifications\NewTenantRegisteredNotification;
@@ -39,19 +39,17 @@ class TenantPublicController extends AppBaseController
 
         $tenant->createDomain(['domain' => $domainNormalized]);
 
-        // Send welcome email (queued for reliability; falls back to sync if queue is sync)
+        // Send welcome email synchronously so it runs regardless of queue worker
         $emailData = array_merge($input, ['domain' => $domainNormalized]);
         try {
-            SendTenantWelcomeEmailJob::dispatch($input['email'], $emailData);
+            Mail::to($input['email'])->send(new EmailForQueue($emailData));
+            Log::info('TenantPublicController: Welcome email sent.', ['email' => $input['email'], 'domain' => $domainNormalized]);
         } catch (\Throwable $e) {
-            try {
-                Mail::to($input['email'])->send(new \App\Mail\EmailForQueue($emailData));
-            } catch (\Throwable $e2) {
-                Log::warning('TenantPublicController: Failed to send tenant welcome email.', [
-                    'email' => $input['email'],
-                    'exception' => $e2->getMessage(),
-                ]);
-            }
+            Log::warning('TenantPublicController: Failed to send tenant welcome email.', [
+                'email' => $input['email'],
+                'domain' => $domainNormalized,
+                'exception' => $e->getMessage(),
+            ]);
         }
 
         // Notify admin users only if users table has is_admin column

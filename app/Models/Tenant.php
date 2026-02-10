@@ -13,6 +13,15 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains, HasFactory;
 
+    /**
+     * So that VirtualColumn (HasDataColumn) persists 'active' to the real DB column,
+     * not into the JSON 'data' column. Otherwise toggleActive() never updates the table.
+     */
+    public static function getCustomColumns(): array
+    {
+        return array_merge(parent::getCustomColumns(), ['active']);
+    }
+
     public static function booted()
     {
         static::creating(function ($tenant) {
