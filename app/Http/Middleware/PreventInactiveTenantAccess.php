@@ -19,13 +19,15 @@ class PreventInactiveTenantAccess
             return $next($request);
         }
 
-        if (! Schema::hasColumn((new Tenant)->getTable(), 'active')) {
-            \Log::warning('PreventInactiveTenantAccess - active column not found, skipping check');
+        $centralConnection = config('tenancy.database.central_connection', config('database.default'));
+        
+        // Check column existence on CENTRAL connection, not tenant DB!
+        if (! Schema::connection($centralConnection)->hasColumn('tenants', 'active')) {
+            \Log::warning('PreventInactiveTenantAccess - active column not found in central DB, skipping check');
             return $next($request);
         }
 
-        $centralConnection = config('tenancy.database.central_connection', config('database.default'));
-        // Read active from DB to ensure we have current value (tenant() may be cached)
+        // Read active from central DB
         $isActive = DB::connection($centralConnection)
             ->table('tenants')
             ->where('id', $tenant->id)
