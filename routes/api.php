@@ -31,4 +31,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('tenants', [TenantController::class, 'index']);
     Route::post('tenants', [TenantController::class, 'store']);
     Route::post('tenants/{id}', [TenantController::class, 'destroy']);
+
+    // Notifications
+    Route::get('notifications', [CentralLoginController::class, 'notifications']);
+    Route::post('notifications/{id}/read', [CentralLoginController::class, 'markNotificationAsRead']);
 });

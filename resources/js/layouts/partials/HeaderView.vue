@@ -78,11 +78,13 @@
               <!-- END User Dropdown -->
 
               <!-- Notifications Dropdown -->
-              <div class="dropdown d-inline-block ms-2">
+              <div v-if="userStore.getUser?.is_admin" class="dropdown d-inline-block ms-2">
                 <button type="button" class="btn btn-sm btn-alt-secondary" id="page-header-notifications-dropdown"
                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="fa fa-fw fa-bell"></i>
-                  <span v-if="notifications.length > 0" class="text-primary">•</span>
+                  <span v-if="unreadCount > 0" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="font-size: 0.6rem; padding: 2px 5px;">
+                    {{ unreadCount > 9 ? '9+' : unreadCount }}
+                  </span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 border-0 fs-sm"
                   aria-labelledby="page-header-notifications-dropdown">
@@ -93,15 +95,19 @@
                   </div>
                   <ul class="nav-items mb-0">
                     <li v-for="(notification, index) in notifications" :key="`notification-${index}`">
-                      <a class="text-dark d-flex py-2" :href="`${notification.href}`">
+                      <a class="text-dark d-flex py-2" :class="{ 'bg-body-light': !notification.read_at }" 
+                         :href="notification.href" @click="markAsRead(notification.id)">
                         <div class="flex-shrink-0 me-2 ms-3">
-                          <i :class="`${notification.icon}`"></i>
+                          <i :class="notification.icon"></i>
                         </div>
                         <div class="flex-grow-1 pe-2">
                           <div class="fw-semibold">
                             {{ notification.title }}
                           </div>
-                          <span class="fw-medium text-muted">
+                          <div class="fw-medium text-muted small">
+                            {{ notification.message }}
+                          </div>
+                          <span class="fw-medium text-muted" style="font-size: 0.75rem;">
                             {{ notification.time }}
                           </span>
                         </div>
@@ -110,7 +116,7 @@
                     <li v-if="!notifications.length" class="p-2">
                       <div class="alert alert-light d-flex align-items-center space-x-2 mb-0" role="alert">
                         <i class="fa fa-exclamation-triangle opacity-50"></i>
-                        <p class="mb-0">No new ones!</p>
+                        <p class="mb-0">No hay notificaciones nuevas</p>
                       </div>
                     </li>
                   </ul>
@@ -153,16 +159,49 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from "vue";
 import { useTemplateStore } from "@/stores/template";
 import { useUserStore } from "@/stores/user";
-
-// Grab example data
-import notifications from "@/data/notifications";
+import api from "@/services/api";
 
 // Main store and Router
 const store = useTemplateStore();
 const router = useRouter();
 const userStore = useUserStore();
+
+// Notifications
+const notifications = ref([]);
+const unreadCount = ref(0);
+
+async function fetchNotifications() {
+  try {
+    // Only fetch notifications for admin users
+    if (userStore.getUser?.is_admin) {
+      const { data } = await api.get("/notifications");
+      if (data.success) {
+        notifications.value = data.data || [];
+        unreadCount.value = notifications.value.filter(n => !n.read_at).length;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    notifications.value = [];
+  }
+}
+
+async function markAsRead(notificationId) {
+  try {
+    await api.post(`/notifications/${notificationId}/read`);
+    // Update local state
+    const notification = notifications.value.find(n => n.id === notificationId);
+    if (notification) {
+      notification.read_at = new Date().toISOString();
+      unreadCount.value = notifications.value.filter(n => !n.read_at).length;
+    }
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+  }
+}
 
 function logout() {
   userStore.logout();
@@ -180,6 +219,14 @@ function eventHeaderSearch(event) {
 // Attach ESCAPE key event listener
 onMounted(() => {
   document.addEventListener("keydown", eventHeaderSearch);
+  
+  // Fetch notifications if user is admin
+  if (userStore.getUser?.is_admin) {
+    fetchNotifications();
+    // Refresh notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    onUnmounted(() => clearInterval(interval));
+  }
 });
 
 // Remove keydown event listener

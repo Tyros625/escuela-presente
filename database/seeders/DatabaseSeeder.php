@@ -17,6 +17,23 @@ class DatabaseSeeder extends Seeder
             'password' => '123456',
         ]);
 
+        // Create admin user for local development
+        $adminEmail = 'seturry@gmail.com';
+        $adminUser = User::where('email', $adminEmail)->first();
+        if ($adminUser) {
+            $adminUser->update([
+                'password' => '123456',
+                'is_admin' => true,
+            ]);
+        } else {
+            User::create([
+                'name' => 'Admin',
+                'email' => $adminEmail,
+                'password' => '123456',
+                'is_admin' => true,
+            ]);
+        }
+
         // $this->createTenant();
     }
 
