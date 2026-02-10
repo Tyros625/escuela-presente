@@ -26,11 +26,20 @@ class TenantController extends AppBaseController
 
     public function index(Request $request)
     {
-        $query = Tenant::query();
-        if (Schema::hasColumn((new Tenant)->getTable(), 'active')) {
-            $query->orderByRaw('CASE WHEN active = 1 THEN 0 ELSE 1 END')->orderBy('created_at', 'desc');
-        }
-        return $query->get();
+        // Read directly from DB to ensure we get the real 'active' column value,
+        // not from the model's 'data' JSON which might be stale
+        $centralConnection = config('tenancy.database.central_connection', config('database.default'));
+        
+        $tenants = DB::connection($centralConnection)
+            ->table('tenants')
+            ->select('*')
+            ->when(Schema::hasColumn('tenants', 'active'), function ($query) {
+                return $query->orderByRaw('CASE WHEN active = 1 THEN 0 ELSE 1 END');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return $tenants;
     }
 
     public function store(RegisterTenantRequest $request)
@@ -74,23 +83,45 @@ class TenantController extends AppBaseController
         $tenant = Tenant::find($id);
 
         if (empty($tenant)) {
+            \Log::error('TenantController::toggleActive - Tenant not found', ['id' => $id]);
             return $this->sendError('Tenant not found');
         }
 
         if (! Schema::hasColumn($tenant->getTable(), 'active')) {
-            return $this->sendError('Active column not available', 400);
+            \Log::error('TenantController::toggleActive - Active column missing', [
+                'table' => $tenant->getTable(),
+                'connection' => $tenant->getConnectionName(),
+            ]);
+            return $this->sendError('Active column not available. Run migrations.', 400);
         }
 
         $centralConnection = config('tenancy.database.central_connection', config('database.default'));
+        \Log::info('TenantController::toggleActive - Reading current active', [
+            'tenant_id' => $tenant->id,
+            'connection' => $centralConnection,
+        ]);
+
         $current = DB::connection($centralConnection)
             ->table('tenants')
             ->where('id', $tenant->id)
             ->value('active');
         $newActive = ! (bool) $current;
+
+        \Log::info('TenantController::toggleActive - Updating active', [
+            'tenant_id' => $tenant->id,
+            'current' => $current,
+            'newActive' => $newActive,
+        ]);
+
         DB::connection($centralConnection)
             ->table('tenants')
             ->where('id', $tenant->id)
             ->update(['active' => $newActive]);
+
+        \Log::info('TenantController::toggleActive - Toggle completed', [
+            'tenant_id' => $tenant->id,
+            'active' => $newActive,
+        ]);
 
         return response()->json([
             'success' => true,
