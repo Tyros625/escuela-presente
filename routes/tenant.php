@@ -29,6 +29,7 @@ use App\Jobs\EmailPaymentJob;
 use App\Models\Tenants\AcademicGroup;
 use App\Models\Tenants\Grade;
 use App\Models\Tenants\Student;
+use App\Http\Middleware\PreventInactiveTenantAccess;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -49,6 +50,7 @@ Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
+    PreventInactiveTenantAccess::class,
 ])->group(function () {
     Route::get('/', function () {
         return view('app');
@@ -61,6 +63,7 @@ Route::prefix('api')->middleware([
     'api',
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
+    PreventInactiveTenantAccess::class,
 ])->group(function () {
     Route::name('api.')->group(function () {
         Route::get('/', function () {

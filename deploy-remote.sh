@@ -24,6 +24,7 @@ ssh ${SERVER_USER}@${SERVER_IP} << EOF
     git clean -fd
     git pull origin main
     composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+    php artisan migrate --force
     npm ci --legacy-peer-deps
     npm run build
     php artisan optimize:clear

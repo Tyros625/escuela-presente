@@ -63,8 +63,6 @@ class TenantController extends AppBaseController
             return $this->sendError('Tenant not found');
         }
 
-        $tenant->getDatabaseName();
-
         $tenant->delete();
 
         return $this->sendSuccess('Tenant deleted successfully');
