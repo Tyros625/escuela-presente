@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterTenantRequest;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class TenantController extends AppBaseController
@@ -80,13 +81,21 @@ class TenantController extends AppBaseController
             return $this->sendError('Active column not available', 400);
         }
 
-        $tenant->active = ! $tenant->active;
-        $tenant->save();
+        $centralConnection = config('tenancy.database.central_connection', config('database.default'));
+        $current = DB::connection($centralConnection)
+            ->table('tenants')
+            ->where('id', $tenant->id)
+            ->value('active');
+        $newActive = ! (bool) $current;
+        DB::connection($centralConnection)
+            ->table('tenants')
+            ->where('id', $tenant->id)
+            ->update(['active' => $newActive]);
 
         return response()->json([
             'success' => true,
-            'message' => $tenant->active ? 'Cliente activado' : 'Cliente desactivado',
-            'active' => (bool) $tenant->active,
+            'message' => $newActive ? 'Cliente activado' : 'Cliente desactivado',
+            'active' => $newActive,
         ]);
     }
 

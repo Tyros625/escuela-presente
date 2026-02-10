@@ -22,8 +22,10 @@ const grades = ref([]);
 
 const getGrades = async () => {
   const { data } = await api.get(`grades`);
-  grades.value = data.data;
-  form.grade = grades.value[0].description;
+  grades.value = data?.data ?? [];
+  if (grades.value.length > 0) {
+    form.grade = grades.value[0].description;
+  }
 };
 
 const getData = async () => {
