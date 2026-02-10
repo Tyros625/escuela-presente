@@ -8,7 +8,9 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Notifications\NewTenantRegisteredNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 
 class TenantPublicController extends AppBaseController
 {
@@ -37,15 +39,31 @@ class TenantPublicController extends AppBaseController
 
         $tenant->createDomain(['domain' => $domainNormalized]);
 
-        // Send email with domain link
-        $emailData = array_merge($input, ['domain' => $domainNormalized]);
-        $email = new EmailForQueue($emailData);
-        Mail::to($input['email'])->send($email);
+        // Send email with domain link (non-blocking: do not fail request if mail fails)
+        try {
+            $emailData = array_merge($input, ['domain' => $domainNormalized]);
+            $email = new EmailForQueue($emailData);
+            Mail::to($input['email'])->send($email);
+        } catch (\Throwable $e) {
+            Log::warning('TenantPublicController: Failed to send tenant welcome email.', [
+                'email' => $input['email'],
+                'domain' => $domainNormalized,
+                'exception' => $e->getMessage(),
+            ]);
+        }
 
-        // Notify all admin users
-        $adminUsers = User::where('is_admin', true)->get();
-        foreach ($adminUsers as $admin) {
-            $admin->notify(new NewTenantRegisteredNotification($tenant));
+        // Notify admin users only if users table has is_admin column
+        try {
+            if (Schema::hasColumn((new User)->getTable(), 'is_admin')) {
+                $adminUsers = User::where('is_admin', true)->get();
+                foreach ($adminUsers as $admin) {
+                    $admin->notify(new NewTenantRegisteredNotification($tenant));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('TenantPublicController: Failed to notify admins.', [
+                'exception' => $e->getMessage(),
+            ]);
         }
 
         return response()->json([

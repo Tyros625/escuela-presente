@@ -30,7 +30,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('tenants', [TenantController::class, 'index']);
     Route::post('tenants', [TenantController::class, 'store']);
-    Route::post('tenants/{id}', [TenantController::class, 'destroy']);
+    Route::delete('tenants/{id}', [TenantController::class, 'destroy']);
+    Route::patch('tenants/{id}/toggle-active', [TenantController::class, 'toggleActive']);
 
     // Notifications
     Route::get('notifications', [CentralLoginController::class, 'notifications']);

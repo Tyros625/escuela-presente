@@ -17,6 +17,8 @@ const initialForm = {
 };
 const form = reactive({ ...initialForm });
 
+const isSubmitting = ref(false);
+
 const options = [
   {
     label: "México",
@@ -28,24 +30,55 @@ const options = [
   },
 ];
 
-function onSubmit() {
-  api
-    .post(`/tenants/public`, form)
-    .then(() => {
-      Swal.fire(
-        "¡Excelente!",
-        "Se le enviará un correo electrónico con los datos de acceso al sistema.",
-        "success"
-      );
+function getPayload() {
+  const fullDomain = domain.value || `${form.domain || ""}.${import.meta.env.VITE_APP_NAME || "escuelapresente.com"}`;
+  return {
+    ...form,
+    domain: fullDomain,
+  };
+}
 
-      Object.assign(form, initialForm);
+function onSubmit() {
+  if (isSubmitting.value) return;
+
+  const payload = getPayload();
+  if (!payload.domain || !payload.school_name || !payload.cct || !payload.email || !payload.password || !payload.phone) {
+    Toast.fire({
+      icon: "warning",
+      title: "Complete todos los campos requeridos.",
+    });
+    return;
+  }
+
+  isSubmitting.value = true;
+  api
+    .post(`/tenants/public`, payload)
+    .then((res) => {
+      const ok = res.data && res.data.success !== false;
+      if (ok) {
+        Swal.fire(
+          "¡Excelente!",
+          "Su cuenta ha sido creada. Revisa tu correo para acceder al sistema.",
+          "success"
+        );
+        Object.assign(form, initialForm);
+        domain.value = "";
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: res.data?.message || "Ocurrió un error",
+        });
+      }
     })
     .catch((err) => {
-      console.log(err);
+      const msg = err.response?.data?.message || err.response?.data?.errors?.domain?.[0] || "Ocurrió un error";
       Toast.fire({
         icon: "error",
-        title: "Error",
+        title: msg,
       });
+    })
+    .finally(() => {
+      isSubmitting.value = false;
     });
 }
 
@@ -204,6 +237,7 @@ const slugify = (str) =>
                       type="submit"
                       class="btn central-landing-form__submit"
                       :disabled="
+                        isSubmitting ||
                         !form.cct ||
                         !form.school_name ||
                         !form.email ||
@@ -211,8 +245,9 @@ const slugify = (str) =>
                         !form.phone
                       "
                     >
-                      <i class="fa-solid fa-user-plus me-2"></i>
-                      Crear Cuenta Gratuita
+                      <i v-if="isSubmitting" class="fa-solid fa-circle-notch fa-spin me-2"></i>
+                      <i v-else class="fa-solid fa-user-plus me-2"></i>
+                      {{ isSubmitting ? "Creando cuenta..." : "Crear Cuenta Gratuita" }}
                     </button>
                   </form>
                 </div>

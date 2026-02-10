@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterTenantRequest;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class TenantController extends AppBaseController
 {
@@ -24,7 +25,11 @@ class TenantController extends AppBaseController
 
     public function index(Request $request)
     {
-        return Tenant::all();
+        $query = Tenant::query();
+        if (Schema::hasColumn((new Tenant)->getTable(), 'active')) {
+            $query->orderByRaw('CASE WHEN active = 1 THEN 0 ELSE 1 END')->orderBy('created_at', 'desc');
+        }
+        return $query->get();
     }
 
     public function store(RegisterTenantRequest $request)
@@ -63,6 +68,28 @@ class TenantController extends AppBaseController
         $tenant->delete();
 
         return $this->sendSuccess('Tenant deleted successfully');
+    }
+
+    public function toggleActive($id)
+    {
+        $tenant = Tenant::find($id);
+
+        if (empty($tenant)) {
+            return $this->sendError('Tenant not found');
+        }
+
+        if (! Schema::hasColumn($tenant->getTable(), 'active')) {
+            return $this->sendError('Active column not available', 400);
+        }
+
+        $tenant->active = ! $tenant->active;
+        $tenant->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => $tenant->active ? 'Cliente activado' : 'Cliente desactivado',
+            'active' => (bool) $tenant->active,
+        ]);
     }
 
     private function createWebhookConekta($domain)

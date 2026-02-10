@@ -48,8 +48,18 @@ const columns = [
     sort: "",
   },
   {
+    name: "Estado",
+    field: "active",
+    sort: "",
+  },
+  {
     name: "Creado",
     field: "created_at",
+    sort: "",
+  },
+  {
+    name: "Acciones",
+    field: "action",
     sort: "",
   },
 ];

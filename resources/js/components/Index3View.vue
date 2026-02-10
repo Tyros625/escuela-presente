@@ -79,15 +79,32 @@
                               {{ `https://${row[`${field}`]}.${actualDomain}` }}
                             </a>
                           </span>
+                          <span v-else-if="field === 'active'">
+                            <span
+                              :class="row[field] !== false ? 'badge bg-success' : 'badge bg-secondary'"
+                            >
+                              {{ row[field] !== false ? "Activo" : "Inactivo" }}
+                            </span>
+                          </span>
                           <span v-else>{{ row[`${field}`] }}</span>
                         </div>
                       </td>
                       <td v-if="columns.some((e) => e.field === 'action')">
                         <div class="btn-group">
                           <button
+                            v-if="routeName === 'tenants'"
+                            type="button"
+                            :class="row.active !== false ? 'btn btn-sm btn-warning' : 'btn btn-sm btn-success'"
+                            :title="row.active !== false ? 'Desactivar' : 'Activar'"
+                            @click.prevent="toggleActive(row)"
+                          >
+                            <i :class="row.active !== false ? 'fa fa-fw fa-ban' : 'fa fa-fw fa-check'"></i>
+                          </button>
+                          <button
                             v-if="permissions.delete"
                             type="button"
                             class="btn btn-sm btn-danger"
+                            title="Eliminar"
                             @click.prevent="destroy(row.id)"
                           >
                             <i class="fa fa-fw fa-times"></i>
@@ -291,10 +308,10 @@ function saveData() {
 
 function destroy(id) {
   Swal.fire({
-    title: "¿Estás segurx de eliminar?",
+    title: "¿Está seguro de eliminar?",
     showDenyButton: false,
     showCancelButton: true,
-    confirmButtonText: "Si",
+    confirmButtonText: "Sí",
     cancelButtonText: "Cancelar",
   }).then((result) => {
     if (result.isConfirmed) {
@@ -310,9 +327,41 @@ function destroy(id) {
           }
         })
         .catch((error) => {
+          const msg = error.response?.data?.message || error.message;
           Toast.fire({
             icon: "error",
-            title: error.message,
+            title: msg,
+          });
+        });
+    }
+  });
+}
+
+function toggleActive(row) {
+  const action = row.active !== false ? "desactivar" : "activar";
+  Swal.fire({
+    title: `¿${action.charAt(0).toUpperCase() + action.slice(1)} este cliente?`,
+    showCancelButton: true,
+    confirmButtonText: "Sí",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      api
+        .patch(`/${props.routeFetch}/${row.id}/toggle-active`)
+        .then((res) => {
+          if (res.data?.success) {
+            Toast.fire({
+              icon: "success",
+              title: res.data.message || "Actualizado",
+            });
+            getData();
+          }
+        })
+        .catch((error) => {
+          const msg = error.response?.data?.message || error.message;
+          Toast.fire({
+            icon: "error",
+            title: msg,
           });
         });
     }
