@@ -94,6 +94,15 @@
                           <button
                             v-if="routeName === 'tenants'"
                             type="button"
+                            class="btn btn-sm btn-alt-primary"
+                            title="Editar período de acceso"
+                            @click.prevent="modalShow(`modal-${routeName}`, row)"
+                          >
+                            <i class="fa fa-fw fa-calendar-alt"></i>
+                          </button>
+                          <button
+                            v-if="routeName === 'tenants'"
+                            type="button"
                             :class="row.active !== false ? 'btn btn-sm btn-warning' : 'btn btn-sm btn-success'"
                             :title="row.active !== false ? 'Desactivar' : 'Activar'"
                             @click.prevent="toggleActive(row)"
@@ -369,8 +378,11 @@ function toggleActive(row) {
 }
 
 function getDataID() {
+  const id = rowSelected.value && typeof rowSelected.value === 'object' && rowSelected.value.id != null
+    ? rowSelected.value.id
+    : rowSelected.value;
   api
-    .get(`/${props.routeFetch}/${rowSelected.value}`)
+    .get(`/${props.routeFetch}/${id}`)
     .then((res) => {
       if (res.status === 200) {
         let data = res.data.data;
@@ -389,14 +401,24 @@ function getDataID() {
 }
 
 function updateData() {
+  const id = rowSelected.value && typeof rowSelected.value === 'object' && rowSelected.value.id != null
+    ? rowSelected.value.id
+    : rowSelected.value;
   let updateForm = form;
-  if (route.name === "equipments") {
+  if (props.routeName === 'tenants') {
+    updateForm = {
+      active: form.active,
+      access_start: form.access_start || null,
+      access_end: form.access_end || null,
+    };
+  } else if (route.name === "equipments") {
+    updateForm = { ...form };
     updateForm.general = JSON.stringify(updateForm.general);
     updateForm.specifications = JSON.stringify(updateForm.specifications);
   }
 
   api
-    .put(`/${props.routeName}/${rowSelected.value}`, updateForm)
+    .put(`/${props.routeName}/${id}`, updateForm)
     .then(() => {
       Object.assign(form, props.formModel);
       Toast.fire({

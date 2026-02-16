@@ -19,7 +19,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public static function getCustomColumns(): array
     {
-        return array_merge(parent::getCustomColumns(), ['active']);
+        return array_merge(parent::getCustomColumns(), ['active', 'access_start', 'access_end']);
     }
 
     public static function booted()

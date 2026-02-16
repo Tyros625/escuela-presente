@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 class CreateTenantPublic implements ShouldQueue
@@ -35,6 +36,9 @@ class CreateTenantPublic implements ShouldQueue
 
     private function createTenant($input, $subdomain)
     {
+        $now = Carbon::now();
+        $accessEnd = $now->copy()->addMonth();
+
         $tenant = Tenant::create([
             'id' => $subdomain,
             'school_name' => $input['school_name'],
@@ -44,6 +48,8 @@ class CreateTenantPublic implements ShouldQueue
             'password' => $input['password'],
             'country_code' => $input['country_code'],
             'phone' => $input['phone'],
+            'access_start' => $now->toDateString(),
+            'access_end' => $accessEnd->toDateString(),
         ]);
 
         $tenant->createDomain(['domain' => $input['domain']]);

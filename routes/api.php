@@ -29,7 +29,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('me', [CentralLoginController::class, 'me']);
 
     Route::get('tenants', [TenantController::class, 'index']);
+    Route::get('tenants/{id}', [TenantController::class, 'show']);
     Route::post('tenants', [TenantController::class, 'store']);
+    Route::put('tenants/{id}', [TenantController::class, 'update']);
     Route::delete('tenants/{id}', [TenantController::class, 'destroy']);
     Route::patch('tenants/{id}/toggle-active', [TenantController::class, 'toggleActive']);
 

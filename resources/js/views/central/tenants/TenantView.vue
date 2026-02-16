@@ -75,6 +75,9 @@ const formModel = {
   cct: "",
   country_code: 52,
   phone: "9876543",
+  access_start: "",
+  access_end: "",
+  active: true,
 };
 const formSchema = [
   {
@@ -119,6 +122,20 @@ const formSchema = [
     label: "Confirmar Contraseña",
     model: "password_confirmation",
     class: "col-md-12",
+  },
+  {
+    type: "input",
+    inputType: "date",
+    label: "Inicio de acceso",
+    model: "access_start",
+    class: "col-md-6",
+  },
+  {
+    type: "input",
+    inputType: "date",
+    label: "Fin de acceso",
+    model: "access_end",
+    class: "col-md-6",
   },
 ];
 </script>

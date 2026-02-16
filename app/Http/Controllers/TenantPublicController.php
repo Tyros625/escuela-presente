@@ -8,6 +8,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Notifications\NewTenantRegisteredNotification;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
@@ -25,7 +26,10 @@ class TenantPublicController extends AppBaseController
         $domainNormalized = TenantController::normalizeDomainForTenancy($input['domain']);
         $subdomain = explode('.', $domainNormalized)[0];
 
-        // Create tenant immediately (like admin panel)
+        $now = Carbon::now();
+        $accessEnd = $now->copy()->addMonth();
+
+        // Create tenant immediately (like admin panel). Default access: 1 month from registration.
         $tenant = Tenant::create([
             'id' => $subdomain,
             'school_name' => $input['school_name'],
@@ -35,6 +39,8 @@ class TenantPublicController extends AppBaseController
             'password' => $input['password'],
             'country_code' => $input['country_code'],
             'phone' => $input['phone'],
+            'access_start' => $now->toDateString(),
+            'access_end' => $accessEnd->toDateString(),
         ]);
 
         $tenant->createDomain(['domain' => $domainNormalized]);

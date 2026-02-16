@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterTenantRequest;
 use App\Models\Tenant;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -49,11 +50,58 @@ class TenantController extends AppBaseController
         return $tenants;
     }
 
+    public function show($id)
+    {
+        $tenant = Tenant::find($id);
+        if (empty($tenant)) {
+            return $this->sendError('Tenant not found', 404);
+        }
+        $centralConnection = config('tenancy.database.central_connection', config('database.default'));
+        $row = DB::connection($centralConnection)->table('tenants')->where('id', $id)->first();
+        $data = (array) $row;
+        unset($data['password']);
+        if (isset($data['active'])) {
+            $data['active'] = (bool) $data['active'];
+        }
+        return response()->json(['data' => $data]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $tenant = Tenant::find($id);
+        if (empty($tenant)) {
+            return $this->sendError('Tenant not found', 404);
+        }
+        $centralConnection = config('tenancy.database.central_connection', config('database.default'));
+        $payload = $request->only(['active', 'access_start', 'access_end']);
+        $allowed = [];
+        if (array_key_exists('active', $payload)) {
+            $allowed['active'] = (bool) $payload['active'];
+        }
+        if (array_key_exists('access_start', $payload)) {
+            $allowed['access_start'] = $payload['access_start'] ?: null;
+        }
+        if (array_key_exists('access_end', $payload)) {
+            $allowed['access_end'] = $payload['access_end'] ?: null;
+        }
+        if (empty($allowed)) {
+            return $this->sendError('No valid fields to update', 400);
+        }
+        DB::connection($centralConnection)->table('tenants')->where('id', $id)->update($allowed);
+        return response()->json([
+            'success' => true,
+            'message' => 'Cliente actualizado',
+        ]);
+    }
+
     public function store(RegisterTenantRequest $request)
     {
         $input = $request->validated();
         $domainNormalized = self::normalizeDomainForTenancy($input['domain']);
         $subdomain = explode('.', $domainNormalized)[0];
+
+        $now = Carbon::now();
+        $accessEnd = $now->copy()->addMonth();
 
         $tenant = Tenant::create([
             'id' => $subdomain,
@@ -64,6 +112,8 @@ class TenantController extends AppBaseController
             'password' => $input['password'],
             'country_code' => $input['country_code'],
             'phone' => $input['phone'],
+            'access_start' => $now->toDateString(),
+            'access_end' => $accessEnd->toDateString(),
         ]);
 
         $tenant->createDomain(['domain' => $domainNormalized]);
