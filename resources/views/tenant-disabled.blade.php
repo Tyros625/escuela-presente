@@ -4,71 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso no disponible - Escuela Presente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
-            padding: 1rem;
+            background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 50%, #fefce8 100%);
+            color: #0f172a;
+            padding: 1.5rem;
         }
-        .card {
-            max-width: 420px;
-            width: 100%;
-            background: rgba(255,255,255,0.06);
-            border-radius: 1rem;
-            padding: 2rem;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.9; }
-        h1 { font-size: 1.35rem; margin: 0 0 1rem; font-weight: 600; }
-        p { margin: 0 0 1rem; line-height: 1.6; color: #94a3b8; font-size: 0.95rem; }
-        .btn-whatsapp {
-            display: inline-flex;
+        .page-card {
+            display: flex;
+            flex-wrap: wrap;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: #25D366;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: background 0.2s, transform 0.15s;
+            gap: 2rem;
+            max-width: 720px;
+            width: 100%;
+            background: #fff;
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
         }
-        .btn-whatsapp:hover { background: #20bd5a; color: #fff; transform: translateY(-1px); }
-        .contact { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.875rem; color: #64748b; }
+        .admin-side {
+            flex: 0 0 200px;
+            text-align: center;
+        }
+        .admin-side img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #e0f2fe;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15);
+        }
+        .admin-side .name {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0c4a6e;
+        }
+        .content-side {
+            flex: 1;
+            min-width: 260px;
+        }
+        .content-side h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        .content-side p {
+            font-size: 0.9375rem;
+            line-height: 1.65;
+            color: #475569;
+            margin-bottom: 1rem;
+        }
+        .contact-block {
+            margin-top: 1.25rem;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border-radius: 0.75rem;
+            border: 1px solid #bbf7d0;
+        }
+        .contact-block .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #15803d;
+            margin-bottom: 0.35rem;
+        }
+        .contact-block .whatsapp-number {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+            letter-spacing: 0.02em;
+        }
+        .contact-block .hint {
+            font-size: 0.8125rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+        .footer-note {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.8125rem;
+            color: #94a3b8;
+        }
+        @media (max-width: 560px) {
+            .page-card { flex-direction: column; text-align: center; }
+            .admin-side { flex: none; }
+            .content-side { min-width: 0; }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="icon">⚠️</div>
-        @if(($reason ?? null) === 'expired')
-            <h1>Período de prueba finalizado</h1>
-            <p>Su período de acceso gratuito ha finalizado. Para continuar utilizando la plataforma, póngase en contacto con el administrador.</p>
-        @elseif(($reason ?? null) === 'blocked')
-            <h1>Acceso desactivado</h1>
-            <p>El acceso a esta institución está actualmente desactivado por el administrador. Si considera que es un error, contacte al administrador.</p>
-        @else
-            <h1>Acceso no disponible</h1>
-            <p>El acceso a esta institución no está disponible en este momento. Contacte al administrador si tiene dudas.</p>
-        @endif
-        <p>Puede escribir por <strong>WhatsApp</strong> al administrador para solicitar la reactivación o ampliar su período de acceso.</p>
-        @if(!empty($whatsappUrl))
-            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                Contactar por WhatsApp
-            </a>
-        @endif
-        <div class="contact">Escuela Presente — Contacte al administrador</div>
+    <div class="page-card">
+        <div class="admin-side">
+            <img src="{{ asset('assets/fonts/image/admin.png') }}" alt="Administrador" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none; width:160px; height:160px; margin:0 auto; background:linear-gradient(135deg,#e0f2fe,#fef3c7); border-radius:50%; border:4px solid #e0f2fe;"></div>
+            <div class="name">David</div>
+        </div>
+        <div class="content-side">
+            @if(($reason ?? null) === 'expired')
+                <h1>Período de prueba finalizado</h1>
+                <p>Su período de acceso gratuito ha finalizado. Para continuar utilizando la plataforma, contacte al administrador.</p>
+            @elseif(($reason ?? null) === 'blocked')
+                <h1>Acceso desactivado</h1>
+                <p>El acceso a esta institución está actualmente desactivado. Si considera que es un error, contacte al administrador.</p>
+            @else
+                <h1>Acceso no disponible</h1>
+                <p>El acceso no está disponible en este momento. Contacte al administrador si tiene dudas.</p>
+            @endif
+            <p>Puede escribir por <strong>WhatsApp</strong> al administrador para solicitar la reactivación o ampliar su período de acceso.</p>
+            <div class="contact-block">
+                <div class="label">Contactar por WhatsApp</div>
+                <div class="whatsapp-number">+52 1 55 2969 8426</div>
+                <div class="hint">David — Escuela Presente</div>
+            </div>
+            <div class="footer-note">Escuela Presente — Contacte al administrador</div>
+        </div>
     </div>
 </body>
 </html>
