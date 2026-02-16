@@ -9,59 +9,41 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
         body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            color: #0f172a;
+        }
+        /* 왼쪽 절반: 이미지 (화면 너비의 50%, 전체 높이) */
+        .half-image {
+            width: 50%;
+            min-height: 100vh;
+            background: #e0f2fe url("{{ asset('assets/fonts/image/david.png') }}") center/cover no-repeat;
+        }
+        /* 오른쪽 절반: 정보 */
+        .half-content {
+            width: 50%;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 50%, #fefce8 100%);
-            color: #0f172a;
-            padding: 1.5rem;
-        }
-        .page-card {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 2rem;
-            max-width: 720px;
-            width: 100%;
-            background: #fff;
-            border-radius: 1.25rem;
             padding: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
-            overflow: hidden;
+            background: #fff;
         }
-        .admin-side {
-            flex: 0 0 200px;
-            text-align: center;
+        .content-inner {
+            max-width: 400px;
+            width: 100%;
         }
-        .admin-side img {
-            width: 160px;
-            height: 160px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 4px solid #e0f2fe;
-            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15);
-        }
-        .admin-side .name {
-            margin-top: 1rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #0c4a6e;
-        }
-        .content-side {
-            flex: 1;
-            min-width: 260px;
-        }
-        .content-side h1 {
+        .content-inner h1 {
             font-size: 1.5rem;
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 0.75rem;
             line-height: 1.3;
         }
-        .content-side p {
+        .content-inner p {
             font-size: 0.9375rem;
             line-height: 1.65;
             color: #475569;
@@ -100,21 +82,17 @@
             font-size: 0.8125rem;
             color: #94a3b8;
         }
-        @media (max-width: 560px) {
-            .page-card { flex-direction: column; text-align: center; }
-            .admin-side { flex: none; }
-            .content-side { min-width: 0; }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .half-image { width: 100%; min-height: 40vh; }
+            .half-content { width: 100%; min-height: auto; padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 <body>
-    <div class="page-card">
-        <div class="admin-side">
-            <img src="{{ asset('assets/fonts/image/admin.png') }}" alt="Administrador" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div style="display:none; width:160px; height:160px; margin:0 auto; background:linear-gradient(135deg,#e0f2fe,#fef3c7); border-radius:50%; border:4px solid #e0f2fe;"></div>
-            <div class="name">David</div>
-        </div>
-        <div class="content-side">
+    <div class="half-image"></div>
+    <div class="half-content">
+        <div class="content-inner">
             @if(($reason ?? null) === 'expired')
                 <h1>Período de prueba finalizado</h1>
                 <p>Su período de acceso gratuito ha finalizado. Para continuar utilizando la plataforma, contacte al administrador.</p>
