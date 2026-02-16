@@ -16,13 +16,39 @@
             min-height: 100vh;
             color: #0f172a;
         }
-        /* 왼쪽 절반: 이미지 (화면 너비의 50%, 전체 높이) */
+        /* Left half: admin image (50% width, full height) */
         .half-image {
             width: 50%;
             min-height: 100vh;
-            background: #e0f2fe url("{{ asset('assets/fonts/image/david.png') }}") center/cover no-repeat;
+            background: #e0f2fe;
+            overflow: hidden;
         }
-        /* 오른쪽 절반: 정보 */
+        .half-image .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .half-image .hero-img.failed {
+            display: none;
+        }
+        .half-image .fallback {
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .half-image .fallback.show {
+            display: flex;
+        }
+        .half-image .fallback img {
+            max-width: 80%;
+            max-height: 70%;
+            object-fit: contain;
+        }
+        /* Right half: content and contact */
         .half-content {
             width: 50%;
             min-height: 100vh;
@@ -55,6 +81,20 @@
             background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
             border-radius: 0.75rem;
             border: 1px solid #bbf7d0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .contact-block .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #e0f2fe;
+        }
+        .contact-block .contact-text {
+            flex: 1;
         }
         .contact-block .label {
             font-size: 0.75rem;
@@ -62,7 +102,7 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #15803d;
-            margin-bottom: 0.35rem;
+            margin-bottom: 0.25rem;
         }
         .contact-block .whatsapp-number {
             font-size: 1.25rem;
@@ -73,7 +113,7 @@
         .contact-block .hint {
             font-size: 0.8125rem;
             color: #64748b;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
         .footer-note {
             margin-top: 1.5rem;
@@ -90,7 +130,25 @@
     </style>
 </head>
 <body>
-    <div class="half-image"></div>
+    @php
+        $base = rtrim(request()->getSchemeAndHttpHost(), '/');
+        $imgAdmin = $base . '/assets/fonts/image/admin.png';
+        $imgLogo  = $base . '/assets/fonts/image/main-logo.png';
+        $imgDavid = $base . '/assets/fonts/image/david.png';
+    @endphp
+    <!-- Left half: admin.png (fallback to main-logo.png if load fails) -->
+    <div class="half-image">
+        <img
+            class="hero-img"
+            id="admin-hero"
+            src="{{ $imgAdmin }}"
+            alt="Escuela Presente"
+            onerror="var el=document.getElementById('admin-hero'); if(el){el.classList.add('failed'); document.getElementById('fallback-logo').classList.add('show');}"
+        />
+        <div class="fallback" id="fallback-logo">
+            <img src="{{ $imgLogo }}" alt="Escuela Presente" />
+        </div>
+    </div>
     <div class="half-content">
         <div class="content-inner">
             @if(($reason ?? null) === 'expired')
@@ -105,9 +163,12 @@
             @endif
             <p>Puede escribir por <strong>WhatsApp</strong> al administrador para solicitar la reactivación o ampliar su período de acceso.</p>
             <div class="contact-block">
-                <div class="label">Contactar por WhatsApp</div>
-                <div class="whatsapp-number">+52 1 55 2969 8426</div>
-                <div class="hint">David — Escuela Presente</div>
+                <img class="avatar" src="{{ $imgDavid }}" alt="David" />
+                <div class="contact-text">
+                    <div class="label">Contactar por WhatsApp</div>
+                    <div class="whatsapp-number">+52 1 55 2969 8426</div>
+                    <div class="hint">David — Escuela Presente</div>
+                </div>
             </div>
             <div class="footer-note">Escuela Presente — Contacte al administrador</div>
         </div>
