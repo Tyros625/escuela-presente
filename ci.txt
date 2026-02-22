@@ -10,8 +10,12 @@ git push origin main
 #  (A) Central app loads on server -> old menu (data/menu.js)
 #  (B) Server build is old code -> main-xxx.js has no new menu code
 #
-# On server run:
-#   cd /var/www/escuela-presente && bash scripts/verify-build-on-server.sh
+# On server run (if scripts/ not deployed, run these manually):
+#   cd /var/www/escuela-presente
+#   git log -1 --oneline
+#   grep -l "getMenuNodesForRole\|__ESCUELA_TENANT_APP" public/build/assets/main-*.js && echo "OK: new menu in build" || echo "FAIL: run npm run build"
+#   grep -q "__TENANT_APP" resources/views/app.blade.php && echo "OK: Blade has __TENANT_APP" || echo "FAIL"
+# Or: bash scripts/verify-build-on-server.sh   (after git add/commit/push scripts/)
 #
 # If "New menu code not found" -> (B) run npm run build and redeploy
 # If "New menu code present" but menu still old -> (A) check __ESCUELA_TENANT_APP in browser
