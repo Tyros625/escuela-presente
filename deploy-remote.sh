@@ -20,9 +20,9 @@ ssh ${SERVER_USER}@${SERVER_IP} << EOF
     cd ${SERVER_PATH}
     git config --global --add safe.directory ${SERVER_PATH}
     php artisan down || true
-    git reset --hard
+    git fetch origin
+    git reset --hard origin/main
     git clean -fd
-    git pull origin main
     composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
     php artisan migrate --force
     npm ci --legacy-peer-deps
