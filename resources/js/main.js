@@ -59,8 +59,10 @@ app.directive("user-can", {
 // Use Pinia and Vue Router
 app.use(createPinia());
 
-if (isSubdomain()) {
+const useTenantApp = isSubdomain();
+if (useTenantApp) {
   app.use(tenantRoutes);
+  window.__ESCUELA_TENANT_APP = true; // 새 역할 기반 메뉴 사용 중 (배포 확인용)
 } else {
   app.use(centralRoutes);
 }

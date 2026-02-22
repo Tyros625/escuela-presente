@@ -3,3 +3,13 @@ git add .
 git commit -m "Fix tenant active: cast to boolean for Vue compatibility"
 git push origin main
 ./deploy-remote.sh root 69.62.98.214 /var/www/escuela-presente
+
+# Por qué en local se ve el menú nuevo y en el servidor no:
+# - Local: "npm run dev" sirve el código al vuelo (siempre actual).
+# - Servidor: public/build está en .gitignore; el servidor DEBE ejecutar "npm run build"
+#   después del pull. Si no se ejecuta o falla, se sigue sirviendo el build anterior.
+#
+# Solución: el script deploy-remote.sh hace "npm run build"; si falla, el deploy termina con error.
+# Tras desplegar, en el navegador: F12 → Console → escribe __ESCUELA_TENANT_APP
+#   Si sale "true" = cargó la app tenant (menú por rol). Si undefined = cargó la app central o build viejo.
+# Recarga forzada: Ctrl+Shift+R (o ventana privada) por si la caché tiene JS viejo.

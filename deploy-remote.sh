@@ -26,7 +26,9 @@ ssh ${SERVER_USER}@${SERVER_IP} << EOF
     composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
     php artisan migrate --force
     npm ci --legacy-peer-deps
-    npm run build
+    echo "📦 Building frontend (Vite)..."
+    npm run build || { echo "❌ npm run build FAILED - frontend will show OLD menu"; exit 1; }
+    echo "📦 Build done: $(ls -la public/build/assets/ 2>/dev/null | head -5)"
     php artisan optimize:clear
     php artisan up
     chown -R www-data:www-data .
