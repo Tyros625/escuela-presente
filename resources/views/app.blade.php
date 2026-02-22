@@ -31,6 +31,10 @@
         </div>
     </div>
 
+    @if(function_exists('tenant') && tenant())
+    <script>window.__TENANT_APP = true;</script>
+    @endif
+
     @vite('resources/js/main.js')
 </body>
 

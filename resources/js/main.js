@@ -59,10 +59,11 @@ app.directive("user-can", {
 // Use Pinia and Vue Router
 app.use(createPinia());
 
-const useTenantApp = isSubdomain();
+// Prefer server-set tenant flag so tenant menu shows even when URL is not a subdomain
+const useTenantApp = window.__TENANT_APP === true || isSubdomain();
 if (useTenantApp) {
   app.use(tenantRoutes);
-  window.__ESCUELA_TENANT_APP = true; // 새 역할 기반 메뉴 사용 중 (배포 확인용)
+  window.__ESCUELA_TENANT_APP = true; // tenant app with role-based menu (for deploy verification)
 } else {
   app.use(centralRoutes);
 }

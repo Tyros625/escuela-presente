@@ -4,12 +4,19 @@ git commit -m "Fix tenant active: cast to boolean for Vue compatibility"
 git push origin main
 ./deploy-remote.sh root 69.62.98.214 /var/www/escuela-presente
 
-# Por qué en local se ve el menú nuevo y en el servidor no:
-# - Local: "npm run dev" sirve el código al vuelo (siempre actual).
-# - Servidor: public/build está en .gitignore; el servidor DEBE ejecutar "npm run build"
-#   después del pull. Si no se ejecuta o falla, se sigue sirviendo el build anterior.
+# --- When new menu shows locally but not on server ---
 #
-# Solución: el script deploy-remote.sh hace "npm run build"; si falla, el deploy termina con error.
-# Tras desplegar, en el navegador: F12 → Console → escribe __ESCUELA_TENANT_APP
-#   Si sale "true" = cargó la app tenant (menú por rol). Si undefined = cargó la app central o build viejo.
-# Recarga forzada: Ctrl+Shift+R (o ventana privada) por si la caché tiene JS viejo.
+# Cause is one (or both) of:
+#  (A) Central app loads on server -> old menu (data/menu.js)
+#  (B) Server build is old code -> main-xxx.js has no new menu code
+#
+# On server run:
+#   cd /var/www/escuela-presente && bash scripts/verify-build-on-server.sh
+#
+# If "New menu code not found" -> (B) run npm run build and redeploy
+# If "New menu code present" but menu still old -> (A) check __ESCUELA_TENANT_APP in browser
+#
+# In browser (demo.escuelapresente.com):
+#  F12 -> Console -> __ESCUELA_TENANT_APP
+#    true = tenant app loaded; undefined = central app loaded
+#  Hard refresh: Ctrl+Shift+R
