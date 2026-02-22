@@ -30,8 +30,29 @@ class RolesSeeder extends Seeder
             $adminRole = Role::where('name', \App\Models\Tenants\Role::ROLE_ADMIN)->first();
         }
 
+        if (! Role::where('name', \App\Models\Tenants\Role::ROLE_TEACHER)->exists()) {
+            Role::create([
+                'name' => \App\Models\Tenants\Role::ROLE_TEACHER,
+                'guard_name' => 'api',
+            ]);
+        }
+
+        if (! Role::where('name', \App\Models\Tenants\Role::ROLE_STUDENT)->exists()) {
+            Role::create([
+                'name' => \App\Models\Tenants\Role::ROLE_STUDENT,
+                'guard_name' => 'api',
+            ]);
+        }
+
+        if (! Role::where('name', \App\Models\Tenants\Role::ROLE_PARENT)->exists()) {
+            Role::create([
+                'name' => \App\Models\Tenants\Role::ROLE_PARENT,
+                'guard_name' => 'api',
+            ]);
+        }
+
         if (! Role::where('name', \App\Models\Tenants\Role::ROLE_USER)->exists()) {
-            $userRole = Role::create([
+            Role::create([
                 'name' => \App\Models\Tenants\Role::ROLE_USER,
                 'guard_name' => 'api',
             ]);

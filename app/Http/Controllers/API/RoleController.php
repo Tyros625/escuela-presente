@@ -33,7 +33,10 @@ class RoleController extends Controller
 
     public function index()
     {
+        $this->ensureDefaultRolesExist();
+
         $roles = Role::where('name', '!=', Role::ROLE_SUPER_ADMIN)
+            ->orderBy('name')
             ->get();
 
         $roles->each(function (Role $role) {
@@ -76,13 +79,13 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
-        $inputs = $this->validate($request, [
-            'name' => 'required|string|unique:roles',
-        ]);
-
         if ($role->isLocked()) {
-            abort(422, 'Este rol no puede ser modificado.');
+            abort(422, 'Este rol no puede ser modificado (nombre fijo).');
         }
+
+        $inputs = $this->validate($request, [
+            'name' => 'required|string|unique:roles,name,' . $role->id,
+        ]);
 
         $role->fill($inputs);
         $role->save();
@@ -189,5 +192,29 @@ class RoleController extends Controller
         ];
 
         return $modules;
+    }
+
+    /**
+     * Ensure the 4 default roles exist in this tenant (for Roles page and user add).
+     */
+    protected function ensureDefaultRolesExist(): void
+    {
+        $defaults = [
+            Role::ROLE_ADMIN,
+            Role::ROLE_TEACHER,
+            Role::ROLE_STUDENT,
+            Role::ROLE_PARENT,
+        ];
+        $missing = [];
+        foreach ($defaults as $name) {
+            if (! Role::where('name', $name)->exists()) {
+                $missing[] = $name;
+            }
+        }
+        if (empty($missing)) {
+            return;
+        }
+        $seeder = app()->make(\Database\Seeders\RolesSeeder::class);
+        $seeder->run();
     }
 }

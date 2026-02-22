@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cp public/build-cors.htaccess public/build/.htaccess",
     "dev:all": "concurrently -n \"vite,artisan\" -c \"cyan,magenta\" \"vite\" \"php artisan serve\""
   },
   "devDependencies": {

@@ -1,3 +1,8 @@
+<IfModule mod_headers.c>
+    SetEnvIf Request_URI "^/build/" cors_build
+    Header set Access-Control-Allow-Origin "*" env=cors_build
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

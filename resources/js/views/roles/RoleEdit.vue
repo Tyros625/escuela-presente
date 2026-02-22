@@ -17,10 +17,20 @@
         <div class="row">
           <div class="col-md-6">
             <label class="form-label">Nombre</label>
-            <input type="text" class="form-control" v-model="form.name" />
+            <input
+              type="text"
+              class="form-control"
+              v-model="form.name"
+              :disabled="form.is_locked"
+            />
+            <small v-if="form.is_locked" class="text-muted">
+              Los roles fijos (Administrador, Docente, Estudiante, Padre/Tutor) no pueden renombrarse.
+            </small>
           </div>
           <div class="col-md-12 mt-3">
-            <button type="submit" class="btn btn-primary">Actualizar</button>
+            <button type="submit" class="btn btn-primary" :disabled="form.is_locked">
+              Actualizar
+            </button>
           </div>
         </div>
       </form>
@@ -35,6 +45,7 @@ onMounted(() => {
 
 const initialForm = {
   name: "",
+  is_locked: false,
 };
 const form = reactive({ ...initialForm });
 const route = useRoute();

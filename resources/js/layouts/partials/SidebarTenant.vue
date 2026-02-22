@@ -44,14 +44,19 @@
       </div>
       <!-- END Side Header -->
 
+      <!-- User info (wireframe) -->
+      <div v-if="userStore.isLoggedIn" class="content-side-content px-3 py-3 border-bottom border-sidebar">
+        <div class="fw-semibold text-dual smini-hide">{{ userDisplayName }}</div>
+        <span class="badge smini-hide mt-1" :class="roleBadgeClass">{{ roleLabel }}</span>
+      </div>
+      <!-- END User info -->
+
       <!-- Sidebar Scrolling -->
       <div id="simplebar-sidebar" class="js-sidebar-scroll">
         <slot name="content">
           <!-- Side Navigation -->
           <div class="content-side">
             <MenuView />
-            <!-- <MenuView v-if="userStore.isSuperAdmin" />
-            <MenuUserView v-else /> -->
           </div>
           <!-- END Side Navigation -->
         </slot>
@@ -66,6 +71,7 @@
 import MenuView from "@/components/MenuView.vue";
 import { useTemplateStore } from "@/stores/template";
 import { useUserStore } from "@/stores/user";
+import { computed } from "vue";
 
 // SimpleBar, for more info and examples you can check out https://github.com/Grsmto/simplebar/tree/master/packages/simplebar-vue
 import SimpleBar from "simplebar";
@@ -73,6 +79,36 @@ import SimpleBar from "simplebar";
 // Main store
 const store = useTemplateStore();
 const userStore = useUserStore();
+
+const userDisplayName = computed(() => {
+  const u = userStore.getUser;
+  if (!u) return "";
+  return u.name || u.first_name || u.email || "Usuario";
+});
+
+const roleLabel = computed(() => {
+  const r = userStore.getUser?.role;
+  if (!r) return "Usuario";
+  const map = {
+    Administrador: "Administrador",
+    Admin: "Administrador",
+    "Super Admin": "Administrador",
+    Docente: "Docente",
+    Estudiante: "Estudiante",
+    "Padre/Tutor": "Padre/Tutor",
+    Usuario: "Usuario",
+  };
+  return map[r] || r;
+});
+
+const roleBadgeClass = computed(() => {
+  const r = String(userStore.getUser?.role || "").toLowerCase();
+  if (r === "administrador" || r === "admin" || r === "super admin") return "bg-warning text-dark";
+  if (r === "docente") return "bg-info";
+  if (r === "estudiante") return "bg-primary";
+  if (r === "padre/tutor" || r === "padre") return "bg-pink";
+  return "bg-secondary";
+});
 
 // Dark Mode preference helper for radios
 const radioDarkMode = ref();

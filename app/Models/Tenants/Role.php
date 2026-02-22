@@ -20,12 +20,28 @@ class Role extends RoleBase
 
     public const ROLE_SUPER_ADMIN = 'Super Admin';
 
-    public const ROLE_ADMIN = 'Admin';
+    /** @var string Administrador (wireframe default role) */
+    public const ROLE_ADMIN = 'Administrador';
 
+    /** @var string Docente / Teacher */
+    public const ROLE_TEACHER = 'Docente';
+
+    /** @var string Estudiante / Student */
+    public const ROLE_STUDENT = 'Estudiante';
+
+    /** @var string Padre/Tutor / Parent */
+    public const ROLE_PARENT = 'Padre/Tutor';
+
+    /** @var string Legacy generic user (editable, not locked) */
     public const ROLE_USER = 'Usuario';
 
+    /** Roles that cannot be deleted or renamed (4 default + Super Admin) */
     protected static $lockedRoles = [
         self::ROLE_SUPER_ADMIN,
+        self::ROLE_ADMIN,
+        self::ROLE_TEACHER,
+        self::ROLE_STUDENT,
+        self::ROLE_PARENT,
     ];
 
     protected $dates = [

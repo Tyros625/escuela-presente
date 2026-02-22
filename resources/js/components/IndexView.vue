@@ -85,7 +85,7 @@
                               <i class="fa fa-fw fa-pencil-alt"></i>
                             </button>
                           </router-link>
-                          <button v-if="permissions.delete" type="button" class="btn btn-sm btn-danger"
+                          <button v-if="permissions.delete && !(route.name === 'roles' && row.is_locked)" type="button" class="btn btn-sm btn-danger"
                             @click.prevent="destroy(row.id)">
                             <i class="fa fa-fw fa-times"></i>
                           </button>

@@ -61,13 +61,35 @@ class SelectListController extends Controller
 
     public function getRoles($search)
     {
-        $query = Role::select('id', 'name');
+        $this->ensureDefaultRolesExist();
+
+        $query = Role::select('id', 'name')
+            ->where('name', '!=', Role::ROLE_SUPER_ADMIN);
 
         if (! empty($search)) {
             $query->where('name', 'like', '%'.$search.'%');
         }
 
-        return $query->get();
+        return $query->orderBy('name')->get();
+    }
+
+    /**
+     * Ensure the 4 default roles exist so they appear when adding users.
+     */
+    protected function ensureDefaultRolesExist(): void
+    {
+        $defaults = [
+            Role::ROLE_ADMIN,
+            Role::ROLE_TEACHER,
+            Role::ROLE_STUDENT,
+            Role::ROLE_PARENT,
+        ];
+        foreach ($defaults as $name) {
+            if (! Role::where('name', $name)->exists()) {
+                app()->make(\Database\Seeders\RolesSeeder::class)->run();
+                return;
+            }
+        }
     }
 
     public function getSpecialties($search)

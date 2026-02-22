@@ -73,7 +73,7 @@
                       {{ userStore.getUser.name }}
                     </p>
                     <p class="mb-0 text-muted fs-sm fw-medium">
-                      {{ userStore.getUser.roles[0]?.name }}
+                      {{ userStore.getUser.role || '—' }}
                     </p>
                   </div>
                   <div class="p-2">

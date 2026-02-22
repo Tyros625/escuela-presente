@@ -44,6 +44,7 @@ class User extends Authenticatable
 
     protected $appends = [
         'is_super_admin',
+        'role',
     ];
 
     public function setPasswordAttribute($value)

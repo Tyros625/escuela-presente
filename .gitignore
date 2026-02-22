@@ -76,6 +76,10 @@ Temporary Items
 *.icloud
 
 ### Windows ###
+# Reserved device name (e.g. accidental "echo > nul")
+nul
+NUL
+
 # Windows thumbnail cache files
 Thumbs.db
 Thumbs.db:encryptable
