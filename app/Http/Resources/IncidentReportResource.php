@@ -18,7 +18,7 @@ class IncidentReportResource extends JsonResource
             'incident' => $this->incident->description,
             // 'incident' => $this->incident,
             'teacher_id' => $this->teacher_id,
-            'teacher' => "{$this->teacher->last_name}, {$this->teacher->name}",
+            'teacher' => $this->teacher->display_name,
             // 'teacher' => $this->teacher,
             'specialty_id' => $this->specialty_id,
             'specialty' => $this->specialty->description,

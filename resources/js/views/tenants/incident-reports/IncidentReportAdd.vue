@@ -42,7 +42,7 @@
             <VueSelect
               v-model="form.teacher_id"
               :options="teachers"
-              label="name"
+              label="display_name"
               :reduce="(option) => option.id"
               placeholder="Elige un valor..."
               :disabled="isLoading"

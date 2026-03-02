@@ -105,10 +105,15 @@ class SelectListController extends Controller
 
     public function getTeachers($search)
     {
-        $query = Teacher::select('id', 'name', 'last_name');
+        $query = Teacher::select('id', 'name', 'last_name', 'last_name_father', 'last_name_mother');
 
         if (! empty($search)) {
-            $query->where('name', 'like', '%'.$search.'%');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('last_name_father', 'like', '%'.$search.'%')
+                    ->orWhere('last_name_mother', 'like', '%'.$search.'%')
+                    ->orWhere('last_name', 'like', '%'.$search.'%');
+            });
         }
 
         return $query->get();

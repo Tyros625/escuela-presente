@@ -29,16 +29,25 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
+            $lastNameFather = $row['apellido_paterno'] ?? $row['apellidos'] ?? null;
+            $lastNameMother = $row['apellido_materno'] ?? null;
+
             Teacher::create(
                 [
                     'name' => $row['nombres'],
-                    'last_name' => $row['apellidos'],
-                    'date_birth' => $row['fecha_nacimiento'],
-                    'sex' => $row['sexo'],
-                    'email' => $row['correo_electronico'],
-                    'phone' => $row['telefono'],
-                    'address' => $row['direccion'],
-                    'specialty_id' => $this->specialty[$row['especialidad']],
+                    'last_name' => $row['apellidos'] ?? null,
+                    'last_name_father' => $lastNameFather,
+                    'last_name_mother' => $lastNameMother,
+                    'rfc' => $row['rfc'] ?? null,
+                    'date_birth' => isset($row['fecha_nacimiento']) ? $row['fecha_nacimiento'] : null,
+                    'sex' => $row['sexo'] ?? null,
+                    'email' => $row['correo_electronico'] ?? null,
+                    'institutional_email' => $row['correo_institucional'] ?? null,
+                    'phone' => $row['telefono'] ?? null,
+                    'address' => $row['direccion'] ?? null,
+                    'specialty_id' => $this->specialty[$row['especialidad']] ?? null,
+                    'max_hours_per_week' => $row['horas_maximas_semana'] ?? null,
+                    'available_hours' => $row['horarios_disponibles'] ?? null,
                 ]
             );
         }
@@ -61,18 +70,36 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
 
     public function prepareForValidation($data)
     {
-        // dd($data);
-
-        $data['nombres'] = Helper::unaccent($data['nombres']);
-        $data['apellidos'] = Helper::unaccent($data['apellidos']);
-        $data['fecha_nacimiento'] = Date::excelToDateTimeObject($data['fecha_nacimiento'])->format('Y-m-d');
-        $data['sexo'] = Helper::unaccent($data['sexo']);
-        $data['correo_electronico'] = $data['correo_electronico'];
-        $data['telefono'] = Helper::unaccent($data['telefono']);
-        $data['direccion'] = Helper::unaccent($data['direccion']);
-        $data['especialidad'] = Helper::unaccent($data['especialidad']);
-
-        // dd($data);
+        if (isset($data['nombres'])) {
+            $data['nombres'] = Helper::unaccent($data['nombres']);
+        }
+        if (isset($data['apellidos'])) {
+            $data['apellidos'] = Helper::unaccent($data['apellidos']);
+        }
+        if (isset($data['apellido_paterno'])) {
+            $data['apellido_paterno'] = Helper::unaccent($data['apellido_paterno']);
+        }
+        if (isset($data['apellido_materno'])) {
+            $data['apellido_materno'] = Helper::unaccent($data['apellido_materno']);
+        }
+        if (isset($data['fecha_nacimiento'])) {
+            $data['fecha_nacimiento'] = Date::excelToDateTimeObject($data['fecha_nacimiento'])->format('Y-m-d');
+        }
+        if (isset($data['sexo'])) {
+            $data['sexo'] = Helper::unaccent($data['sexo']);
+        }
+        if (isset($data['correo_electronico'])) {
+            $data['correo_electronico'] = $data['correo_electronico'];
+        }
+        if (isset($data['telefono'])) {
+            $data['telefono'] = Helper::unaccent($data['telefono']);
+        }
+        if (isset($data['direccion'])) {
+            $data['direccion'] = Helper::unaccent($data['direccion']);
+        }
+        if (isset($data['especialidad'])) {
+            $data['especialidad'] = Helper::unaccent($data['especialidad']);
+        }
 
         return $data;
     }
@@ -81,13 +108,16 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
     {
         return [
             '*.nombres' => 'required',
-            '*.apellidos' => 'required',
-            '*.fecha_nacimiento' => 'required',
-            '*.sexo' => 'required',
-            '*.correo_electronico' => 'required|unique:teachers,email',
-            '*.telefono' => 'required|unique:teachers,phone',
-            '*.direccion' => 'required',
-            '*.especialidad' => 'required',
+            '*.apellido_paterno' => 'nullable',
+            '*.apellido_materno' => 'nullable',
+            '*.apellidos' => 'nullable',
+            '*.fecha_nacimiento' => 'nullable',
+            '*.sexo' => 'nullable',
+            '*.correo_electronico' => 'nullable|unique:teachers,email',
+            '*.correo_institucional' => 'nullable|unique:teachers,institutional_email',
+            '*.telefono' => 'nullable|unique:teachers,phone',
+            '*.direccion' => 'nullable',
+            '*.especialidad' => 'nullable',
         ];
     }
 

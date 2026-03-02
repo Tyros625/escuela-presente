@@ -9,7 +9,7 @@ onMounted(async () => {
 });
 
 const getData = async () => {
-  const { data } = await api.get(`/incident-reports/${route.params.id}`);
+  const { data } = await api.get(`/students/incidents/${route.params.id}`);
   records.value = data.data.reverse();
 };
 
@@ -58,7 +58,7 @@ function modalShow(modalName, data) {
                   {{ `${item.created_at}` }}
                 </td>
                 <td>{{ item.incident.description }}</td>
-                <td>{{ `${item.teacher.last_name}, ${item.teacher.name}` }}</td>
+                <td>{{ item.teacher?.display_name || `${item.teacher?.last_name || ''}, ${item.teacher?.name || ''}`.trim() }}</td>
                 <td>{{ item.specialty.description }}</td>
                 <td>{{ item.observations }}</td>
                 <td>
