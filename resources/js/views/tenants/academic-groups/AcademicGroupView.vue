@@ -63,8 +63,23 @@ const columns = [
 		sort: "",
 	},
 	{
+		name: "Turno",
+		field: "shift",
+		sort: "",
+	},
+	{
+		name: "Salón / Aula",
+		field: "room_name",
+		sort: "",
+	},
+	{
 		name: "Límite",
 		field: "student_limit",
+		sort: "",
+	},
+	{
+		name: "Materias",
+		field: "subjects_count",
 		sort: "",
 	},
 	{
@@ -80,8 +95,16 @@ const formModel = {
 	grade_id: "",
 	section_id: "",
 	school_cycle_id: "",
+	shift: "morning",
+	room_name: "",
 	student_limit: "",
+	subjects_count: 0,
+	subjects: [],
 };
+const subjectsCountOptions = Array.from({ length: 20 }, (_, i) => ({
+	id: i + 1,
+	description: String(i + 1),
+}));
 const formSchema = [
 	{
 		type: "select",
@@ -108,11 +131,45 @@ const formSchema = [
 		values: [],
 	},
 	{
+		type: "select",
+		label: "Turno",
+		model: "shift",
+		class: "col-md-6",
+		labelApi: "description",
+		values: [
+			{ id: "morning", description: "Mañana" },
+			{ id: "afternoon", description: "Tarde" },
+		],
+	},
+	{
 		type: "input",
 		inputType: "number",
 		label: "Límite Estudiantes",
 		model: "student_limit",
 		class: "col-md-6",
+	},
+	{
+		type: "input",
+		inputType: "text",
+		label: "Salón / Aula",
+		model: "room_name",
+		class: "col-md-6",
+	},
+	{
+		type: "select",
+		label: "Número de materias",
+		model: "subjects_count",
+		class: "col-md-6",
+		labelApi: "description",
+		values: subjectsCountOptions,
+	},
+	{
+		type: "subjects",
+		label: "Materias",
+		model: "subjects",
+		countModel: "subjects_count",
+		itemPlaceholder: "Materia",
+		class: "col-md-12",
 	},
 ];
 </script>

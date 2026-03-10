@@ -193,6 +193,22 @@
                   multiple
                   :disabled="isLoading"
                 />
+                <div v-if="el.type === 'subjects'">
+                  <div
+                    v-for="i in Math.max(0, Number(form[el.countModel] || 0))"
+                    :key="i"
+                    class="mb-2"
+                  >
+                    <input
+                      type="text"
+                      v-model="form[el.model][i - 1]"
+                      class="form-control"
+                      :placeholder="`${el.itemPlaceholder || 'Materia'} ${i}`"
+                      :disabled="isLoading"
+                      v-uppercase
+                    />
+                  </div>
+                </div>
               </div>
               <div class="col-md-12 mt-3 text-end">
                 <button
@@ -322,9 +338,32 @@ onMounted(async () => {
   console.log("Route Name: " + route.name);
   actualDomain.value = window.location.host;
   getData();
+  setupSubjectsWatchers();
 });
 
 const actualDomain = ref("");
+
+function normalizeSubjectsField(el) {
+  const count = Math.max(0, Number(form[el.countModel] || 0));
+  if (!Array.isArray(form[el.model])) form[el.model] = [];
+  if (form[el.model].length > count) {
+    form[el.model] = form[el.model].slice(0, count);
+  } else {
+    while (form[el.model].length < count) form[el.model].push("");
+  }
+}
+
+function setupSubjectsWatchers() {
+  props.formSchema
+    .filter((el) => el.type === "subjects")
+    .forEach((el) => {
+      watch(
+        () => form[el.countModel],
+        () => normalizeSubjectsField(el),
+        { immediate: true }
+      );
+    });
+}
 
 const getData = async () => {
   const { data } = await api.get(`/${props.routeFetch}`);
@@ -444,6 +483,16 @@ function getDataID() {
       if (res.status === 200) {
         let data = res.data.data;
         Object.assign(form, data);
+        props.formSchema
+          .filter((el) => el.type === "subjects")
+          .forEach((el) => {
+            if (!form[el.countModel]) {
+              form[el.countModel] = Array.isArray(form[el.model])
+                ? form[el.model].length
+                : 0;
+            }
+            normalizeSubjectsField(el);
+          });
       }
     })
     .catch((err) => {

@@ -15,19 +15,27 @@ class AcademicGroup extends Model
         'grade_id',
         'section_id',
         'school_cycle_id',
+        'shift',
+        'room_name',
         'student_limit',
+        'subjects',
     ];
 
     protected $casts = [
         'created_at' => ActualTimeZone::class,
         'updated_at' => ActualTimeZone::class,
+        'subjects' => 'array',
     ];
 
     public static $rules = [
         'grade_id' => 'required',
         'section_id' => 'required',
         'school_cycle_id' => 'required',
+        'shift' => 'required|in:morning,afternoon',
+        'room_name' => 'nullable|string|max:255',
         'student_limit' => 'required',
+        'subjects' => 'nullable|array|max:20',
+        'subjects.*' => 'nullable|string|max:255',
     ];
 
     public function grade(): BelongsTo
