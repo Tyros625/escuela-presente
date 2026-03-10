@@ -12,6 +12,7 @@ class AcademicGroup extends Model
     public $table = 'academic_groups';
 
     public $fillable = [
+        'name',
         'grade_id',
         'section_id',
         'school_cycle_id',
@@ -28,12 +29,13 @@ class AcademicGroup extends Model
     ];
 
     public static $rules = [
+        'name' => 'required|string|max:255',
         'grade_id' => 'required',
         'section_id' => 'required',
         'school_cycle_id' => 'required',
         'shift' => 'required|in:morning,afternoon',
         'room_name' => 'nullable|string|max:255',
-        'student_limit' => 'required',
+        'student_limit' => 'required|integer|min:1',
         'subjects' => 'nullable|array|max:20',
         'subjects.*' => 'nullable|string|max:255',
     ];

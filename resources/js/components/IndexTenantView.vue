@@ -171,6 +171,10 @@
                   :type="el.inputType"
                   v-model="form[el.model]"
                   class="form-control"
+                  :placeholder="el.placeholder"
+                  :min="el.min"
+                  :max="el.max"
+                  :step="el.step"
                   :disabled="isLoading"
                   v-uppercase
                 />

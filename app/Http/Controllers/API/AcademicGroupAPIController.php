@@ -13,7 +13,10 @@ class AcademicGroupAPIController extends AppBaseController
 {
     public function index(): JsonResponse
     {
-        $academicGroups = AcademicGroup::all();
+        $academicGroups = AcademicGroup::query()
+            ->with(['grade', 'section', 'schoolCycle'])
+            ->withCount('students')
+            ->get();
 
         return $this->sendResponse(AcademicGroupResource::collection($academicGroups), 'Academic Groups retrieved successfully');
     }
@@ -21,13 +24,17 @@ class AcademicGroupAPIController extends AppBaseController
     public function store(CreateAcademicGroupAPIRequest $request): JsonResponse
     {
         $academicGroup = AcademicGroup::create($request->all());
+        $academicGroup->load(['grade', 'section', 'schoolCycle'])->loadCount('students');
 
         return $this->sendResponse(new AcademicGroupResource($academicGroup), 'Academic Group saved successfully');
     }
 
     public function show($id): JsonResponse
     {
-        $academicGroup = AcademicGroup::find($id);
+        $academicGroup = AcademicGroup::query()
+            ->with(['grade', 'section', 'schoolCycle'])
+            ->withCount('students')
+            ->find($id);
 
         if (empty($academicGroup)) {
             return $this->sendError('Academic Group not found');
@@ -46,6 +53,7 @@ class AcademicGroupAPIController extends AppBaseController
 
         $academicGroup->fill($request->all());
         $academicGroup->save();
+        $academicGroup->load(['grade', 'section', 'schoolCycle'])->loadCount('students');
 
         return $this->sendResponse(new AcademicGroupResource($academicGroup), 'AcademicGroup updated successfully');
     }
