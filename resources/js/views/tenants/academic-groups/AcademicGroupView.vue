@@ -197,8 +197,19 @@
 								/>
 							</div>
 
+							<!-- Año Escolar + Turno (ya está arriba, aquí ciclo) -->
+							<div class="col-md-6">
+								<label class="form-label fw-semibold">Año Escolar</label>
+								<select class="form-select" v-model="form.school_cycle_id" :disabled="isSaving" required>
+									<option value="">Selecciona un ciclo...</option>
+									<option v-for="c in schoolCycles" :key="c.id" :value="c.id">
+										{{ c.description }}
+									</option>
+								</select>
+							</div>
+
 							<!-- Salón / Aula -->
-							<div class="col-md-8">
+							<div class="col-md-6">
 								<label class="form-label fw-semibold">Salón / Aula</label>
 								<input
 									class="form-control"
@@ -224,20 +235,6 @@
 								/>
 							</div>
 
-							<!-- Año Escolar (oculto, auto) -->
-							<div class="col-12" v-if="!form.school_cycle_id">
-								<div class="alert alert-warning py-2 mb-0 fs-sm">
-									<i class="fa-solid fa-triangle-exclamation me-1"></i>
-									Selecciona un ciclo escolar en el filtro superior para asignarlo al grupo.
-								</div>
-							</div>
-							<div class="col-12" v-else>
-								<div class="alert alert-info py-2 mb-0 fs-sm">
-									<i class="fa-solid fa-calendar-check me-1"></i>
-									Ciclo escolar: <strong>{{ selectedCycleName }}</strong>
-								</div>
-							</div>
-
 							<!-- Acciones -->
 							<div class="col-12 d-flex justify-content-end gap-2 mt-2">
 								<button
@@ -251,7 +248,7 @@
 								<button
 									type="submit"
 									class="btn btn-primary"
-									:disabled="isSaving || !form.school_cycle_id"
+									:disabled="isSaving"
 								>
 									<i class="fa fa-cog fa-spin me-1" v-if="isSaving"></i>
 									<i class="fa-solid fa-floppy-disk me-1" v-else></i>
@@ -375,15 +372,6 @@ function hideModal() {
 }
 
 async function onSubmit() {
-	if (!form.school_cycle_id) {
-		Swal.fire({
-			icon: 'warning',
-			title: 'Ciclo escolar requerido',
-			text: 'Selecciona un ciclo escolar en el filtro superior antes de guardar el grupo.',
-		});
-		return;
-	}
-
 	isSaving.value = true;
 	try {
 		const count = Math.max(0, Math.min(20, Number(form.subjects_count || 0)));
