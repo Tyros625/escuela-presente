@@ -1,6 +1,6 @@
 <template>
 	<BasePageHeading
-		title="Gestión de Grupos"
+		title="Gestión de Materias"
 		:subtitle="selectedCycleName ? `— Ciclo Escolar ${selectedCycleName}` : ''"
 	>
 		<template #extra>
@@ -12,14 +12,14 @@
 					</option>
 				</select>
 
-				<button type="button" class="btn btn-sm btn-alt-primary" disabled>
-					<i class="fa-solid fa-wand-magic-sparkles me-1"></i>
-					Asignación
+				<button type="button" class="btn btn-sm btn-alt-primary btn-icon-center" disabled>
+					<i class="fa-solid fa-wand-magic-sparkles"></i>
+					Asignación Auto
 				</button>
 
-				<button type="button" class="btn btn-sm btn-primary" @click="openCreateModal">
-					<i class="fa fa-plus opacity-50 me-1"></i>
-					Nuevo Grupo
+				<button type="button" class="btn btn-sm btn-primary btn-icon-center" @click="openCreateModal">
+					<i class="fa fa-plus opacity-50"></i>
+					Nueva Materia
 				</button>
 			</div>
 		</template>
@@ -28,14 +28,28 @@
 	<div class="content">
 		<BaseBlock content-full>
 			<template #header>
-				<div class="d-flex align-items-center justify-content-between w-100 py-1">
+				<div class="d-flex align-items-center justify-content-between w-100 py-1 gap-3 flex-wrap">
 					<div class="d-flex align-items-center gap-2">
-						<i class="fa-solid fa-layer-group text-primary"></i>
-						<h3 class="block-title mb-0">Grupos Registrados</h3>
+						<i class="fa-solid fa-book text-primary"></i>
+						<h3 class="block-title mb-0">Catálogo de Materias</h3>
 					</div>
-					<span v-if="selectedCycleName" class="badge bg-primary-subtle text-primary fs-xs">
-						Ciclo {{ selectedCycleName }}
-					</span>
+					<div class="d-flex align-items-center gap-2 flex-wrap">
+						<div class="search-wrap">
+							<i class="fa-solid fa-magnifying-glass search-icon"></i>
+							<input
+								type="text"
+								class="form-control form-control-sm search-input"
+								v-model.trim="searchText"
+								placeholder="Buscar materia..."
+							/>
+						</div>
+						<select class="form-select form-select-sm w-auto" v-model="selectedGradeId">
+							<option :value="null">Todos los grados</option>
+							<option v-for="g in grades" :key="g.id" :value="g.id">
+								{{ g.description }}
+							</option>
+						</select>
+					</div>
 				</div>
 			</template>
 
@@ -43,62 +57,35 @@
 				<table class="table table-striped table-hover mb-0 align-middle">
 					<thead>
 						<tr class="text-uppercase fs-xs">
-							<th>Grupo</th>
+							<th>Clave</th>
+							<th>Materia</th>
 							<th>Grado</th>
-							<th>Turno</th>
-							<th class="text-center">Alumnos</th>
-							<th class="text-center">Materias</th>
-							<th style="min-width: 180px">Cobertura</th>
-							<th>Salón</th>
+							<th class="text-center">Horas/Sem.</th>
+							<th class="text-center">Créditos</th>
+							<th>Campo Formativo</th>
 							<th class="text-end">Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="g in filteredGroups" :key="g.id">
-							<td class="fw-semibold">{{ g.name || g.group_label }}</td>
-							<td>{{ g.grade }}</td>
+						<tr v-for="row in filteredRows" :key="row.id">
+							<td class="fw-semibold">{{ row.code }}</td>
+							<td>{{ row.subjectName }}</td>
 							<td>
-								<span
-									:class="[
-										'badge rounded-pill',
-										g.shift === 'afternoon' ? 'bg-warning text-dark' : 'bg-info',
-									]"
-								>
-									{{ g.shift === 'afternoon' ? 'Vespertino' : 'Matutino' }}
+								<span class="badge bg-body-secondary text-body-emphasis">{{ row.gradeLabel }}</span>
+							</td>
+							<td class="text-center fw-semibold">{{ row.hoursPerWeek }}h</td>
+							<td class="text-center">{{ row.credits }}</td>
+							<td>
+								<span class="badge bg-info-subtle text-info-emphasis">
+									{{ row.trainingField }}
 								</span>
 							</td>
-							<td class="text-center">{{ g.students_count ?? 0 }}</td>
-							<td class="text-center">{{ g.subjects_count ?? 0 }}</td>
-							<td>
-								<div class="d-flex align-items-center gap-2">
-									<span
-										class="fs-xs fw-semibold"
-										style="min-width: 36px"
-										:class="coverageTextClass(g.coverage_percent)"
-									>
-										{{ Math.min(100, Number(g.coverage_percent || 0)) }}%
-									</span>
-									<div class="progress flex-grow-1" style="height: 8px">
-										<div
-											class="progress-bar"
-											:class="coverageBarClass(g.coverage_percent)"
-											role="progressbar"
-											:style="{ width: `${Math.min(100, Number(g.coverage_percent || 0))}%` }"
-										/>
-									</div>
-								</div>
-							</td>
-							<td class="text-muted">{{ g.room_name || '-' }}</td>
 							<td class="text-end">
 								<div class="btn-group">
-									<button type="button" class="btn btn-sm btn-alt-secondary" disabled>
-										<i class="fa-regular fa-calendar me-1"></i>
-										Horario
-									</button>
 									<button
 										type="button"
 										class="btn btn-sm btn-alt-warning"
-										@click="openEditModal(g)"
+										@click="openEditModal(row.source)"
 										title="Editar"
 									>
 										<i class="fa-solid fa-pen"></i>
@@ -106,7 +93,7 @@
 									<button
 										type="button"
 										class="btn btn-sm btn-alt-danger"
-										@click="confirmDelete(g)"
+										@click="confirmDelete(row.source)"
 										title="Eliminar"
 									>
 										<i class="fa-solid fa-trash"></i>
@@ -114,10 +101,10 @@
 								</div>
 							</td>
 						</tr>
-						<tr v-if="!filteredGroups.length">
-							<td colspan="8" class="text-center text-muted py-5">
+						<tr v-if="!filteredRows.length">
+							<td colspan="7" class="text-center text-muted py-5">
 								<i class="fa-solid fa-folder-open fa-2x d-block mb-2 opacity-50"></i>
-								Sin grupos registrados
+								Sin materias registradas
 							</td>
 						</tr>
 					</tbody>
@@ -126,7 +113,6 @@
 		</BaseBlock>
 	</div>
 
-	<!-- Modal Nuevo / Editar Grupo -->
 	<div
 		class="modal fade"
 		id="modal-academic-groups"
@@ -139,8 +125,8 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title d-flex align-items-center gap-2" id="modal-academic-groups-label">
-						<i class="fa-solid fa-users-gear text-primary"></i>
-						{{ modalType === 'add' ? 'Nuevo Grupo' : 'Editar Grupo' }}
+						<i class="fa-solid fa-book-open text-primary"></i>
+						{{ modalType === 'add' ? 'Nueva Materia' : 'Editar Materia' }}
 					</h5>
 					<button
 						type="button"
@@ -152,16 +138,25 @@
 				<div class="modal-body">
 					<form @submit.prevent="onSubmit">
 						<div class="row g-3">
-
-							<!-- Nombre del Grupo + Grado -->
 							<div class="col-md-6">
-								<label class="form-label fw-semibold">Nombre del Grupo</label>
+								<label class="form-label fw-semibold">Clave</label>
 								<input
 									class="form-control"
 									type="text"
-									v-model="form.name"
-									placeholder="Ej. 1°A"
+									v-model.trim="form.code"
+									placeholder="Ej. MAT1"
 									v-uppercase
+									:disabled="isSaving"
+									required
+								/>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label fw-semibold">Nombre de la Materia</label>
+								<input
+									class="form-control"
+									type="text"
+									v-model.trim="form.subject_name"
+									placeholder="Ej. Matemáticas I"
 									:disabled="isSaving"
 									required
 								/>
@@ -175,29 +170,32 @@
 									</option>
 								</select>
 							</div>
-
-							<!-- Turno + Capacidad -->
-							<div class="col-md-6">
-								<label class="form-label fw-semibold">Turno</label>
-								<select class="form-select" v-model="form.shift" :disabled="isSaving" required>
-									<option value="morning">Matutino</option>
-									<option value="afternoon">Vespertino</option>
-								</select>
-							</div>
-							<div class="col-md-6">
-								<label class="form-label fw-semibold">Capacidad máx. alumnos</label>
+							<div class="col-md-3">
+								<label class="form-label fw-semibold">Horas por Semana</label>
 								<input
 									class="form-control"
 									type="number"
 									min="1"
+									max="40"
 									step="1"
-									v-model.number="form.student_limit"
+									v-model.number="form.hours_per_week"
 									:disabled="isSaving"
 									required
 								/>
 							</div>
-
-							<!-- Año Escolar + Turno (ya está arriba, aquí ciclo) -->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold">Créditos</label>
+								<input
+									class="form-control"
+									type="number"
+									min="1"
+									max="20"
+									step="1"
+									v-model.number="form.credits"
+									:disabled="isSaving"
+									required
+								/>
+							</div>
 							<div class="col-md-6">
 								<label class="form-label fw-semibold">Año Escolar</label>
 								<select class="form-select" v-model="form.school_cycle_id" :disabled="isSaving" required>
@@ -207,35 +205,15 @@
 									</option>
 								</select>
 							</div>
-
-							<!-- Salón / Aula -->
 							<div class="col-md-6">
-								<label class="form-label fw-semibold">Salón / Aula</label>
-								<input
-									class="form-control"
-									type="text"
-									v-model="form.room_name"
-									placeholder="Ej. Aula 12-B"
-									v-uppercase
-									:disabled="isSaving"
-								/>
+								<label class="form-label fw-semibold">Campo Formativo</label>
+								<select class="form-select" v-model="form.training_field" :disabled="isSaving" required>
+									<option value="">Selecciona un campo...</option>
+									<option v-for="field in trainingFieldOptions" :key="field" :value="field">
+										{{ field }}
+									</option>
+								</select>
 							</div>
-
-							<!-- Número de materias -->
-							<div class="col-md-4">
-								<label class="form-label fw-semibold">Nº de Materias</label>
-								<input
-									class="form-control"
-									type="number"
-									min="0"
-									max="20"
-									step="1"
-									v-model.number="form.subjects_count"
-									:disabled="isSaving"
-								/>
-							</div>
-
-							<!-- Acciones -->
 							<div class="col-12 d-flex justify-content-end gap-2 mt-2">
 								<button
 									type="button"
@@ -247,12 +225,12 @@
 								</button>
 								<button
 									type="submit"
-									class="btn btn-primary"
+									class="btn btn-primary btn-icon-center"
 									:disabled="isSaving"
 								>
-									<i class="fa fa-cog fa-spin me-1" v-if="isSaving"></i>
-									<i class="fa-solid fa-floppy-disk me-1" v-else></i>
-									{{ modalType === 'add' ? 'Guardar Grupo' : 'Actualizar Grupo' }}
+									<i class="fa fa-cog fa-spin" v-if="isSaving"></i>
+									<i class="fa-solid fa-floppy-disk" v-else></i>
+									{{ modalType === 'add' ? 'Guardar Materia' : 'Actualizar Materia' }}
 								</button>
 							</div>
 						</div>
@@ -267,55 +245,81 @@
 import api from '@/services/api';
 import Swal from 'sweetalert2';
 
+const trainingFieldOptions = [
+	'Lenguajes',
+	'Saberes y Pensamiento Científico',
+	'Ética, Naturaleza y Sociedades',
+	'De lo Humano y lo Comunitario',
+];
+
 const groups = ref([]);
 const grades = ref([]);
 const schoolCycles = ref([]);
 const selectedSchoolCycleId = ref(null);
+const selectedGradeId = ref(null);
+const searchText = ref('');
 
 const modalType = ref('add');
 const rowSelected = ref(null);
 const isSaving = ref(false);
 
 const form = reactive({
-	name: '',
+	code: '',
+	subject_name: '',
 	grade_id: '',
 	school_cycle_id: '',
-	shift: 'morning',
-	student_limit: 40,
-	room_name: '',
-	subjects_count: 8,
+	hours_per_week: 5,
+	credits: 8,
+	training_field: trainingFieldOptions[0],
 });
 
 const selectedCycleName = computed(() => {
 	if (!selectedSchoolCycleId.value) return '';
-	const c = schoolCycles.value.find((c) => c.id === selectedSchoolCycleId.value);
+	const c = schoolCycles.value.find((cycle) => cycle.id === selectedSchoolCycleId.value);
 	return c ? c.description : '';
 });
 
-const filteredGroups = computed(() => {
-	if (!selectedSchoolCycleId.value) return groups.value;
-	return groups.value.filter((g) => g.school_cycle_id === selectedSchoolCycleId.value);
+function normalizeSubjectRow(g) {
+	const subjects = Array.isArray(g.subjects) ? g.subjects.filter(Boolean) : [];
+	const trainingField = subjects.find((item) => trainingFieldOptions.includes(item)) || trainingFieldOptions[0];
+	const credits = Math.max(1, Number(g.subjects_count || subjects.length || 1));
+
+	return {
+		id: g.id,
+		code: g.name || g.group_label || '-',
+		subjectName: g.room_name || g.group_label || '-',
+		gradeId: g.grade_id,
+		gradeLabel: g.grade || '-',
+		hoursPerWeek: Math.max(1, Number(g.student_limit || 1)),
+		credits,
+		trainingField,
+		source: g,
+	};
+}
+
+const filteredRows = computed(() => {
+	const search = searchText.value.toLowerCase();
+	return groups.value
+		.map(normalizeSubjectRow)
+		.filter((row) => {
+			if (selectedSchoolCycleId.value && row.source.school_cycle_id !== selectedSchoolCycleId.value) {
+				return false;
+			}
+			if (selectedGradeId.value && row.gradeId !== selectedGradeId.value) {
+				return false;
+			}
+			if (!search) return true;
+			return (
+				row.code.toLowerCase().includes(search) ||
+				row.subjectName.toLowerCase().includes(search) ||
+				row.gradeLabel.toLowerCase().includes(search) ||
+				row.trainingField.toLowerCase().includes(search)
+			);
+		});
 });
 
-function coverageBarClass(p) {
-	const n = Number(p || 0);
-	if (n >= 90) return 'bg-success';
-	if (n >= 70) return 'bg-warning';
-	return 'bg-danger';
-}
-
-function coverageTextClass(p) {
-	const n = Number(p || 0);
-	if (n >= 90) return 'text-success';
-	if (n >= 70) return 'text-warning';
-	return 'text-danger';
-}
-
 async function fetchLists() {
-	const [g, c] = await Promise.all([
-		api.get('/lists/grades'),
-		api.get('/lists/school-cycles'),
-	]);
+	const [g, c] = await Promise.all([api.get('/lists/grades'), api.get('/lists/school-cycles')]);
 	grades.value = g.data;
 	schoolCycles.value = c.data;
 }
@@ -327,13 +331,13 @@ async function fetchGroups() {
 
 function resetForm() {
 	Object.assign(form, {
-		name: '',
+		code: '',
+		subject_name: '',
 		grade_id: '',
 		school_cycle_id: selectedSchoolCycleId.value || '',
-		shift: 'morning',
-		student_limit: 40,
-		room_name: '',
-		subjects_count: 8,
+		hours_per_week: 5,
+		credits: 8,
+		training_field: trainingFieldOptions[0],
 	});
 }
 
@@ -345,16 +349,17 @@ function openCreateModal() {
 }
 
 function openEditModal(g) {
+	const row = normalizeSubjectRow(g);
 	modalType.value = 'edit';
 	rowSelected.value = g;
 	Object.assign(form, {
-		name: g.name || g.group_label || '',
+		code: row.code,
+		subject_name: row.subjectName,
 		grade_id: g.grade_id,
 		school_cycle_id: g.school_cycle_id,
-		shift: g.shift || 'morning',
-		student_limit: g.student_limit || 40,
-		room_name: g.room_name || '',
-		subjects_count: g.subjects_count ?? 0,
+		hours_per_week: row.hoursPerWeek,
+		credits: row.credits,
+		training_field: row.trainingField,
 	});
 	showModal();
 }
@@ -374,17 +379,17 @@ function hideModal() {
 async function onSubmit() {
 	isSaving.value = true;
 	try {
-		const count = Math.max(0, Math.min(20, Number(form.subjects_count || 0)));
-		const subjectsArray = Array.from({ length: count }, () => '');
+		const credits = Math.max(1, Math.min(20, Number(form.credits || 1)));
+		const subjectsArray = Array.from({ length: credits }, () => form.training_field);
 
 		const payload = {
-			name: form.name,
+			name: form.code,
 			grade_id: form.grade_id,
 			section_id: null,
 			school_cycle_id: form.school_cycle_id,
-			shift: form.shift,
-			room_name: form.room_name || null,
-			student_limit: form.student_limit,
+			shift: 'morning',
+			room_name: form.subject_name,
+			student_limit: Math.max(1, Number(form.hours_per_week || 1)),
 			subjects: subjectsArray,
 		};
 
@@ -399,8 +404,8 @@ async function onSubmit() {
 
 		Swal.fire({
 			icon: 'success',
-			title: modalType.value === 'add' ? 'Grupo creado' : 'Grupo actualizado',
-			text: form.name,
+			title: modalType.value === 'add' ? 'Materia creada' : 'Materia actualizada',
+			text: form.subject_name,
 			timer: 1500,
 			showConfirmButton: false,
 		});
@@ -416,9 +421,10 @@ async function onSubmit() {
 }
 
 function confirmDelete(g) {
+	const row = normalizeSubjectRow(g);
 	Swal.fire({
-		title: '¿Eliminar grupo?',
-		text: g.name || g.group_label,
+		title: '¿Eliminar materia?',
+		text: `${row.code} - ${row.subjectName}`,
 		icon: 'warning',
 		showCancelButton: true,
 		confirmButtonText: 'Sí, eliminar',
@@ -430,7 +436,7 @@ function confirmDelete(g) {
 			await api.delete(`/academic-groups/${g.id}`);
 			await fetchGroups();
 		} catch {
-			Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo eliminar el grupo.' });
+			Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo eliminar la materia.' });
 		}
 	});
 }
@@ -448,3 +454,34 @@ onMounted(async () => {
 	form.school_cycle_id = selectedSchoolCycleId.value || '';
 });
 </script>
+
+<style scoped>
+.btn-icon-center {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.35rem;
+}
+
+.btn-icon-center i {
+	line-height: 1;
+}
+
+.search-wrap {
+	position: relative;
+	min-width: 220px;
+}
+
+.search-icon {
+	position: absolute;
+	left: 0.65rem;
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.search-input {
+	padding-left: 2rem;
+}
+</style>
