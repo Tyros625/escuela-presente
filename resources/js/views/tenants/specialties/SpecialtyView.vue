@@ -252,7 +252,7 @@ const trainingFieldOptions = [
 	"De lo Humano y lo Comunitario",
 ];
 
-const groups = ref([]);
+const subjects = ref([]);
 const grades = ref([]);
 const schoolCycles = ref([]);
 const selectedSchoolCycleId = ref(null);
@@ -279,30 +279,34 @@ const selectedCycleName = computed(() => {
 	return c ? c.description : "";
 });
 
-function normalizeSubjectRow(g) {
-	const subjects = Array.isArray(g.subjects) ? g.subjects.filter(Boolean) : [];
-	const trainingField = subjects.find((item) => trainingFieldOptions.includes(item)) || trainingFieldOptions[0];
-	const credits = Math.max(1, Number(g.subjects_count || subjects.length || 1));
+function normalizeSubjectRow(item) {
+	const trainingField = item.training_field || trainingFieldOptions[0];
+	const gradeLabel = item.grade || grades.value.find((g) => g.id === item.grade_id)?.description || "-";
+	const cycleId = item.school_cycle_id ?? null;
+	const gradeId = item.grade_id ?? null;
+	const subjectName = item.description || "-";
+	const code = item.code || item.description || "-";
 
 	return {
-		id: g.id,
-		code: g.name || g.group_label || "-",
-		subjectName: g.room_name || g.group_label || "-",
-		gradeId: g.grade_id,
-		gradeLabel: g.grade || "-",
-		hoursPerWeek: Math.max(1, Number(g.student_limit || 1)),
-		credits,
+		id: item.id,
+		code,
+		subjectName,
+		gradeId,
+		gradeLabel,
+		cycleId,
+		hoursPerWeek: Math.max(1, Number(item.hours_per_week || 1)),
+		credits: Math.max(1, Number(item.credits || 1)),
 		trainingField,
-		source: g,
+		source: item,
 	};
 }
 
 const filteredRows = computed(() => {
 	const search = searchText.value.toLowerCase();
-	return groups.value
+	return subjects.value
 		.map(normalizeSubjectRow)
 		.filter((row) => {
-			if (selectedSchoolCycleId.value && row.source.school_cycle_id !== selectedSchoolCycleId.value) {
+			if (selectedSchoolCycleId.value && row.cycleId !== selectedSchoolCycleId.value) {
 				return false;
 			}
 			if (selectedGradeId.value && row.gradeId !== selectedGradeId.value) {
@@ -324,9 +328,9 @@ async function fetchLists() {
 	schoolCycles.value = c.data;
 }
 
-async function fetchGroups() {
-	const { data } = await api.get("/academic-groups");
-	groups.value = data.data;
+async function fetchSubjects() {
+	const { data } = await api.get("/specialties");
+	subjects.value = data.data;
 }
 
 function resetForm() {
@@ -348,15 +352,15 @@ function openCreateModal() {
 	showModal();
 }
 
-function openEditModal(g) {
-	const row = normalizeSubjectRow(g);
+function openEditModal(item) {
+	const row = normalizeSubjectRow(item);
 	modalType.value = "edit";
-	rowSelected.value = g;
+	rowSelected.value = item;
 	Object.assign(form, {
 		code: row.code,
 		subject_name: row.subjectName,
-		grade_id: g.grade_id,
-		school_cycle_id: g.school_cycle_id,
+		grade_id: row.gradeId || "",
+		school_cycle_id: row.cycleId || "",
 		hours_per_week: row.hoursPerWeek,
 		credits: row.credits,
 		training_field: row.trainingField,
@@ -380,26 +384,24 @@ async function onSubmit() {
 	isSaving.value = true;
 	try {
 		const credits = Math.max(1, Math.min(20, Number(form.credits || 1)));
-		const subjectsArray = Array.from({ length: credits }, () => form.training_field);
 
 		const payload = {
-			name: form.code,
+			description: form.subject_name,
+			code: form.code,
 			grade_id: form.grade_id,
-			section_id: null,
 			school_cycle_id: form.school_cycle_id,
-			shift: "morning",
-			room_name: form.subject_name,
-			student_limit: Math.max(1, Number(form.hours_per_week || 1)),
-			subjects: subjectsArray,
+			hours_per_week: Math.max(1, Number(form.hours_per_week || 1)),
+			credits,
+			training_field: form.training_field,
 		};
 
 		if (modalType.value === "add") {
-			await api.post("/academic-groups", payload);
+			await api.post("/specialties", payload);
 		} else {
-			await api.put(`/academic-groups/${rowSelected.value.id}`, payload);
+			await api.put(`/specialties/${rowSelected.value.id}`, payload);
 		}
 
-		await fetchGroups();
+		await fetchSubjects();
 		hideModal();
 
 		Swal.fire({
@@ -420,8 +422,8 @@ async function onSubmit() {
 	}
 }
 
-function confirmDelete(g) {
-	const row = normalizeSubjectRow(g);
+function confirmDelete(item) {
+	const row = normalizeSubjectRow(item);
 	Swal.fire({
 		title: "¿Eliminar materia?",
 		text: `${row.code} - ${row.subjectName}`,
@@ -433,8 +435,8 @@ function confirmDelete(g) {
 	}).then(async (result) => {
 		if (!result.isConfirmed) return;
 		try {
-			await api.delete(`/academic-groups/${g.id}`);
-			await fetchGroups();
+			await api.delete(`/specialties/${item.id}`);
+			await fetchSubjects();
 		} catch {
 			Swal.fire({ icon: "error", title: "Error", text: "No se pudo eliminar la materia." });
 		}
@@ -447,7 +449,7 @@ watch(selectedSchoolCycleId, (val) => {
 
 onMounted(async () => {
 	await fetchLists();
-	await fetchGroups();
+	await fetchSubjects();
 	if (schoolCycles.value.length && selectedSchoolCycleId.value == null) {
 		selectedSchoolCycleId.value = schoolCycles.value[0].id;
 	}

@@ -14,7 +14,10 @@ class SpecialtyAPIController extends AppBaseController
 {
     public function index(Request $request): JsonResponse
     {
-        $specialties = Specialty::all();
+        $specialties = Specialty::query()
+            ->with(['grade', 'schoolCycle'])
+            ->latest('id')
+            ->get();
 
         return $this->sendResponse(SpecialtyResource::collection($specialties), 'Specialties retrieved successfully');
     }
@@ -22,15 +25,21 @@ class SpecialtyAPIController extends AppBaseController
     public function store(CreateSpecialtyAPIRequest $request): JsonResponse
     {
         $input = $request->all();
+        if (empty($input['description'])) {
+            $input['description'] = $input['subject_name'] ?? $input['code'] ?? 'Materia';
+        }
 
         $specialty = Specialty::create($input);
+        $specialty->load(['grade', 'schoolCycle']);
 
         return $this->sendResponse(new SpecialtyResource($specialty), 'Specialty saved successfully');
     }
 
     public function show($id): JsonResponse
     {
-        $specialty = Specialty::find($id);
+        $specialty = Specialty::query()
+            ->with(['grade', 'schoolCycle'])
+            ->find($id);
 
         if (empty($specialty)) {
             return $this->sendError('Specialty not found');
@@ -48,7 +57,11 @@ class SpecialtyAPIController extends AppBaseController
         }
 
         $specialty->fill($request->all());
+        if (empty($specialty->description)) {
+            $specialty->description = $request->input('subject_name', $request->input('code', 'Materia'));
+        }
         $specialty->save();
+        $specialty->load(['grade', 'schoolCycle']);
 
         return $this->sendResponse(new SpecialtyResource($specialty), 'Specialty updated successfully');
     }
