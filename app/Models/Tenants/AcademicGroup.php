@@ -31,7 +31,7 @@ class AcademicGroup extends Model
     public static $rules = [
         'name' => 'required|string|max:255',
         'grade_id' => 'required',
-        'section_id' => 'required',
+        'section_id' => 'nullable|exists:sections,id',
         'school_cycle_id' => 'required',
         'shift' => 'required|in:morning,afternoon',
         'room_name' => 'nullable|string|max:255',

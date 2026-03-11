@@ -25,6 +25,7 @@ ssh ${SERVER_USER}@${SERVER_IP} << EOF
     git clean -fd
     composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
     php artisan migrate --force
+    php artisan tenants:migrate --force
     npm ci --legacy-peer-deps
     echo "📦 Building frontend (Vite)..."
     npm run build || { echo "❌ npm run build FAILED - frontend will show OLD menu"; exit 1; }

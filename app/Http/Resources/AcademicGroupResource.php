@@ -12,24 +12,27 @@ class AcademicGroupResource extends JsonResource
         $limit = (int) ($this->student_limit ?? 0);
         $coverage = $limit > 0 ? (int) round(min(100, ($studentsCount / $limit) * 100)) : 0;
 
+        $gradeDescription = $this->grade?->description ?? '';
+        $sectionDescription = $this->section?->description ?? '';
+        $groupLabel = $this->name ?? trim($gradeDescription.' '.$sectionDescription);
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'grade_id' => $this->grade_id,
-            'grade' => $this->grade->description,
+            'grade' => $gradeDescription,
             'section_id' => $this->section_id,
-            'section' => $this->section->description,
-            'group_label' => trim($this->grade->description.' '.$this->section->description),
+            'section' => $sectionDescription,
+            'group_label' => $groupLabel,
             'school_cycle_id' => $this->school_cycle_id,
-            'school_year' => $this->schoolCycle->description,
+            'school_year' => $this->schoolCycle?->description ?? '',
             'shift' => $this->shift,
             'room_name' => $this->room_name,
             'student_limit' => $this->student_limit,
-            'subjects' => $this->subjects,
+            'subjects' => $this->subjects ?? [],
             'subjects_count' => is_array($this->subjects) ? count($this->subjects) : 0,
             'students_count' => $studentsCount,
             'coverage_percent' => $coverage,
-            'students' => new StudentResource($this->whenLoaded('students')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
