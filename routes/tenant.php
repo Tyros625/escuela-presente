@@ -22,6 +22,7 @@ use App\Http\Controllers\API\SelectListController;
 use App\Http\Controllers\API\SpecialtyAPIController;
 use App\Http\Controllers\API\StudentAPIController;
 use App\Http\Controllers\API\TeacherAPIController;
+use App\Http\Controllers\API\QualificationRecordAPIController;
 use App\Http\Controllers\API\UserAPIController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\TenantLoginController;
@@ -142,6 +143,13 @@ Route::prefix('api')->middleware([
             // Teachers
             Route::apiResource('teachers', TeacherAPIController::class);
             Route::post('teachers/import', [TeacherAPIController::class, 'import']);
+
+            // Qualification Record (Grades by student and history)
+            Route::get('qualification/groups', [QualificationRecordAPIController::class, 'groups']);
+            Route::get('qualification/groups/{group}/grades', [QualificationRecordAPIController::class, 'groupGrades']);
+            Route::put('qualification/grades/{grade}', [QualificationRecordAPIController::class, 'updateGrade']);
+            Route::get('qualification/grades/{grade}/receipt', [QualificationRecordAPIController::class, 'receipt']);
+            Route::get('qualification/grades/history', [QualificationRecordAPIController::class, 'history']);
 
             Route::apiResource('specialties', SpecialtyAPIController::class);
 

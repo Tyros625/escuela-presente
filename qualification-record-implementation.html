@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qualification Record – Implementación Técnica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f0883e;
+    --accent4: #ff7b72;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --tag-bg: #1f6feb22;
+    --code-bg: #1f2428;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--tag-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.08em;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    margin-top: 0.4rem;
+    font-size: 0.95rem;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  h2::before {
+    content: '##';
+    color: var(--border);
+    font-size: 0.85rem;
+  }
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.2rem 0 0.5rem;
+  }
+
+  p { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+  /* ── Tabs diagram ── */
+  .tabs-diagram {
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab-panel {
+    flex: 1;
+    background: var(--surface);
+    padding: 1rem;
+    position: relative;
+  }
+
+  .tab-panel.active { background: var(--surface2); }
+  .tab-panel.active::after {
+    content: '← activo';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.6rem;
+  }
+
+  .tab-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 0.5rem;
+  }
+
+  .tab-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── DB Schema ── */
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .table-card-header {
+    background: var(--surface2);
+    padding: 0.6rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-card table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+
+  .table-card td {
+    padding: 0.35rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .table-card tr:last-child td { border-bottom: none; }
+  .table-card td:first-child { color: var(--text); }
+  .table-card td:last-child { color: var(--accent); }
+  .pk { color: var(--accent4) !important; }
+  .fk { color: var(--accent2) !important; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    margin: 0.8rem 0;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .kw { color: #ff7b72; }     /* keywords */
+  .fn { color: #d2a8ff; }     /* functions */
+  .str { color: #a5d6ff; }    /* strings */
+  .cmt { color: #8b949e; font-style: italic; } /* comments */
+  .num { color: #f0883e; }    /* numbers */
+  .cls { color: #ffa657; }    /* class names */
+  .prop { color: #79c0ff; }   /* props/keys */
+
+  /* ── Endpoint table ── */
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin: 0.8rem 0;
+  }
+
+  .api-table th {
+    background: var(--surface2);
+    padding: 0.5rem 1rem;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.73rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .api-table td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  .api-table td:first-child { width: 60px; }
+
+  .method {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .GET { background: #1f6feb44; color: #58a6ff; }
+  .POST { background: #3fb95022; color: #3fb950; }
+  .PUT { background: #f0883e22; color: #f0883e; }
+
+  .endpoint-path { color: var(--text); }
+
+  /* ── Logic boxes ── */
+  .logic-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0;
+  }
+
+  .logic-box.warn { border-left-color: var(--accent3); }
+  .logic-box.info { border-left-color: var(--accent); }
+
+  .logic-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .logic-box.warn .logic-label { color: var(--accent3); }
+  .logic-box.info .logic-label { color: var(--accent); }
+
+  .logic-box p { margin: 0; font-size: 0.85rem; }
+
+  /* ── Flow ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0.8rem 0;
+    font-size: 0.82rem;
+  }
+
+  .flow-step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    font-size: 0.75rem;
+  }
+
+  .arrow { color: var(--border); font-size: 1rem; }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">TECHNICAL SPEC · v1.0</div>
+  <h1>Qualification <span>Record</span></h1>
+  <p class="subtitle">Documentación de implementación para el sistema de captura de calificaciones escolares</p>
+</header>
+
+<!-- OVERVIEW -->
+<div class="section">
+  <h2>Overview</h2>
+  <p>El sistema permite a los maestros capturar, revisar e historial de calificaciones de sus grupos asignados. Cuenta con 3 pestañas principales:</p>
+
+  <div class="tabs-diagram">
+    <div class="tab-panel active">
+      <div class="tab-label">01 · Grade Capture</div>
+      <div class="tab-desc">Captura de calificaciones por parcial. Muestra la tabla de alumnos con Parcial 1, 2, 3 y promedio calculado.</div>
+    </div>
+    <div class="tab-panel">
+      <div class="tab-label">02 · Student Receipt</div>
+      <div class="tab-desc">Visualización y exportación a PDF del resumen de calificaciones del alumno. Incluye búsqueda por apellido.</div>
+    </div>
+    <div class="tab-panel">
+      <div class="tab-label">03 · Change History</div>
+      <div class="tab-desc">Bitácora de cambios de calificación: fecha, campo, valor anterior/nuevo, usuario y motivo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DATABASE SCHEMA -->
+<div class="section">
+  <h2>Database Schema</h2>
+
+  <div class="schema-grid">
+
+    <div class="table-card">
+      <div class="table-card-header">groups</div>
+      <table>
+        <tr><td class="pk">id</td><td>INT PK</td></tr>
+        <tr><td>grade_level</td><td>VARCHAR</td></tr>
+        <tr><td>group_name</td><td>VARCHAR</td></tr>
+        <tr><td class="fk">teacher_id</td><td>INT FK</td></tr>
+        <tr><td class="fk">subject_id</td><td>INT FK</td></tr>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <div class="table-card-header">students</div>
+      <table>
+        <tr><td class="pk">id</td><td>INT PK</td></tr>
+        <tr><td>enrollment</td><td>VARCHAR UNIQUE</td></tr>
+        <tr><td>last_name</td><td>VARCHAR</td></tr>
+        <tr><td>first_name</td><td>VARCHAR</td></tr>
+        <tr><td class="fk">group_id</td><td>INT FK</td></tr>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <div class="table-card-header">grades</div>
+      <table>
+        <tr><td class="pk">id</td><td>INT PK</td></tr>
+        <tr><td class="fk">student_id</td><td>INT FK</td></tr>
+        <tr><td class="fk">subject_id</td><td>INT FK</td></tr>
+        <tr><td>partial_1</td><td>DECIMAL(4,1)</td></tr>
+        <tr><td>partial_2</td><td>DECIMAL(4,1)</td></tr>
+        <tr><td>partial_3</td><td>DECIMAL(4,1)</td></tr>
+        <tr><td>average</td><td>DECIMAL(4,1) COMPUTED</td></tr>
+        <tr><td>status</td><td>ENUM('approved','failed')</td></tr>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <div class="table-card-header">grade_history</div>
+      <table>
+        <tr><td class="pk">id</td><td>INT PK</td></tr>
+        <tr><td class="fk">grade_id</td><td>INT FK</td></tr>
+        <tr><td>changed_at</td><td>DATETIME</td></tr>
+        <tr><td>field_changed</td><td>VARCHAR</td></tr>
+        <tr><td>old_value</td><td>DECIMAL(4,1)</td></tr>
+        <tr><td>new_value</td><td>DECIMAL(4,1)</td></tr>
+        <tr><td>reason</td><td>TEXT</td></tr>
+        <tr><td class="fk">changed_by</td><td>INT FK → users</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- BUSINESS LOGIC -->
+<div class="section">
+  <h2>Business Logic</h2>
+
+  <h3>Cálculo de promedio y estado</h3>
+  <pre><code><span class="cmt">// Regla de negocio principal</span>
+<span class="kw">function</span> <span class="fn">computeGrade</span>(p1, p2, p3) {
+  <span class="kw">const</span> average = (p1 + p2 + p3) / <span class="num">3</span>;
+  <span class="kw">const</span> status  = average >= <span class="num">6.0</span> ? <span class="str">'approved'</span> : <span class="str">'failed'</span>;
+  <span class="kw">return</span> { average: +average.<span class="fn">toFixed</span>(<span class="num">1</span>), status };
+}
+
+<span class="cmt">// Ejemplo</span>
+<span class="fn">computeGrade</span>(<span class="num">7.5</span>, <span class="num">6.0</span>, <span class="num">8.0</span>);
+<span class="cmt">// → { average: 7.2, status: 'approved' }</span>
+
+<span class="fn">computeGrade</span>(<span class="num">4.0</span>, <span class="num">5.0</span>, <span class="num">6.5</span>);
+<span class="cmt">// → { average: 5.2, status: 'failed' }</span></code></pre>
+
+  <div class="logic-box">
+    <div class="logic-label">REGLA</div>
+    <p>Aprobado si <code>average ≥ 6.0</code>. Reprobado si <code>average &lt; 6.0</code>. El UI muestra verde para aprobado, rojo para reprobado.</p>
+  </div>
+
+  <h3>Ordenamiento de lista de alumnos</h3>
+  <div class="logic-box info">
+    <div class="logic-label">COMPORTAMIENTO</div>
+    <p>Los alumnos se ordenan alfabéticamente por apellido. El número de lista (<code>#</code>) es el índice resultante de ese ordenamiento, no un campo persistido.</p>
+  </div>
+
+  <h3>Historial de cambios (audit trail)</h3>
+  <pre><code><span class="cmt">// Antes de actualizar una calificación, guardar en grade_history</span>
+<span class="kw">async function</span> <span class="fn">updateGrade</span>(gradeId, field, newValue, reason, userId) {
+  <span class="kw">const</span> current = <span class="kw">await</span> db.<span class="fn">findOne</span>(<span class="str">'grades'</span>, { id: gradeId });
+
+  <span class="cmt">// 1. Insertar historial ANTES del update</span>
+  <span class="kw">await</span> db.<span class="fn">insert</span>(<span class="str">'grade_history'</span>, {
+    grade_id:     gradeId,
+    changed_at:   <span class="kw">new</span> <span class="cls">Date</span>(),
+    field_changed: field,               <span class="cmt">// "partial_1" | "partial_2" | "partial_3"</span>
+    old_value:    current[field],
+    new_value:    newValue,
+    reason:       reason,
+    changed_by:   userId,
+  });
+
+  <span class="cmt">// 2. Actualizar la calificación</span>
+  <span class="kw">const</span> updated = { ...current, [field]: newValue };
+  <span class="kw">const</span> { average, status } = <span class="fn">computeGrade</span>(
+    updated.partial_1, updated.partial_2, updated.partial_3
+  );
+  <span class="kw">await</span> db.<span class="fn">update</span>(<span class="str">'grades'</span>, { id: gradeId }, { [field]: newValue, average, status });
+}</code></pre>
+</div>
+
+<!-- REST API -->
+<div class="section">
+  <h2>REST API Endpoints</h2>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="method GET">GET</span></td>
+        <td class="endpoint-path">/api/groups?teacher_id={id}</td>
+        <td>Grupos y materia asignados al maestro</td>
+      </tr>
+      <tr>
+        <td><span class="method GET">GET</span></td>
+        <td class="endpoint-path">/api/groups/{id}/grades</td>
+        <td>Lista de alumnos con sus calificaciones (Tab 1)</td>
+      </tr>
+      <tr>
+        <td><span class="method PUT">PUT</span></td>
+        <td class="endpoint-path">/api/grades/{id}</td>
+        <td>Actualiza un parcial. Body: <code>{ field, value, reason }</code></td>
+      </tr>
+      <tr>
+        <td><span class="method GET">GET</span></td>
+        <td class="endpoint-path">/api/grades/{id}/receipt</td>
+        <td>Boleta del alumno (Tab 2). Acepta <code>?format=pdf</code></td>
+      </tr>
+      <tr>
+        <td><span class="method GET">GET</span></td>
+        <td class="endpoint-path">/api/grades/history?group_id={id}</td>
+        <td>Historial de cambios del grupo (Tab 3)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Respuesta GET /api/groups/{id}/grades</h3>
+  <pre><code>{
+  <span class="prop">"group"</span>: { <span class="prop">"id"</span>: <span class="num">1</span>, <span class="prop">"name"</span>: <span class="str">"PRIMERO 1A"</span>, <span class="prop">"subject"</span>: <span class="str">"ESPAÑOL I"</span>, <span class="prop">"teacher"</span>: <span class="str">"Prof. García"</span> },
+  <span class="prop">"students"</span>: [
+    {
+      <span class="prop">"list_number"</span>: <span class="num">1</span>,              <span class="cmt">// calculado al ordenar por apellido</span>
+      <span class="prop">"enrollment"</span>: <span class="str">"2024001"</span>,
+      <span class="prop">"name"</span>: <span class="str">"Acevedo López, Ana"</span>,
+      <span class="prop">"partial_1"</span>: <span class="num">8.0</span>,
+      <span class="prop">"partial_2"</span>: <span class="num">7.5</span>,
+      <span class="prop">"partial_3"</span>: <span class="num">9.0</span>,
+      <span class="prop">"average"</span>: <span class="num">8.2</span>,
+      <span class="prop">"status"</span>: <span class="str">"approved"</span>
+    }
+  ]
+}</code></pre>
+</div>
+
+<!-- UI COMPONENTS -->
+<div class="section">
+  <h2>UI Components (React)</h2>
+
+  <h3>Tab 1 – Grade Capture: columnas de la tabla</h3>
+  <pre><code><span class="kw">const</span> columns = [
+  { key: <span class="str">'list_number'</span>, label: <span class="str">'#'</span>,         editable: <span class="kw">false</span> },
+  { key: <span class="str">'enrollment'</span>,   label: <span class="str">'Matrícula'</span>,  editable: <span class="kw">false</span> },
+  { key: <span class="str">'name'</span>,         label: <span class="str">'Nombre'</span>,     editable: <span class="kw">false</span> },
+  { key: <span class="str">'partial_1'</span>,    label: <span class="str">'Parcial 1'</span>,  editable: <span class="kw">true</span>  },
+  { key: <span class="str">'partial_2'</span>,    label: <span class="str">'Parcial 2'</span>,  editable: <span class="kw">true</span>  },
+  { key: <span class="str">'partial_3'</span>,    label: <span class="str">'Parcial 3'</span>,  editable: <span class="kw">true</span>  },
+  { key: <span class="str">'average'</span>,      label: <span class="str">'Promedio'</span>,   editable: <span class="kw">false</span> },
+  { key: <span class="str">'status'</span>,       label: <span class="str">'Estado'</span>,     editable: <span class="kw">false</span> },
+];
+
+<span class="cmt">// status cell: verde si 'approved', rojo si 'failed'</span>
+<span class="kw">const</span> <span class="cls">StatusCell</span> = ({ value }) =&gt; (
+  &lt;<span class="cls">span</span> style={{ color: value === <span class="str">'approved'</span> ? <span class="str">'green'</span> : <span class="str">'red'</span> }}&gt;
+    {value === <span class="str">'approved'</span> ? <span class="str">'Aprobado'</span> : <span class="str">'Reprobado'</span>}
+  &lt;/<span class="cls">span</span>&gt;
+);</code></pre>
+
+  <h3>Tab 2 – Student Receipt: búsqueda por apellido</h3>
+  <pre><code><span class="kw">const</span> [search, setSearch] = <span class="fn">useState</span>(<span class="str">''</span>);
+
+<span class="kw">const</span> filtered = students.<span class="fn">filter</span>(s =&gt;
+  s.last_name.<span class="fn">toLowerCase</span>().<span class="fn">startsWith</span>(search.<span class="fn">toLowerCase</span>())
+);</code></pre>
+
+  <div class="logic-box warn">
+    <div class="logic-label">PDF EXPORT</div>
+    <p>Al hacer click en "Imprimir PDF", llamar <code>GET /api/grades/{id}/receipt?format=pdf</code>. El backend genera el PDF con los datos de la escuela preconfigurados (nombre, logo, ciclo escolar) y lo retorna como <code>application/pdf</code>.</p>
+  </div>
+
+  <h3>Tab 3 – Change History: columnas</h3>
+  <pre><code><span class="kw">const</span> historyColumns = [
+  { key: <span class="str">'changed_at'</span>,    label: <span class="str">'Fecha'</span>       },
+  { key: <span class="str">'student_name'</span>,  label: <span class="str">'Alumno'</span>      },
+  { key: <span class="str">'subject_name'</span>,  label: <span class="str">'Materia'</span>     },
+  { key: <span class="str">'field_changed'</span>, label: <span class="str">'Campo'</span>       },  <span class="cmt">// "Parcial 1", "Parcial 2"…</span>
+  { key: <span class="str">'old_value'</span>,     label: <span class="str">'Antes'</span>       },
+  { key: <span class="str">'new_value'</span>,     label: <span class="str">'Después'</span>     },
+  { key: <span class="str">'reason'</span>,        label: <span class="str">'Motivo'</span>      },
+  { key: <span class="str">'changed_by'</span>,    label: <span class="str">'Modificado por'</span> },
+];</code></pre>
+</div>
+
+<!-- FLOW -->
+<div class="section">
+  <h2>Flujo principal de usuario</h2>
+
+  <div class="flow">
+    <div class="flow-step">Login</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Seleccionar grupo</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Tab: Grade Capture</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Editar parcial</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">PUT /api/grades/{id}</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Se registra en grade_history</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">UI se actualiza (average + status)</div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">Tab: Student Receipt</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Buscar alumno por apellido</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Ver boleta</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Exportar PDF</div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">Tab: Change History</div>
+    <span class="arrow">→</span>
+    <div class="flow-step">Ver bitácora de cambios del grupo</div>
+  </div>
+</div>
+
+<footer>
+  Qualification Record · Documentación técnica generada automáticamente a partir del QUALIFICATION_RECORD.pptx
+</footer>
+
+</body>
+</html>

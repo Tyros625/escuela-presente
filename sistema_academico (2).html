@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGA — Sistema de Gestión Académica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --surface3: #30363d;
+  --border: #30363d;
+  --border2: #3d444d;
+  --text: #e6edf3;
+  --text2: #9198a1;
+  --text3: #656d76;
+  --accent: #58a6ff;
+  --accent2: #388bfd;
+  --green: #3fb950;
+  --green-dim: #1a4a1e;
+  --yellow: #d29922;
+  --yellow-dim: #3d2e00;
+  --red: #f85149;
+  --red-dim: #3d0000;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --teal: #39d0d0;
+  --pink: #e96c8a;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --transition: 0.18s cubic-bezier(.4,0,.2,1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SIDEBAR ─── */
+#sidebar {
+  position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: transform var(--transition);
+}
+
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 10px;
+}
+.sidebar-logo h1 {
+  font-family: var(--font-display);
+  font-size: 17px; color: var(--text);
+  line-height: 1.2;
+}
+.sidebar-logo span { font-size: 11px; color: var(--text3); font-family: var(--font-body); font-weight: 400; letter-spacing: 0.5px; }
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 8px; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text3); padding: 12px 12px 6px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--radius);
+  cursor: pointer; transition: all var(--transition);
+  color: var(--text2); font-size: 13.5px; font-weight: 500;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: rgba(88,166,255,.12); color: var(--accent); }
+.nav-item .nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.8; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-badge {
+  margin-left: auto; background: var(--accent); color: #000;
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px;
+}
+
+.sidebar-footer {
+  padding: 12px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #000; flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-info .name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-info .role { font-size: 10px; color: var(--text3); }
+.role-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 4px; display: inline-block; }
+
+/* ─── MAIN ─── */
+#main {
+  margin-left: 240px;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+.topbar {
+  height: 56px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px;
+  gap: 16px; position: sticky; top: 0; z-index: 50;
+}
+.topbar-title {
+  font-size: 15px; font-weight: 600; color: var(--text);
+}
+.topbar-subtitle { font-size: 12px; color: var(--text3); margin-left: 4px; }
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+
+/* ─── CONTENT AREA ─── */
+#content { flex: 1; padding: 24px; }
+
+/* ─── VIEWS ─── */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── CARDS / GRID ─── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.stat-card.blue::before { background: linear-gradient(90deg, var(--accent), var(--purple)); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
+.stat-card.orange::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+.stat-card.red::before { background: linear-gradient(90deg, var(--red), var(--pink)); }
+.stat-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+
+.stat-label { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 700; font-family: var(--font-display); line-height: 1; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: var(--text3); }
+.stat-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 28px; opacity: 0.12; }
+
+/* ─── TABLE ─── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  margin-bottom: 20px;
+}
+.card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.card-title { font-size: 14px; font-weight: 600; }
+.card-subtitle { font-size: 12px; color: var(--text3); margin-left: auto; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  background: var(--surface2); padding: 10px 16px;
+  text-align: left; font-size: 11px; font-weight: 600;
+  color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase;
+  white-space: nowrap; border-bottom: 1px solid var(--border);
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background var(--transition); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.03); }
+td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+
+/* ─── BADGES / TAGS ─── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  white-space: nowrap;
+}
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.badge-blue { background: rgba(88,166,255,.15); color: var(--accent); }
+.badge-purple { background: rgba(188,140,255,.15); color: var(--purple); }
+.badge-orange { background: rgba(240,136,62,.15); color: var(--orange); }
+.badge-gray { background: var(--surface3); color: var(--text2); }
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: none; transition: all var(--transition); font-family: var(--font-body);
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: #000; }
+.btn-primary:hover { background: #79bcff; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+.btn-secondary:hover { background: var(--surface3); }
+.btn-danger { background: rgba(248,81,73,.15); color: var(--red); border: 1px solid rgba(248,81,73,.3); }
+.btn-danger:hover { background: rgba(248,81,73,.25); }
+.btn-green { background: rgba(63,185,80,.15); color: var(--green); border: 1px solid rgba(63,185,80,.3); }
+.btn-green:hover { background: rgba(63,185,80,.25); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-icon { padding: 6px; border-radius: var(--radius); background: var(--surface2); color: var(--text2); border: 1px solid var(--border); cursor: pointer; transition: all var(--transition); }
+.btn-icon:hover { background: var(--surface3); color: var(--text); }
+
+/* ─── FORMS ─── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-full { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 12px; font-weight: 500; color: var(--text2); }
+input, select, textarea {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: var(--radius);
+  padding: 8px 12px; font-size: 13px; font-family: var(--font-body);
+  transition: border-color var(--transition);
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(88,166,255,.12);
+}
+input::placeholder, textarea::placeholder { color: var(--text3); }
+select option { background: var(--surface2); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px); z-index: 200;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; animation: fadeIn .2s ease; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); width: 100%; max-width: 600px;
+  max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow);
+}
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-close { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; padding: 4px; border-radius: 4px; transition: color var(--transition); }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ─── ALERT ─── */
+.alert {
+  display: flex; gap: 10px; padding: 12px 16px;
+  border-radius: var(--radius); font-size: 13px; margin-bottom: 16px;
+  border: 1px solid;
+}
+.alert-warn { background: var(--yellow-dim); border-color: rgba(210,153,34,.3); color: var(--yellow); }
+.alert-err { background: var(--red-dim); border-color: rgba(248,81,73,.3); color: var(--red); }
+.alert-ok { background: var(--green-dim); border-color: rgba(63,185,80,.3); color: var(--green); }
+.alert-info { background: rgba(88,166,255,.1); border-color: rgba(88,166,255,.3); color: var(--accent); }
+
+/* ─── PROGRESS BAR ─── */
+.progress-bar-wrap { width: 100%; background: var(--surface3); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 4px; transition: width .6s ease; }
+.progress-green { background: var(--green); }
+.progress-yellow { background: var(--yellow); }
+.progress-red { background: var(--red); }
+.progress-blue { background: var(--accent); }
+
+/* ─── SEARCH ─── */
+.search-wrap { position: relative; }
+.search-wrap input { padding-left: 32px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; pointer-events: none; }
+
+/* ─── HORARIO GRID ─── */
+.horario-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(6, 1fr);
+  gap: 2px; font-size: 11px;
+}
+.horario-cell {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 6px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.horario-cell.header { background: var(--surface3); font-weight: 600; color: var(--text2); min-height: 32px; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+.horario-cell.time { color: var(--text3); font-size: 10px; min-height: 44px; }
+.horario-class {
+  border-radius: 4px; padding: 3px 5px; font-size: 10px; font-weight: 600;
+  text-align: center; line-height: 1.3; cursor: default;
+}
+
+/* ─── BOLETA ─── */
+.boleta { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+.boleta-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 16px; }
+.boleta-escola { font-family: var(--font-display); font-size: 20px; color: var(--accent); }
+.boleta-sub { font-size: 12px; color: var(--text3); }
+.boleta-alumno { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 16px; padding: 12px; background: var(--surface2); border-radius: var(--radius); }
+.boleta-key { color: var(--text3); }
+.boleta-val { font-weight: 600; }
+.boleta-table th { background: rgba(88,166,255,.1); color: var(--accent); }
+.grade-pass { color: var(--green); font-weight: 700; }
+.grade-fail { color: var(--red); font-weight: 700; }
+.grade-avg { color: var(--yellow); font-weight: 700; }
+
+/* ─── DASHBOARD CHART ─── */
+.mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+.mini-bar { flex: 1; background: var(--surface3); border-radius: 3px 3px 0 0; position: relative; cursor: default; transition: background var(--transition); }
+.mini-bar:hover { background: var(--accent); }
+.mini-bar span { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--text3); white-space: nowrap; }
+
+/* ─── TABS ─── */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--text3); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all var(--transition); font-family: var(--font-body); }
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn .2s ease; }
+
+/* ─── COBERTURA SEMAFORO ─── */
+.semaforo { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.semaforo-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.semaforo-yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+.semaforo-red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+/* ─── TOAST ─── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius); padding: 12px 16px;
+  font-size: 13px; min-width: 260px; max-width: 360px;
+  box-shadow: var(--shadow); animation: slideUp .25s ease;
+  display: flex; gap: 8px; align-items: center;
+}
+.toast-ok { border-left: 3px solid var(--green); }
+.toast-err { border-left: 3px solid var(--red); }
+.toast-warn { border-left: 3px solid var(--yellow); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  .form-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.section-divider { height: 1px; background: var(--border); margin: 20px 0; }
+.text-mono { font-family: var(--font-mono); font-size: 12px; }
+.text-muted { color: var(--text3); }
+.text-accent { color: var(--accent); }
+.flex-row { display: flex; align-items: center; gap: 10px; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mt-4 { margin-top: 16px; }
+.mb-4 { margin-bottom: 16px; }
+.gap-2 { gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🎓</div>
+    <h1>SGA Académico</h1>
+    <span>Gestión Escolar v1.0</span>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <button class="nav-item active" onclick="navigate('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zm0 6a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"/></svg>
+      Dashboard
+    </button>
+    <div class="nav-section-label">Gestión</div>
+    <button class="nav-item" onclick="navigate('docentes')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z"/></svg>
+      Docentes
+    </button>
+    <button class="nav-item" onclick="navigate('materias')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+      Materias
+    </button>
+    <button class="nav-item" onclick="navigate('grupos')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>
+      Grupos
+    </button>
+    <div class="nav-section-label">Académico</div>
+    <button class="nav-item" onclick="navigate('asignaciones')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+      Asignaciones
+    </button>
+    <button class="nav-item" onclick="navigate('horarios')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+      Horarios
+    </button>
+    <button class="nav-item" onclick="navigate('calificaciones')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+      Calificaciones
+    </button>
+    <div class="nav-section-label">Reportes</div>
+    <button class="nav-item" onclick="navigate('reportes')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd"/></svg>
+      Reportes
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-avatar">AD</div>
+    <div class="user-info">
+      <div class="name">Admin. General</div>
+      <div class="role"><span class="role-dot"></span>Administrador</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════ -->
+<main id="main">
+  <div class="topbar">
+    <div id="topbar-title" class="topbar-title">Dashboard</div>
+    <span id="topbar-subtitle" class="topbar-subtitle">— Ciclo Escolar 2024-2025</span>
+    <div class="topbar-actions">
+      <button class="btn btn-secondary btn-sm" onclick="showToast('Ciclo 2024-2025 activo','ok')">📅 2024-2025</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-auto')">⚡ Asignación Auto</button>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- ═══════ DASHBOARD ═══════ -->
+    <div id="view-dashboard" class="view active">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Docentes Activos</div>
+          <div class="stat-value text-accent" id="stat-docentes">12</div>
+          <div class="stat-sub">2 sin asignar</div>
+          <div class="stat-icon">👨‍🏫</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Grupos</div>
+          <div class="stat-value" style="color:var(--green)" id="stat-grupos">8</div>
+          <div class="stat-sub">3 grados · turno mixto</div>
+          <div class="stat-icon">🏫</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Materias</div>
+          <div class="stat-value" style="color:var(--orange)" id="stat-materias">24</div>
+          <div class="stat-sub">18 con docente</div>
+          <div class="stat-icon">📚</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Alumnos</div>
+          <div class="stat-value" style="color:var(--purple)" id="stat-alumnos">320</div>
+          <div class="stat-sub">40 por grupo avg</div>
+          <div class="stat-icon">🎒</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Cobertura Académica</div>
+          <div class="stat-value" style="color:var(--yellow)" id="stat-cobertura">75%</div>
+          <div class="stat-sub">6 materias sin docente</div>
+          <div class="stat-icon">📊</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <!-- Alertas -->
+        <div class="card">
+          <div class="card-header">
+            <span>⚠️</span><div class="card-title">Alertas del Sistema</div>
+            <span class="badge badge-red" style="margin-left:auto">3</span>
+          </div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+            <div class="alert alert-err">🔴 Martínez García excede 20h/semana (asignadas: 22h)</div>
+            <div class="alert alert-warn">🟡 Grupo 3°A: 3 materias sin docente asignado</div>
+            <div class="alert alert-warn">🟡 Física II: Solo 1 docente compatible disponible</div>
+            <div class="alert alert-ok">✅ Asignación automática completada al 75%</div>
+          </div>
+        </div>
+
+        <!-- Cobertura por grupo -->
+        <div class="card">
+          <div class="card-header">
+            <span>📊</span><div class="card-title">Cobertura por Grupo</div>
+          </div>
+          <div style="padding:12px 16px;">
+            <div id="cobertura-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px;">
+        <!-- Carga docentes -->
+        <div class="card">
+          <div class="card-header">
+            <span>👨‍🏫</span><div class="card-title">Carga Académica — Docentes</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Docente</th><th>Especialidad</th><th>Horas Asig.</th><th>Máx.</th><th>Carga</th><th>Estado</th></tr></thead>
+              <tbody id="dash-docentes-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Distribución por turno -->
+        <div class="card">
+          <div class="card-header"><span>🌅</span><div class="card-title">Turnos</div></div>
+          <div style="padding:20px 16px;">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <div class="flex-between mb-4" style="margin-bottom:6px"><span style="font-size:13px">Matutino</span><span class="text-mono" style="color:var(--accent)">7</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar progress-blue" style="width:58%"></div></div>
+              </div>
+              <div>
+                <div class="flex-between mb-4" style="margin-bottom:6px"><span style="font-size:13px">Vespertino</span><span class="text-mono" style="color:var(--purple)">4</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar" style="width:33%;background:var(--purple)"></div></div>
+              </div>
+              <div>
+                <div class="flex-between mb-4" style="margin-bottom:6px"><span style="font-size:13px">Ambos</span><span class="text-mono" style="color:var(--green)">1</span></div>
+                <div class="progress-bar-wrap"><div class="progress-bar progress-green" style="width:9%"></div></div>
+              </div>
+            </div>
+            <div class="section-divider"></div>
+            <div class="stat-label" style="margin-bottom:8px">Promedio Institucional</div>
+            <div style="font-size:32px;font-family:var(--font-display);color:var(--yellow)">8.2</div>
+            <div class="text-muted" style="font-size:12px">Parcial 1 · 2024-2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ DOCENTES ═══════ -->
+    <div id="view-docentes" class="view">
+      <div class="flex-between mb-4">
+        <div class="search-wrap" style="width:280px">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Buscar docente..." oninput="filterDocentes(this.value)" id="search-docentes">
+        </div>
+        <div style="display:flex;gap:8px">
+          <select style="width:160px" onchange="filterDocentesTurno(this.value)">
+            <option value="">Todos los turnos</option>
+            <option>Matutino</option>
+            <option>Vespertino</option>
+            <option>Ambos</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('modal-docente')">+ Nuevo Docente</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span>👨‍🏫</span><div class="card-title">Catálogo de Docentes</div>
+          <div class="card-subtitle" id="docentes-count">12 registros</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Docente</th><th>RFC / ID</th><th>Especialidad</th><th>Turno</th><th>Horas Disp.</th><th>Horas Asig.</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="docentes-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ MATERIAS ═══════ -->
+    <div id="view-materias" class="view">
+      <div class="flex-between mb-4">
+        <div class="search-wrap" style="width:280px">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Buscar materia..." oninput="filterMaterias(this.value)">
+        </div>
+        <div style="display:flex;gap:8px">
+          <select style="width:140px" onchange="filterMateriaGrado(this.value)">
+            <option value="">Todos los grados</option>
+            <option>1°</option><option>2°</option><option>3°</option>
+          </select>
+          <button class="btn btn-primary" onclick="openModal('modal-materia')">+ Nueva Materia</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>📚</span><div class="card-title">Catálogo de Materias</div><div class="card-subtitle" id="materias-count">24 materias</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Clave</th><th>Materia</th><th>Grado</th><th>Horas/Sem.</th><th>Créditos</th><th>Especialidades Compat.</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="materias-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ GRUPOS ═══════ -->
+    <div id="view-grupos" class="view">
+      <div class="flex-between mb-4">
+        <div></div>
+        <button class="btn btn-primary" onclick="openModal('modal-grupo')">+ Nuevo Grupo</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>🏫</span><div class="card-title">Grupos Registrados</div><div class="card-subtitle">Ciclo 2024-2025</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Grupo</th><th>Grado</th><th>Turno</th><th>Alumnos</th><th>Materias</th><th>Cobertura</th><th>Salón</th><th>Acciones</th></tr></thead>
+            <tbody id="grupos-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ ASIGNACIONES ═══════ -->
+    <div id="view-asignaciones" class="view">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-lista-asig')">Lista de Asignaciones</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-asig-manual')">Asignación Manual</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-asig-reporte')">Reporte de Carga</button>
+      </div>
+      <div id="tab-lista-asig" class="tab-panel active">
+        <div class="flex-between mb-4">
+          <div class="search-wrap" style="width:280px">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Buscar docente o materia..." oninput="filterAsig(this.value)">
+          </div>
+          <div style="display:flex;gap:8px">
+            <span class="badge badge-green" style="padding:6px 12px">✅ <span id="asig-ok">18</span> Asignadas</span>
+            <span class="badge badge-red" style="padding:6px 12px">❌ <span id="asig-miss">6</span> Pendientes</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Docente</th><th>Materia</th><th>Grupo</th><th>Horas/Sem.</th><th>Turno</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="asig-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="tab-asig-manual" class="tab-panel">
+        <div class="card">
+          <div class="card-header"><span>✏️</span><div class="card-title">Nueva Asignación Manual</div></div>
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Docente</label>
+                <select id="asig-docente" onchange="validarAsignacion()">
+                  <option value="">— Seleccionar —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Materia</label>
+                <select id="asig-materia" onchange="validarAsignacion()">
+                  <option value="">— Seleccionar —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Grupo</label>
+                <select id="asig-grupo" onchange="validarAsignacion()">
+                  <option value="">— Seleccionar —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Turno</label>
+                <select id="asig-turno">
+                  <option>Matutino</option><option>Vespertino</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Día</label>
+                <select id="asig-dia">
+                  <option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Hora inicio</label>
+                <input type="time" id="asig-hora-ini" value="08:00" onchange="validarAsignacion()">
+              </div>
+            </div>
+            <div id="asig-alertas" style="margin-top:16px"></div>
+            <div style="margin-top:16px;display:flex;gap:10px">
+              <button class="btn btn-primary" onclick="guardarAsignacionManual()">💾 Guardar Asignación</button>
+              <button class="btn btn-secondary" onclick="limpiarAsignacion()">🗑️ Limpiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-asig-reporte" class="tab-panel">
+        <div id="reporte-carga-wrap"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ HORARIOS ═══════ -->
+    <div id="view-horarios" class="view">
+      <div class="flex-between mb-4">
+        <div style="display:flex;gap:10px;align-items:center">
+          <label style="font-size:13px;color:var(--text2)">Ver horario de:</label>
+          <select id="horario-docente-select" onchange="renderHorario()" style="width:220px">
+            <option value="">— Seleccionar Docente —</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <label style="font-size:13px;color:var(--text2)">O por grupo:</label>
+          <select id="horario-grupo-select" onchange="renderHorarioGrupo()" style="width:160px">
+            <option value="">— Grupo —</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>📅</span><div class="card-title" id="horario-titulo">Seleccione un docente o grupo</div></div>
+        <div style="padding:16px;overflow-x:auto" id="horario-content">
+          <div class="alert alert-info">Seleccione un docente o grupo para visualizar su horario semanal.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ CALIFICACIONES ═══════ -->
+    <div id="view-calificaciones" class="view">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-cap-calif')">Captura de Calificaciones</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-boleta')">Boleta de Alumno</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-historial')">Historial de Cambios</button>
+      </div>
+      <div id="tab-cap-calif" class="tab-panel active">
+        <div class="flex-between mb-4">
+          <div style="display:flex;gap:10px">
+            <select id="calif-grupo" onchange="loadCalifGrupo()" style="width:160px">
+              <option value="">— Grupo —</option>
+            </select>
+            <select id="calif-materia" onchange="loadCalifMateria()" style="width:200px">
+              <option value="">— Materia —</option>
+            </select>
+            <select id="calif-periodo" style="width:160px">
+              <option value="1">Parcial 1</option>
+              <option value="2">Parcial 2</option>
+              <option value="3">Parcial 3</option>
+              <option value="4">Examen Final</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="guardarCalificaciones()">💾 Guardar Calificaciones</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><span>📝</span><div class="card-title" id="calif-titulo">Seleccione grupo y materia</div><div class="card-subtitle" id="calif-periodo-label">—</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Matrícula</th><th>Alumno</th><th>P1</th><th>P2</th><th>P3</th><th>Examen Final</th><th>Promedio</th><th>Estado</th></tr></thead>
+              <tbody id="calif-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="tab-boleta" class="tab-panel">
+        <div class="flex-between mb-4">
+          <div style="display:flex;gap:10px;align-items:center">
+            <select id="boleta-alumno" style="width:280px">
+              <option value="">— Seleccionar Alumno —</option>
+            </select>
+            <button class="btn btn-secondary" onclick="loadBoleta()">📄 Ver Boleta</button>
+          </div>
+          <button class="btn btn-green" onclick="imprimirBoleta()">🖨️ Imprimir / PDF</button>
+        </div>
+        <div id="boleta-content">
+          <div class="alert alert-info">Seleccione un alumno para visualizar su boleta de calificaciones.</div>
+        </div>
+      </div>
+      <div id="tab-historial" class="tab-panel">
+        <div class="card">
+          <div class="card-header"><span>📋</span><div class="card-title">Historial de Cambios en Calificaciones</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Alumno</th><th>Materia</th><th>Campo</th><th>Antes</th><th>Después</th><th>Motivo</th><th>Modificado por</th></tr></thead>
+              <tbody id="historial-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ REPORTES ═══════ -->
+    <div id="view-reportes" class="view">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="card" style="cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="generarReporte('carga')">
+          <div style="padding:20px;text-align:center">
+            <div style="font-size:32px;margin-bottom:10px">📊</div>
+            <div style="font-weight:600;margin-bottom:4px">Carga Académica</div>
+            <div class="text-muted" style="font-size:12px">Por docente</div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--green)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="generarReporte('materias-grupo')">
+          <div style="padding:20px;text-align:center">
+            <div style="font-size:32px;margin-bottom:10px">📚</div>
+            <div style="font-weight:600;margin-bottom:4px">Materias por Grupo</div>
+            <div class="text-muted" style="font-size:12px">Cobertura académica</div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--yellow)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="generarReporte('promedio')">
+          <div style="padding:20px;text-align:center">
+            <div style="font-size:32px;margin-bottom:10px">📈</div>
+            <div style="font-weight:600;margin-bottom:4px">Promedio por Materia</div>
+            <div class="text-muted" style="font-size:12px">Análisis académico</div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--purple)'" onmouseleave="this.style.borderColor='var(--border)'" onclick="generarReporte('boletas')">
+          <div style="padding:20px;text-align:center">
+            <div style="font-size:32px;margin-bottom:10px">📄</div>
+            <div style="font-weight:600;margin-bottom:4px">Boletas</div>
+            <div class="text-muted" style="font-size:12px">Exportar todas</div>
+          </div>
+        </div>
+      </div>
+      <div id="reporte-output"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════
+     MODALES
+═══════════════════════════════════════ -->
+
+<!-- Modal: Nuevo Docente -->
+<div id="modal-docente" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👨‍🏫 <span id="modal-docente-title">Nuevo Docente</span></div>
+      <button class="modal-close" onclick="closeModal('modal-docente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre(s)</label>
+          <input type="text" id="d-nombre" placeholder="Ej. Juan Carlos">
+        </div>
+        <div class="form-group">
+          <label>Apellido Paterno</label>
+          <input type="text" id="d-apat" placeholder="Ej. García">
+        </div>
+        <div class="form-group">
+          <label>Apellido Materno</label>
+          <input type="text" id="d-amat" placeholder="Ej. López">
+        </div>
+        <div class="form-group">
+          <label>RFC / ID Institucional</label>
+          <input type="text" id="d-rfc" placeholder="Ej. GALJ800101ABC" maxlength="18" style="font-family:var(--font-mono)">
+        </div>
+        <div class="form-group">
+          <label>Especialidad Principal</label>
+          <select id="d-especialidad">
+            <option value="">— Seleccionar —</option>
+            <option>Matemáticas</option>
+            <option>Español y Literatura</option>
+            <option>Ciencias Naturales</option>
+            <option>Historia y Geografía</option>
+            <option>Inglés</option>
+            <option>Educación Física</option>
+            <option>Química</option>
+            <option>Física</option>
+            <option>Biología</option>
+            <option>Informática</option>
+            <option>Arte y Cultura</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Horas Máx. por Semana</label>
+          <input type="number" id="d-horas" min="1" max="40" value="20" placeholder="20">
+        </div>
+        <div class="form-group">
+          <label>Turno Disponible</label>
+          <select id="d-turno">
+            <option>Matutino</option>
+            <option>Vespertino</option>
+            <option>Ambos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Email Institucional</label>
+          <input type="email" id="d-email" placeholder="docente@escuela.edu.mx">
+        </div>
+        <div class="form-group form-full">
+          <label>Materias que puede impartir</label>
+          <div id="d-materias-check" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;padding:12px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-docente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarDocente()">💾 Guardar Docente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nueva Materia -->
+<div id="modal-materia" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📚 Nueva Materia</div>
+      <button class="modal-close" onclick="closeModal('modal-materia')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Clave</label>
+          <input type="text" id="m-clave" placeholder="Ej. MAT-1A" style="font-family:var(--font-mono)">
+        </div>
+        <div class="form-group">
+          <label>Nombre de la Materia</label>
+          <input type="text" id="m-nombre" placeholder="Ej. Matemáticas I">
+        </div>
+        <div class="form-group">
+          <label>Grado</label>
+          <select id="m-grado">
+            <option>1°</option><option>2°</option><option>3°</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Semestre</label>
+          <select id="m-semestre">
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Horas por Semana</label>
+          <input type="number" id="m-horas" min="1" max="10" value="4">
+        </div>
+        <div class="form-group">
+          <label>Créditos</label>
+          <input type="number" id="m-creditos" min="1" max="10" value="5">
+        </div>
+        <div class="form-group form-full">
+          <label>Área de Conocimiento</label>
+          <select id="m-area">
+            <option>Matemáticas y Ciencias Exactas</option>
+            <option>Humanidades y Ciencias Sociales</option>
+            <option>Ciencias Naturales y Experimentales</option>
+            <option>Comunicación y Lenguaje</option>
+            <option>Tecnología e Informática</option>
+            <option>Arte y Cultura</option>
+            <option>Educación Física</option>
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label>Especialidades Compatibles</label>
+          <div id="m-esp-check" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;padding:12px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border)">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Matemáticas</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Física</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Química</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Biología</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Español y Literatura</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Historia y Geografía</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Inglés</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> Informática</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-materia')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarMateria()">💾 Guardar Materia</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo Grupo -->
+<div id="modal-grupo" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">🏫 Nuevo Grupo</div>
+      <button class="modal-close" onclick="closeModal('modal-grupo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre del Grupo</label>
+          <input type="text" id="g-nombre" placeholder="Ej. 1°A">
+        </div>
+        <div class="form-group">
+          <label>Grado</label>
+          <select id="g-grado"><option>1°</option><option>2°</option><option>3°</option></select>
+        </div>
+        <div class="form-group">
+          <label>Turno</label>
+          <select id="g-turno"><option>Matutino</option><option>Vespertino</option></select>
+        </div>
+        <div class="form-group">
+          <label>Capacidad máx. alumnos</label>
+          <input type="number" id="g-cap" min="10" max="60" value="40">
+        </div>
+        <div class="form-group form-full">
+          <label>Salón / Aula</label>
+          <input type="text" id="g-salon" placeholder="Ej. Aula 12-B">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-grupo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarGrupo()">💾 Guardar Grupo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Asignación Automática -->
+<div id="modal-auto" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">⚡ Asignación Automática</div>
+      <button class="modal-close" onclick="closeModal('modal-auto')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">El algoritmo CSP-Greedy analizará especialidades, disponibilidad de horario y límites de horas para asignar docentes automáticamente.</div>
+      <div style="margin:16px 0;font-size:13px;color:var(--text2)">
+        <strong style="color:var(--text)">Configuración:</strong>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox" checked> Respetar límite de horas del docente</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox" checked> Validar compatibilidad de especialidad</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox" checked> Evitar empalmes de horario</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text);font-weight:400"><input type="checkbox"> Sobrescribir asignaciones manuales existentes</label>
+        </div>
+      </div>
+      <div id="auto-progress" style="display:none">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:8px" id="auto-progress-label">Procesando...</div>
+        <div class="progress-bar-wrap" style="height:8px">
+          <div class="progress-bar progress-blue" id="auto-bar" style="width:0%;transition:width .4s ease"></div>
+        </div>
+      </div>
+      <div id="auto-result" style="margin-top:16px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-auto')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-ejecutar-auto" onclick="ejecutarAsignacionAuto()">⚡ Ejecutar Asignación</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Detalle Docente -->
+<div id="modal-docente-ver" class="modal-overlay">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <div class="modal-title" id="ver-docente-titulo">Perfil Docente</div>
+      <button class="modal-close" onclick="closeModal('modal-docente-ver')">✕</button>
+    </div>
+    <div class="modal-body" id="ver-docente-content"></div>
+  </div>
+</div>
+
+<!-- Modal: Calificación individual -->
+<div id="modal-edit-calif" class="modal-overlay">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Modificar Calificación</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-calif')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Alumno</label>
+        <input type="text" id="ec-alumno" readonly style="background:var(--surface3)">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Campo a modificar</label>
+        <input type="text" id="ec-campo" readonly style="background:var(--surface3)">
+      </div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-group">
+          <label>Valor anterior</label>
+          <input type="text" id="ec-antes" readonly style="background:var(--surface3);color:var(--red)">
+        </div>
+        <div class="form-group">
+          <label>Nuevo valor (0-10)</label>
+          <input type="number" id="ec-nuevo" min="0" max="10" step="0.1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Motivo de modificación <span style="color:var(--red)">*</span></label>
+        <textarea id="ec-motivo" rows="3" placeholder="Descripción obligatoria del motivo..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-calif')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarEditCalif()">💾 Confirmar Cambio</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  DATA STORE
+// ═══════════════════════════════════════════════════════════
+const ESPECIALIDADES = ['Matemáticas','Español y Literatura','Ciencias Naturales','Historia y Geografía','Inglés','Educación Física','Química','Física','Biología','Informática','Arte y Cultura'];
+
+const db = {
+  docentes: [
+    {id:1,nombre:'Laura Elena',apPat:'Martínez',apMat:'García',rfc:'MAGL820315XK2',especialidad:'Matemáticas',horas_max:20,horas_asig:22,turno:'Matutino',email:'l.martinez@esc.edu.mx',activo:true,materias:['Matemáticas I','Matemáticas II','Álgebra']},
+    {id:2,nombre:'Roberto',apPat:'Sánchez',apMat:'Pérez',rfc:'SAPR790605MN4',especialidad:'Física',horas_max:18,horas_asig:16,turno:'Matutino',email:'r.sanchez@esc.edu.mx',activo:true,materias:['Física I','Física II']},
+    {id:3,nombre:'María Fernanda',apPat:'López',apMat:'Ruiz',rfc:'LORM950210FJ8',especialidad:'Español y Literatura',horas_max:22,horas_asig:20,turno:'Vespertino',email:'mf.lopez@esc.edu.mx',activo:true,materias:['Español I','Español II','Literatura']},
+    {id:4,nombre:'Carlos Alberto',apPat:'Hernández',apMat:'Vega',rfc:'HEVC801120AS1',especialidad:'Historia y Geografía',horas_max:20,horas_asig:18,turno:'Matutino',email:'c.hernandez@esc.edu.mx',activo:true,materias:['Historia Universal','Historia de México','Geografía']},
+    {id:5,nombre:'Ana Patricia',apPat:'Ramírez',apMat:'Torres',rfc:'RATA880930BK5',especialidad:'Inglés',horas_max:24,horas_asig:20,turno:'Ambos',email:'a.ramirez@esc.edu.mx',activo:true,materias:['Inglés I','Inglés II','Inglés III']},
+    {id:6,nombre:'Jorge Luis',apPat:'González',apMat:'Morales',rfc:'GOMJ751005XQ3',especialidad:'Química',horas_max:18,horas_asig:14,turno:'Matutino',email:'j.gonzalez@esc.edu.mx',activo:true,materias:['Química I','Química II']},
+    {id:7,nombre:'Sofía',apPat:'Díaz',apMat:'Castro',rfc:'DICS910715PL9',especialidad:'Biología',horas_max:20,horas_asig:16,turno:'Vespertino',email:'s.diaz@esc.edu.mx',activo:true,materias:['Biología I','Biología II','Ciencias Naturales']},
+    {id:8,nombre:'Miguel Ángel',apPat:'Flores',apMat:'Jiménez',rfc:'FOJM830422RT7',especialidad:'Informática',horas_max:16,horas_asig:12,turno:'Matutino',email:'m.flores@esc.edu.mx',activo:true,materias:['Informática I','Programación Básica']},
+    {id:9,nombre:'Patricia',apPat:'Moreno',apMat:'Ávila',rfc:'MOAP760818GH2',especialidad:'Arte y Cultura',horas_max:14,horas_asig:10,turno:'Vespertino',email:'p.moreno@esc.edu.mx',activo:true,materias:['Arte I','Música','Teatro']},
+    {id:10,nombre:'Alejandro',apPat:'Reyes',apMat:'Guzmán',rfc:'REGA920303KN6',especialidad:'Educación Física',horas_max:20,horas_asig:18,turno:'Matutino',email:'a.reyes@esc.edu.mx',activo:true,materias:['Educación Física I','Educación Física II']},
+    {id:11,nombre:'Carmen',apPat:'Vásquez',apMat:'Luna',rfc:'VALC850625WM4',especialidad:'Matemáticas',horas_max:22,horas_asig:0,turno:'Vespertino',email:'c.vasquez@esc.edu.mx',activo:true,materias:['Matemáticas III','Cálculo']},
+    {id:12,nombre:'Fernando',apPat:'Mendoza',apMat:'Ortiz',rfc:'MEOF700911DX8',especialidad:'Ciencias Naturales',horas_max:18,horas_asig:0,turno:'Matutino',email:'f.mendoza@esc.edu.mx',activo:false,materias:['Ciencias Naturales','Biología']},
+  ],
+  materias: [
+    {id:1,clave:'MAT1',nombre:'Matemáticas I',grado:'1°',semestre:1,horas:5,creditos:8,area:'Matemáticas y Ciencias Exactas',especialidades:['Matemáticas'],activo:true},
+    {id:2,clave:'MAT2',nombre:'Matemáticas II',grado:'2°',semestre:3,horas:5,creditos:8,area:'Matemáticas y Ciencias Exactas',especialidades:['Matemáticas'],activo:true},
+    {id:3,clave:'MAT3',nombre:'Matemáticas III',grado:'3°',semestre:5,horas:5,creditos:8,area:'Matemáticas y Ciencias Exactas',especialidades:['Matemáticas'],activo:true},
+    {id:4,clave:'ESP1',nombre:'Español I',grado:'1°',semestre:1,horas:4,creditos:7,area:'Comunicación y Lenguaje',especialidades:['Español y Literatura'],activo:true},
+    {id:5,clave:'ESP2',nombre:'Español II',grado:'2°',semestre:3,horas:4,creditos:7,area:'Comunicación y Lenguaje',especialidades:['Español y Literatura'],activo:true},
+    {id:6,clave:'ENG1',nombre:'Inglés I',grado:'1°',semestre:1,horas:4,creditos:6,area:'Comunicación y Lenguaje',especialidades:['Inglés'],activo:true},
+    {id:7,clave:'FIS1',nombre:'Física I',grado:'2°',semestre:3,horas:4,creditos:7,area:'Ciencias Naturales y Experimentales',especialidades:['Física','Matemáticas'],activo:true},
+    {id:8,clave:'QUI1',nombre:'Química I',grado:'2°',semestre:3,horas:4,creditos:7,area:'Ciencias Naturales y Experimentales',especialidades:['Química','Biología'],activo:true},
+    {id:9,clave:'BIO1',nombre:'Biología I',grado:'1°',semestre:1,horas:3,creditos:6,area:'Ciencias Naturales y Experimentales',especialidades:['Biología','Ciencias Naturales'],activo:true},
+    {id:10,clave:'HIS1',nombre:'Historia Universal',grado:'1°',semestre:1,horas:3,creditos:6,area:'Humanidades y Ciencias Sociales',especialidades:['Historia y Geografía'],activo:true},
+    {id:11,clave:'GEO1',nombre:'Geografía',grado:'1°',semestre:2,horas:3,creditos:5,area:'Humanidades y Ciencias Sociales',especialidades:['Historia y Geografía'],activo:true},
+    {id:12,clave:'INF1',nombre:'Informática I',grado:'1°',semestre:1,horas:3,creditos:5,area:'Tecnología e Informática',especialidades:['Informática'],activo:true},
+    {id:13,clave:'EDF1',nombre:'Educación Física I',grado:'1°',semestre:1,horas:2,creditos:4,area:'Educación Física',especialidades:['Educación Física'],activo:true},
+    {id:14,clave:'ART1',nombre:'Arte I',grado:'1°',semestre:1,horas:2,creditos:4,area:'Arte y Cultura',especialidades:['Arte y Cultura'],activo:true},
+    {id:15,clave:'FIS2',nombre:'Física II',grado:'3°',semestre:5,horas:4,creditos:7,area:'Ciencias Naturales y Experimentales',especialidades:['Física'],activo:true},
+    {id:16,clave:'QUI2',nombre:'Química II',grado:'3°',semestre:5,horas:4,creditos:7,area:'Ciencias Naturales y Experimentales',especialidades:['Química'],activo:true},
+    {id:17,clave:'CALC',nombre:'Cálculo',grado:'3°',semestre:6,horas:5,creditos:9,area:'Matemáticas y Ciencias Exactas',especialidades:['Matemáticas'],activo:true},
+    {id:18,clave:'LIT1',nombre:'Literatura',grado:'2°',semestre:4,horas:3,creditos:6,area:'Comunicación y Lenguaje',especialidades:['Español y Literatura'],activo:true},
+    {id:19,clave:'ENG2',nombre:'Inglés II',grado:'2°',semestre:4,horas:4,creditos:6,area:'Comunicación y Lenguaje',especialidades:['Inglés'],activo:true},
+    {id:20,clave:'BIO2',nombre:'Biología II',grado:'2°',semestre:4,horas:3,creditos:6,area:'Ciencias Naturales y Experimentales',especialidades:['Biología'],activo:true},
+    {id:21,clave:'HIS2',nombre:'Historia de México',grado:'2°',semestre:3,horas:3,creditos:6,area:'Humanidades y Ciencias Sociales',especialidades:['Historia y Geografía'],activo:true},
+    {id:22,clave:'EDF2',nombre:'Educación Física II',grado:'2°',semestre:3,horas:2,creditos:4,area:'Educación Física',especialidades:['Educación Física'],activo:true},
+    {id:23,clave:'ENG3',nombre:'Inglés III',grado:'3°',semestre:5,horas:4,creditos:6,area:'Comunicación y Lenguaje',especialidades:['Inglés'],activo:true},
+    {id:24,clave:'PRG1',nombre:'Programación Básica',grado:'3°',semestre:6,horas:3,creditos:5,area:'Tecnología e Informática',especialidades:['Informática'],activo:true},
+  ],
+  grupos: [
+    {id:1,nombre:'1°A',grado:'1°',turno:'Matutino',alumnos:42,materias:8,salon:'Aula 101',cobertura:100},
+    {id:2,nombre:'1°B',grado:'1°',turno:'Matutino',alumnos:40,materias:8,salon:'Aula 102',cobertura:100},
+    {id:3,nombre:'1°C',grado:'1°',turno:'Vespertino',alumnos:38,materias:8,salon:'Aula 103',cobertura:87},
+    {id:4,nombre:'2°A',grado:'2°',turno:'Matutino',alumnos:41,materias:9,salon:'Aula 201',cobertura:100},
+    {id:5,nombre:'2°B',grado:'2°',turno:'Matutino',alumnos:39,materias:9,salon:'Aula 202',cobertura:78},
+    {id:6,nombre:'2°C',grado:'2°',turno:'Vespertino',alumnos:37,materias:9,salon:'Aula 203',cobertura:67},
+    {id:7,nombre:'3°A',grado:'3°',turno:'Matutino',alumnos:40,materias:7,salon:'Aula 301',cobertura:57},
+    {id:8,nombre:'3°B',grado:'3°',turno:'Matutino',alumnos:43,materias:7,salon:'Aula 302',cobertura:100},
+  ],
+  asignaciones: [
+    {id:1,docenteId:1,materiaId:1,grupoId:1,horas:5,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:2,docenteId:1,materiaId:2,grupoId:4,horas:5,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:3,docenteId:2,materiaId:7,grupoId:4,horas:4,turno:'Matutino',tipo:'manual',estado:'activa'},
+    {id:4,docenteId:2,materiaId:7,grupoId:5,horas:4,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:5,docenteId:3,materiaId:4,grupoId:1,horas:4,turno:'Vespertino',tipo:'auto',estado:'activa'},
+    {id:6,docenteId:3,materiaId:5,grupoId:4,horas:4,turno:'Vespertino',tipo:'auto',estado:'activa'},
+    {id:7,docenteId:4,materiaId:10,grupoId:1,horas:3,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:8,docenteId:4,materiaId:21,grupoId:4,horas:3,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:9,docenteId:5,materiaId:6,grupoId:1,horas:4,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:10,docenteId:5,materiaId:19,grupoId:4,horas:4,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:11,docenteId:6,materiaId:8,grupoId:4,horas:4,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:12,docenteId:7,materiaId:9,grupoId:1,horas:3,turno:'Vespertino',tipo:'auto',estado:'activa'},
+    {id:13,docenteId:8,materiaId:12,grupoId:1,horas:3,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:14,docenteId:9,materiaId:14,grupoId:1,horas:2,turno:'Vespertino',tipo:'manual',estado:'activa'},
+    {id:15,docenteId:10,materiaId:13,grupoId:1,horas:2,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:16,docenteId:10,materiaId:22,grupoId:4,horas:2,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:17,docenteId:1,materiaId:1,grupoId:2,horas:5,turno:'Matutino',tipo:'auto',estado:'activa'},
+    {id:18,docenteId:5,materiaId:6,grupoId:2,horas:4,turno:'Matutino',tipo:'auto',estado:'activa'},
+  ],
+  alumnos: [
+    {id:1,matricula:'2024001',nombre:'Andrea Sofía',apellidos:'Torres Morales',grupoId:1},
+    {id:2,matricula:'2024002',nombre:'Luis Alberto',apellidos:'Ramírez Vega',grupoId:1},
+    {id:3,matricula:'2024003',nombre:'Valentina',apellidos:'Cruz Hernández',grupoId:1},
+    {id:4,matricula:'2024004',nombre:'Sebastián',apellidos:'Gutiérrez Reyes',grupoId:1},
+    {id:5,matricula:'2024005',nombre:'Camila Isabel',apellidos:'Ortiz Sánchez',grupoId:1},
+    {id:6,matricula:'2024006',nombre:'Diego Alejandro',apellidos:'Flores Martínez',grupoId:2},
+    {id:7,matricula:'2024007',nombre:'Isabella',apellidos:'Jiménez Castro',grupoId:2},
+    {id:8,matricula:'2024101',nombre:'Fernando',apellidos:'López Díaz',grupoId:4},
+    {id:9,matricula:'2024102',nombre:'Mariana',apellidos:'González Pérez',grupoId:4},
+    {id:10,matricula:'2024103',nombre:'Carlos',apellidos:'Mendoza Ávila',grupoId:4},
+  ],
+  calificaciones: [
+    {id:1,alumnoId:1,asigId:1,p1:8.5,p2:9.0,p3:8.0,final:8.5,promedio:8.5,estado:'publicada'},
+    {id:2,alumnoId:2,asigId:1,p1:7.0,p2:7.5,p3:8.0,final:7.0,promedio:7.4,estado:'publicada'},
+    {id:3,alumnoId:3,asigId:1,p1:9.5,p2:9.0,p3:9.5,final:9.5,promedio:9.4,estado:'publicada'},
+    {id:4,alumnoId:4,asigId:1,p1:6.0,p2:5.5,p3:6.0,final:5.5,promedio:5.8,estado:'publicada'},
+    {id:5,alumnoId:5,asigId:1,p1:8.0,p2:8.5,p3:8.0,final:9.0,promedio:8.5,estado:'publicada'},
+    {id:6,alumnoId:1,asigId:5,p1:9.0,p2:8.5,p3:9.0,final:9.0,promedio:9.0,estado:'capturada'},
+    {id:7,alumnoId:2,asigId:5,p1:7.5,p2:7.0,p3:8.0,final:7.5,promedio:7.6,estado:'capturada'},
+    {id:8,alumnoId:3,asigId:5,p1:10,p2:9.5,p3:10,final:10,promedio:9.9,estado:'capturada'},
+  ],
+  historial: [
+    {id:1,califId:4,alumnoId:4,campo:'p2',antes:4.5,despues:5.5,motivo:'Error de captura verificado contra examen físico',modificadoPor:'Admin. General',fecha:'2024-10-15 14:32'},
+    {id:2,califId:2,alumnoId:2,campo:'final',antes:6.5,despues:7.0,motivo:'Revisión de examen solicitada por alumno y validada por docente',modificadoPor:'L. Martínez García',fecha:'2024-10-20 10:15'},
+  ]
+};
+
+let editCalifData = null;
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const titles = {
+  dashboard:'Dashboard', docentes:'Gestión de Docentes', materias:'Gestión de Materias',
+  grupos:'Gestión de Grupos', asignaciones:'Asignación de Carga Académica',
+  horarios:'Horarios', calificaciones:'Registro de Calificaciones', reportes:'Reportes'
+};
+
+function navigate(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes("'"+view+"'")) n.classList.add('active');
+  });
+  document.getElementById('topbar-title').textContent = titles[view];
+  renderView(view);
+}
+
+function renderView(view) {
+  if (view === 'dashboard') renderDashboard();
+  if (view === 'docentes') renderDocentes();
+  if (view === 'materias') renderMaterias();
+  if (view === 'grupos') renderGrupos();
+  if (view === 'asignaciones') renderAsignaciones();
+  if (view === 'horarios') renderHorarioInit();
+  if (view === 'calificaciones') renderCalificacionesInit();
+  if (view === 'reportes') document.getElementById('reporte-output').innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderDashboard() {
+  // Cobertura por grupo
+  const cl = document.getElementById('cobertura-list');
+  cl.innerHTML = db.grupos.map(g => {
+    const cls = g.cobertura===100?'green':g.cobertura>=70?'yellow':'red';
+    return `<div style="margin-bottom:12px">
+      <div class="flex-between" style="margin-bottom:4px">
+        <span style="font-size:13px"><span class="semaforo semaforo-${cls}" style="margin-right:6px"></span>${g.nombre}</span>
+        <span class="text-mono" style="color:var(--${cls})">${g.cobertura}%</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar progress-${cls}" style="width:${g.cobertura}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Docentes dash
+  const tb = document.getElementById('dash-docentes-tbody');
+  tb.innerHTML = db.docentes.filter(d=>d.activo).slice(0,8).map(d => {
+    const pct = Math.round(d.horas_asig/d.horas_max*100);
+    const cls = pct>100?'red':pct>85?'yellow':'green';
+    const badgeCls = pct>100?'badge-red':pct>85?'badge-yellow':'badge-green';
+    const estado = pct>100?'Sobrecarga':pct>85?'Al límite':'Normal';
+    return `<tr>
+      <td><div style="font-weight:500">${d.nombre} ${d.apPat}</div><div class="text-muted" style="font-size:11px">${d.email}</div></td>
+      <td><span class="badge badge-blue">${d.especialidad}</span></td>
+      <td class="text-mono" style="color:var(--${cls})">${d.horas_asig}h</td>
+      <td class="text-mono text-muted">${d.horas_max}h</td>
+      <td style="min-width:100px"><div class="progress-bar-wrap"><div class="progress-bar progress-${cls}" style="width:${Math.min(pct,100)}%"></div></div></td>
+      <td><span class="badge ${badgeCls}">${estado}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DOCENTES
+// ═══════════════════════════════════════════════════════════
+function renderDocentes(filter='', turno='') {
+  const filtered = db.docentes.filter(d => {
+    const q = filter.toLowerCase();
+    const match = !q || `${d.nombre} ${d.apPat} ${d.apMat} ${d.rfc} ${d.especialidad}`.toLowerCase().includes(q);
+    const matchT = !turno || d.turno === turno;
+    return match && matchT;
+  });
+  document.getElementById('docentes-count').textContent = `${filtered.length} registros`;
+  document.getElementById('docentes-tbody').innerHTML = filtered.map(d => {
+    const pct = d.horas_max>0?Math.round(d.horas_asig/d.horas_max*100):0;
+    const over = pct > 100;
+    return `<tr>
+      <td><div class="flex-row"><div style="width:32px;height:32px;border-radius:50%;background:${specColor(d.especialidad)};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0">${initials(d.nombre,d.apPat)}</div><div><div style="font-weight:500">${d.nombre} ${d.apPat} ${d.apMat}</div><div class="text-muted" style="font-size:11px">${d.email}</div></div></div></td>
+      <td class="text-mono" style="font-size:12px;color:var(--text3)">${d.rfc}</td>
+      <td><span class="badge badge-blue">${d.especialidad}</span></td>
+      <td><span class="badge badge-gray">${d.turno}</span></td>
+      <td class="text-mono">${d.horas_max}h</td>
+      <td class="text-mono" style="color:${over?'var(--red)':'var(--text)'}">${d.horas_asig}h ${over?'⚠️':''}</td>
+      <td><span class="badge ${d.activo?'badge-green':'badge-red'}">${d.activo?'Activo':'Baja'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="verDocente(${d.id})">👁 Ver</button>
+        <button class="btn btn-secondary btn-sm" onclick="editarDocente(${d.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="bajaDocente(${d.id})">${d.activo?'🗑️':'♻️'}</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterDocentes(v) { renderDocentes(v, document.querySelector('#view-docentes select')?.value||''); }
+function filterDocentesTurno(v) { renderDocentes(document.getElementById('search-docentes')?.value||'', v); }
+function initials(n,a) { return (n[0]||'')+(a[0]||''); }
+function specColor(s) {
+  const map = {'Matemáticas':'#58a6ff','Física':'#f0883e','Química':'#3fb950','Biología':'#39d0d0','Español y Literatura':'#bc8cff','Historia y Geografía':'#d29922','Inglés':'#e96c8a','Informática':'#58a6ff','Arte y Cultura':'#bc8cff','Educación Física':'#3fb950','Ciencias Naturales':'#39d0d0'};
+  return map[s]||'#656d76';
+}
+
+function verDocente(id) {
+  const d = db.docentes.find(x=>x.id===id);
+  if(!d) return;
+  const misAsig = db.asignaciones.filter(a=>a.docenteId===id);
+  const pct = d.horas_max>0?Math.round(d.horas_asig/d.horas_max*100):0;
+  const cls = pct>100?'red':pct>85?'yellow':'green';
+  document.getElementById('ver-docente-titulo').textContent = `👨‍🏫 ${d.nombre} ${d.apPat} ${d.apMat}`;
+  document.getElementById('ver-docente-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;padding:14px;background:var(--surface2);border-radius:var(--radius)">
+      <div><div class="text-muted" style="font-size:11px">RFC/ID</div><div class="text-mono" style="font-size:13px">${d.rfc}</div></div>
+      <div><div class="text-muted" style="font-size:11px">Especialidad</div><div><span class="badge badge-blue">${d.especialidad}</span></div></div>
+      <div><div class="text-muted" style="font-size:11px">Turno</div><div>${d.turno}</div></div>
+      <div><div class="text-muted" style="font-size:11px">Email</div><div style="font-size:13px">${d.email}</div></div>
+      <div><div class="text-muted" style="font-size:11px">Horas máx/sem</div><div class="text-mono">${d.horas_max}h</div></div>
+      <div><div class="text-muted" style="font-size:11px">Horas asignadas</div><div class="text-mono" style="color:var(--${cls})">${d.horas_asig}h (${pct}%)</div></div>
+    </div>
+    <div style="margin-bottom:8px"><div class="progress-bar-wrap" style="height:10px"><div class="progress-bar progress-${cls}" style="width:${Math.min(pct,100)}%"></div></div></div>
+    ${pct>100?`<div class="alert alert-err" style="margin:10px 0">⚠️ Sobrecarga: excede ${d.horas_asig-d.horas_max}h el límite permitido</div>`:''}
+    <div style="margin:16px 0 8px;font-weight:600;font-size:14px">Asignaciones Actuales</div>
+    ${misAsig.length?`<table style="width:100%;font-size:12px;border-collapse:collapse">${misAsig.map(a=>{const m=db.materias.find(x=>x.id===a.materiaId);const g=db.grupos.find(x=>x.id===a.grupoId);return`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 4px">${m?.nombre||'-'}</td><td style="padding:8px 4px"><span class="badge badge-gray">${g?.nombre||'-'}</span></td><td style="padding:8px 4px" class="text-mono">${a.horas}h/sem</td><td style="padding:8px 4px"><span class="badge ${a.tipo==='auto'?'badge-blue':'badge-purple'}">${a.tipo}</span></td></tr>`;}).join('')}</table>`:'<div class="text-muted" style="font-size:13px;padding:8px 0">Sin asignaciones en el ciclo actual</div>'}
+    <div style="margin:16px 0 8px;font-weight:600;font-size:14px">Materias que puede impartir</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">${d.materias.map(m=>`<span class="badge badge-gray">${m}</span>`).join('')}</div>
+  `;
+  openModal('modal-docente-ver');
+}
+
+function editarDocente(id) {
+  document.getElementById('modal-docente-title').textContent = 'Editar Docente';
+  const d = db.docentes.find(x=>x.id===id);
+  if(!d) return;
+  document.getElementById('d-nombre').value = d.nombre;
+  document.getElementById('d-apat').value = d.apPat;
+  document.getElementById('d-amat').value = d.apMat;
+  document.getElementById('d-rfc').value = d.rfc;
+  document.getElementById('d-especialidad').value = d.especialidad;
+  document.getElementById('d-horas').value = d.horas_max;
+  document.getElementById('d-turno').value = d.turno;
+  document.getElementById('d-email').value = d.email;
+  openModal('modal-docente');
+}
+
+function bajaDocente(id) {
+  const d = db.docentes.find(x=>x.id===id);
+  if(!d) return;
+  d.activo = !d.activo;
+  renderDocentes();
+  renderDashboard();
+  showToast(`Docente ${d.nombre} ${d.apPat} ${d.activo?'reactivado':'dado de baja'}`, d.activo?'ok':'warn');
+}
+
+function guardarDocente() {
+  const n = document.getElementById('d-nombre').value.trim();
+  const ap = document.getElementById('d-apat').value.trim();
+  if(!n || !ap) { showToast('Nombre y apellido son requeridos','err'); return; }
+  const nuevoId = Math.max(...db.docentes.map(d=>d.id))+1;
+  db.docentes.push({id:nuevoId,nombre:n,apPat:ap,apMat:document.getElementById('d-amat').value,rfc:document.getElementById('d-rfc').value,especialidad:document.getElementById('d-especialidad').value,horas_max:+document.getElementById('d-horas').value||20,horas_asig:0,turno:document.getElementById('d-turno').value,email:document.getElementById('d-email').value,activo:true,materias:[]});
+  closeModal('modal-docente');
+  renderDocentes();
+  document.getElementById('stat-docentes').textContent = db.docentes.filter(d=>d.activo).length;
+  showToast('Docente registrado correctamente','ok');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MATERIAS
+// ═══════════════════════════════════════════════════════════
+function renderMaterias(filter='', grado='') {
+  const filtered = db.materias.filter(m => {
+    const q = filter.toLowerCase();
+    return (!q || (m.nombre+m.clave+m.area).toLowerCase().includes(q)) && (!grado || m.grado===grado);
+  });
+  document.getElementById('materias-count').textContent = `${filtered.length} materias`;
+  document.getElementById('materias-tbody').innerHTML = filtered.map(m => {
+    const docComp = db.docentes.filter(d => d.activo && m.especialidades.includes(d.especialidad)).length;
+    return `<tr>
+      <td class="text-mono" style="color:var(--accent);font-size:12px">${m.clave}</td>
+      <td style="font-weight:500">${m.nombre}</td>
+      <td><span class="badge badge-gray">${m.grado} Sem.${m.semestre}</span></td>
+      <td class="text-mono text-accent">${m.horas}h</td>
+      <td class="text-mono">${m.creditos}</td>
+      <td><div style="display:flex;flex-wrap:wrap;gap:4px">${m.especialidades.map(e=>`<span class="badge badge-purple" style="font-size:10px">${e}</span>`).join('')}</div></td>
+      <td><span class="badge ${m.activo?'badge-green':'badge-red'}">${m.activo?'Activa':'Inactiva'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="showToast('${docComp} docentes compatibles para esta materia','ok')">👁 Compatibles</button>
+        <button class="btn btn-danger btn-sm" onclick="toggleMateria(${m.id})">${m.activo?'🗑️':'♻️'}</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function filterMaterias(v) { renderMaterias(v); }
+function filterMateriaGrado(v) { renderMaterias('', v); }
+function toggleMateria(id) { const m=db.materias.find(x=>x.id===id); if(m){m.activo=!m.activo;renderMaterias();showToast(`Materia ${m.activo?'activada':'desactivada'}`,'ok');}}
+function guardarMateria() {
+  const n=document.getElementById('m-nombre').value.trim();
+  if(!n){showToast('Nombre requerido','err');return;}
+  const id=Math.max(...db.materias.map(m=>m.id))+1;
+  db.materias.push({id,clave:document.getElementById('m-clave').value,nombre:n,grado:document.getElementById('m-grado').value,semestre:+document.getElementById('m-semestre').value,horas:+document.getElementById('m-horas').value,creditos:+document.getElementById('m-creditos').value,area:document.getElementById('m-area').value,especialidades:[],activo:true});
+  closeModal('modal-materia');renderMaterias();document.getElementById('stat-materias').textContent=db.materias.filter(m=>m.activo).length;showToast('Materia registrada','ok');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GRUPOS
+// ═══════════════════════════════════════════════════════════
+function renderGrupos() {
+  document.getElementById('grupos-tbody').innerHTML = db.grupos.map(g => {
+    const semCls = g.cobertura===100?'green':g.cobertura>=70?'yellow':'red';
+    return `<tr>
+      <td style="font-weight:600;font-size:15px">${g.nombre}</td>
+      <td>${g.grado}</td>
+      <td><span class="badge ${g.turno==='Matutino'?'badge-blue':'badge-orange'}">${g.turno}</span></td>
+      <td class="text-mono">${g.alumnos}</td>
+      <td class="text-mono">${g.materias}</td>
+      <td>
+        <div class="flex-row"><span class="semaforo semaforo-${semCls}"></span><span style="font-size:12px;color:var(--${semCls})">${g.cobertura}%</span></div>
+        <div class="progress-bar-wrap" style="margin-top:4px"><div class="progress-bar progress-${semCls}" style="width:${g.cobertura}%"></div></div>
+      </td>
+      <td style="color:var(--text3);font-size:12px">${g.salon}</td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="navigate('horarios')">📅 Horario</button>
+        <button class="btn btn-danger btn-sm" onclick="showToast('Grupo eliminado del sistema','warn')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function guardarGrupo() {
+  const n=document.getElementById('g-nombre').value.trim();
+  if(!n){showToast('Nombre del grupo requerido','err');return;}
+  const id=Math.max(...db.grupos.map(g=>g.id))+1;
+  db.grupos.push({id,nombre:n,grado:document.getElementById('g-grado').value,turno:document.getElementById('g-turno').value,alumnos:0,materias:0,salon:document.getElementById('g-salon').value,cobertura:0});
+  closeModal('modal-grupo');renderGrupos();document.getElementById('stat-grupos').textContent=db.grupos.length;showToast('Grupo creado correctamente','ok');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ASIGNACIONES
+// ═══════════════════════════════════════════════════════════
+function renderAsignaciones() {
+  document.getElementById('asig-tbody').innerHTML = db.asignaciones.map(a => {
+    const d=db.docentes.find(x=>x.id===a.docenteId);
+    const m=db.materias.find(x=>x.id===a.materiaId);
+    const g=db.grupos.find(x=>x.id===a.grupoId);
+    return `<tr>
+      <td style="font-weight:500">${d?.nombre||'?'} ${d?.apPat||''}</td>
+      <td>${m?.nombre||'?'}</td>
+      <td><span class="badge badge-gray">${g?.nombre||'?'}</span></td>
+      <td class="text-mono text-accent">${a.horas}h/sem</td>
+      <td><span class="badge ${a.turno==='Matutino'?'badge-blue':'badge-orange'}">${a.turno}</span></td>
+      <td><span class="badge ${a.tipo==='auto'?'badge-blue':'badge-purple'}">${a.tipo==='auto'?'⚡ Auto':'✏️ Manual'}</span></td>
+      <td><span class="badge badge-green">Activa</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="eliminarAsig(${a.id})">🗑️ Quitar</button></td>
+    </tr>`;
+  }).join('');
+
+  // Populate selects for manual assignment
+  populateAsigSelects();
+  renderReporteCarga();
+}
+
+function filterAsig(v) {
+  const q=v.toLowerCase();
+  document.querySelectorAll('#asig-tbody tr').forEach(tr => {
+    tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+
+function eliminarAsig(id) {
+  const idx=db.asignaciones.findIndex(a=>a.id===id);
+  if(idx>-1){db.asignaciones.splice(idx,1);renderAsignaciones();showToast('Asignación eliminada','warn');}
+}
+
+function populateAsigSelects() {
+  const dSel=document.getElementById('asig-docente');
+  const mSel=document.getElementById('asig-materia');
+  const gSel=document.getElementById('asig-grupo');
+  if(!dSel)return;
+  dSel.innerHTML='<option value="">— Seleccionar —</option>'+db.docentes.filter(d=>d.activo).map(d=>`<option value="${d.id}">${d.nombre} ${d.apPat} (${d.especialidad})</option>`).join('');
+  mSel.innerHTML='<option value="">— Seleccionar —</option>'+db.materias.filter(m=>m.activo).map(m=>`<option value="${m.id}">${m.nombre} (${m.horas}h)</option>`).join('');
+  gSel.innerHTML='<option value="">— Seleccionar —</option>'+db.grupos.map(g=>`<option value="${g.id}">${g.nombre} — ${g.turno}</option>`).join('');
+}
+
+function validarAsignacion() {
+  const dId=+document.getElementById('asig-docente').value;
+  const mId=+document.getElementById('asig-materia').value;
+  if(!dId||!mId){document.getElementById('asig-alertas').innerHTML='';return;}
+  const d=db.docentes.find(x=>x.id===dId);
+  const m=db.materias.find(x=>x.id===mId);
+  let alertas=[];
+  if(d&&m){
+    if(!m.especialidades.includes(d.especialidad)) alertas.push({type:'warn',msg:`⚠️ Especialidad incompatible: ${d.especialidad} no es compatible con ${m.nombre}`});
+    if(d.horas_asig+m.horas>d.horas_max) alertas.push({type:'err',msg:`🔴 Sobrecarga: esta asignación llevaría al docente a ${d.horas_asig+m.horas}h (máximo: ${d.horas_max}h)`});
+    if(alertas.length===0) alertas.push({type:'ok',msg:'✅ Asignación válida: sin conflictos detectados'});
+  }
+  document.getElementById('asig-alertas').innerHTML=alertas.map(a=>`<div class="alert alert-${a.type==='warn'?'warn':a.type==='err'?'err':'ok'}">${a.msg}</div>`).join('');
+}
+
+function guardarAsignacionManual() {
+  const dId=+document.getElementById('asig-docente').value;
+  const mId=+document.getElementById('asig-materia').value;
+  const gId=+document.getElementById('asig-grupo').value;
+  if(!dId||!mId||!gId){showToast('Complete todos los campos requeridos','err');return;}
+  const m=db.materias.find(x=>x.id===mId);
+  const d=db.docentes.find(x=>x.id===dId);
+  const dup=db.asignaciones.find(a=>a.docenteId===dId&&a.materiaId===mId&&a.grupoId===gId);
+  if(dup){showToast('Esta asignación ya existe','err');return;}
+  const id=Math.max(...db.asignaciones.map(a=>a.id))+1;
+  db.asignaciones.push({id,docenteId:dId,materiaId:mId,grupoId:gId,horas:m?.horas||4,turno:document.getElementById('asig-turno').value,tipo:'manual',estado:'activa'});
+  if(d)d.horas_asig+=m?.horas||4;
+  document.getElementById('asig-alertas').innerHTML='';
+  renderAsignaciones();
+  showToast('Asignación manual guardada correctamente','ok');
+}
+
+function limpiarAsignacion() {
+  ['asig-docente','asig-materia','asig-grupo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('asig-alertas').innerHTML='';
+}
+
+function renderReporteCarga() {
+  const wrap=document.getElementById('reporte-carga-wrap');
+  if(!wrap)return;
+  wrap.innerHTML=`<div class="card"><div class="card-header"><span>📊</span><div class="card-title">Reporte de Carga Académica por Docente</div></div>
+  <div class="table-wrap"><table><thead><tr><th>Docente</th><th>Especialidad</th><th>Materias Asignadas</th><th>Horas Asig.</th><th>Horas Máx.</th><th>% Ocupación</th><th>Estado</th></tr></thead>
+  <tbody>${db.docentes.filter(d=>d.activo).map(d=>{
+    const misAsig=db.asignaciones.filter(a=>a.docenteId===d.id);
+    const pct=d.horas_max>0?Math.round(d.horas_asig/d.horas_max*100):0;
+    const cls=pct>100?'red':pct>85?'yellow':'green';
+    return`<tr><td style="font-weight:500">${d.nombre} ${d.apPat}</td><td><span class="badge badge-blue">${d.especialidad}</span></td><td class="text-mono">${misAsig.length}</td><td class="text-mono" style="color:var(--${cls})">${d.horas_asig}h</td><td class="text-mono">${d.horas_max}h</td>
+    <td><div class="flex-row"><div class="progress-bar-wrap" style="flex:1"><div class="progress-bar progress-${cls}" style="width:${Math.min(pct,100)}%"></div></div><span class="text-mono" style="font-size:11px;color:var(--${cls});min-width:36px">${pct}%</span></div></td>
+    <td><span class="badge ${pct>100?'badge-red':pct>85?'badge-yellow':'badge-green'}">${pct>100?'Sobrecarga':pct>85?'Al límite':'Normal'}</span></td></tr>`;
+  }).join('')}</tbody></table></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HORARIOS
+// ═══════════════════════════════════════════════════════════
+const HORAS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const COLORS_H = ['#58a6ff','#3fb950','#f0883e','#bc8cff','#e96c8a','#39d0d0','#d29922','#f85149'];
+
+// Synthetic horario data per docente
+const horarioData = {
+  1:[{dia:0,hora:0,mat:'Matemáticas I',grupo:'1°A'},{dia:1,hora:0,mat:'Matemáticas I',grupo:'1°A'},{dia:2,hora:0,mat:'Matemáticas I',grupo:'1°A'},{dia:3,hora:1,mat:'Matemáticas II',grupo:'2°A'},{dia:4,hora:1,mat:'Matemáticas II',grupo:'2°A'}],
+  2:[{dia:0,hora:2,mat:'Física I',grupo:'2°A'},{dia:2,hora:2,mat:'Física I',grupo:'2°A'},{dia:4,hora:2,mat:'Física I',grupo:'2°B'}],
+  3:[{dia:1,hora:3,mat:'Español I',grupo:'1°A'},{dia:3,hora:3,mat:'Español I',grupo:'1°A'},{dia:0,hora:4,mat:'Español II',grupo:'2°A'},{dia:2,hora:4,mat:'Español II',grupo:'2°A'}],
+  4:[{dia:0,hora:5,mat:'Hist. Universal',grupo:'1°A'},{dia:2,hora:5,mat:'Historia México',grupo:'2°A'},{dia:4,hora:5,mat:'Historia México',grupo:'2°A'}],
+  5:[{dia:1,hora:1,mat:'Inglés I',grupo:'1°A'},{dia:3,hora:1,mat:'Inglés I',grupo:'2°B'},{dia:0,hora:2,mat:'Inglés II',grupo:'2°A'}],
+};
+
+function renderHorarioInit() {
+  const dSel=document.getElementById('horario-docente-select');
+  const gSel=document.getElementById('horario-grupo-select');
+  if(dSel&&!dSel.options.length>1) {
+    dSel.innerHTML='<option value="">— Seleccionar Docente —</option>'+db.docentes.filter(d=>d.activo).map(d=>`<option value="${d.id}">${d.nombre} ${d.apPat}</option>`).join('');
+    gSel.innerHTML='<option value="">— Grupo —</option>'+db.grupos.map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  }
+}
+
+function renderHorario() {
+  const id=+document.getElementById('horario-docente-select').value;
+  if(!id){document.getElementById('horario-content').innerHTML='<div class="alert alert-info">Seleccione un docente.</div>';return;}
+  const d=db.docentes.find(x=>x.id===id);
+  document.getElementById('horario-titulo').textContent=`Horario — ${d?.nombre} ${d?.apPat}`;
+  document.getElementById('horario-grupo-select').value='';
+  buildHorarioGrid(horarioData[id]||[]);
+}
+
+function renderHorarioGrupo() {
+  const id=+document.getElementById('horario-grupo-select').value;
+  if(!id)return;
+  const g=db.grupos.find(x=>x.id===id);
+  document.getElementById('horario-titulo').textContent=`Horario — Grupo ${g?.nombre}`;
+  document.getElementById('horario-docente-select').value='';
+  // Synthetic grupo horario
+  const data=[{dia:0,hora:0,mat:'Matemáticas I',docente:'L. Martínez'},{dia:1,hora:0,mat:'Matemáticas I',docente:'L. Martínez'},{dia:0,hora:2,mat:'Inglés I',docente:'A. Ramírez'},{dia:2,hora:2,mat:'Inglés I',docente:'A. Ramírez'},{dia:1,hora:3,mat:'Español I',docente:'M. López'},{dia:3,hora:3,mat:'Español I',docente:'M. López'},{dia:0,hora:5,mat:'Historia',docente:'C. Hernández'},{dia:4,hora:1,mat:'Física I',docente:'R. Sánchez'}];
+  buildHorarioGrid(data, true);
+}
+
+function buildHorarioGrid(data, isGrupo=false) {
+  const grid=document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:70px repeat(6,1fr);gap:2px;min-width:600px';
+  // Header row
+  const emptyH=document.createElement('div');
+  emptyH.className='horario-cell header';
+  emptyH.textContent='Hora';
+  grid.appendChild(emptyH);
+  DIAS.forEach(d=>{const c=document.createElement('div');c.className='horario-cell header';c.textContent=d;grid.appendChild(c);});
+  // Data rows
+  HORAS.forEach((h,hi)=>{
+    const timeC=document.createElement('div');
+    timeC.className='horario-cell time';
+    timeC.style.cssText='font-size:10px;font-family:var(--font-mono);color:var(--text3)';
+    timeC.textContent=h;
+    grid.appendChild(timeC);
+    DIAS.forEach((_,di)=>{
+      const c=document.createElement('div');
+      c.className='horario-cell';
+      const clase=data.find(x=>x.dia===di&&x.hora===hi);
+      if(clase){
+        const colorIdx=(clase.mat?.charCodeAt(0)||0)%COLORS_H.length;
+        c.innerHTML=`<div class="horario-class" style="background:${COLORS_H[colorIdx]}22;color:${COLORS_H[colorIdx]};border:1px solid ${COLORS_H[colorIdx]}44;width:100%">${clase.mat}<br>${isGrupo?clase.docente||'':clase.grupo||''}</div>`;
+      }
+      grid.appendChild(c);
+    });
+  });
+  document.getElementById('horario-content').innerHTML='';
+  document.getElementById('horario-content').appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CALIFICACIONES
+// ═══════════════════════════════════════════════════════════
+function renderCalificacionesInit() {
+  const gSel=document.getElementById('calif-grupo');
+  const aSel=document.getElementById('boleta-alumno');
+  if(gSel){
+    gSel.innerHTML='<option value="">— Grupo —</option>'+db.grupos.map(g=>`<option value="${g.id}">${g.nombre}</option>`).join('');
+  }
+  if(aSel){
+    aSel.innerHTML='<option value="">— Seleccionar Alumno —</option>'+db.alumnos.map(a=>`<option value="${a.id}">${a.apellidos}, ${a.nombre} (${a.matricula})</option>`).join('');
+  }
+  renderHistorial();
+}
+
+function loadCalifGrupo() {
+  const gId=+document.getElementById('calif-grupo').value;
+  if(!gId)return;
+  const grupoMats=db.asignaciones.filter(a=>a.grupoId===gId);
+  const mSel=document.getElementById('calif-materia');
+  mSel.innerHTML='<option value="">— Materia —</option>'+grupoMats.map(a=>{const m=db.materias.find(x=>x.id===a.materiaId);return`<option value="${a.id}">${m?.nombre||'?'}</option>`;}).join('');
+}
+
+function loadCalifMateria() {
+  const asigId=+document.getElementById('calif-materia').value;
+  const gId=+document.getElementById('calif-grupo').value;
+  if(!asigId)return;
+  const asig=db.asignaciones.find(a=>a.id===asigId);
+  const m=db.materias.find(x=>x.id===asig?.materiaId);
+  const g=db.grupos.find(x=>x.id===gId);
+  const d=db.docentes.find(x=>x.id===asig?.docenteId);
+  document.getElementById('calif-titulo').textContent=`${m?.nombre||'?'} — Grupo ${g?.nombre||'?'}`;
+  document.getElementById('calif-periodo-label').textContent=`Docente: ${d?.nombre||'?'} ${d?.apPat||''}`;
+  
+  const alumnos=db.alumnos.filter(a=>a.grupoId===gId);
+  document.getElementById('calif-tbody').innerHTML=alumnos.map((al,idx)=>{
+    const cal=db.calificaciones.find(c=>c.alumnoId===al.id&&c.asigId===asigId);
+    const p1=cal?.p1??'';const p2=cal?.p2??'';const p3=cal?.p3??'';const fin=cal?.final??'';
+    const prom=cal?.promedio;
+    const promCls=prom>=6?'grade-pass':prom<6?'grade-fail':'';
+    const estado=cal?.estado||'sin captura';
+    return `<tr>
+      <td class="text-muted text-mono">${idx+1}</td>
+      <td class="text-mono" style="font-size:11px;color:var(--text3)">${al.matricula}</td>
+      <td style="font-weight:500">${al.apellidos}, ${al.nombre}</td>
+      ${['p1','p2','p3','final'].map((campo,ci)=>{const val=[p1,p2,p3,fin][ci];return`<td><input type="number" min="0" max="10" step="0.1" value="${val}" style="width:70px;text-align:center;font-family:var(--font-mono)" data-alumno="${al.id}" data-asig="${asigId}" data-campo="${campo}" onchange="updateCalif(this,${cal?.id||0})">`; }).join('')}
+      <td class="${promCls} text-mono" style="font-size:14px">${prom!==undefined?prom.toFixed(1):'—'}</td>
+      <td><span class="badge ${estado==='publicada'?'badge-green':estado==='capturada'?'badge-blue':estado==='revisada'?'badge-yellow':'badge-gray'}">${estado}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function updateCalif(input, califId) {
+  const val=+input.value;
+  if(val<0||val>10){showToast('Calificación fuera de rango (0-10)','err');input.value='';return;}
+  const row=input.closest('tr');
+  const inputs=row.querySelectorAll('input[type=number]');
+  const vals=[...inputs].map(i=>+i.value||0);
+  const prom=((vals[0]+vals[1]+vals[2])*0.6+vals[3]*0.4).toFixed(1);
+  const promCell=row.querySelector('td:nth-child(8)');
+  if(promCell){promCell.textContent=prom;promCell.className=(+prom>=6?'grade-pass':'grade-fail')+' text-mono';}
+}
+
+function guardarCalificaciones() {
+  const asigId=+document.getElementById('calif-materia').value;
+  const gId=+document.getElementById('calif-grupo').value;
+  if(!asigId){showToast('Seleccione grupo y materia primero','err');return;}
+  const rows=document.querySelectorAll('#calif-tbody tr');
+  let saved=0;
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input[type=number]');
+    if(inputs.length<4)return;
+    const alumnoId=+inputs[0].dataset.alumno;
+    const vals=[...inputs].map(i=>+i.value||0);
+    const prom=+((vals[0]+vals[1]+vals[2])*0.6+vals[3]*0.4).toFixed(2);
+    const existing=db.calificaciones.find(c=>c.alumnoId===alumnoId&&c.asigId===asigId);
+    if(existing){existing.p1=vals[0];existing.p2=vals[1];existing.p3=vals[2];existing.final=vals[3];existing.promedio=prom;existing.estado='capturada';}
+    else{const id=Math.max(...db.calificaciones.map(c=>c.id),0)+1;db.calificaciones.push({id,alumnoId,asigId,p1:vals[0],p2:vals[1],p3:vals[2],final:vals[3],promedio:prom,estado:'capturada'});}
+    saved++;
+  });
+  showToast(`${saved} calificaciones guardadas correctamente`,'ok');
+}
+
+function loadBoleta() {
+  const aId=+document.getElementById('boleta-alumno').value;
+  if(!aId){showToast('Seleccione un alumno','err');return;}
+  const al=db.alumnos.find(x=>x.id===aId);
+  const g=db.grupos.find(x=>x.id===al?.grupoId);
+  const misCalif=db.calificaciones.filter(c=>c.alumnoId===aId);
+  const promGeneral=misCalif.length?( misCalif.reduce((s,c)=>s+c.promedio,0)/misCalif.length).toFixed(1):null;
+  
+  const rows=misCalif.map(c=>{
+    const asig=db.asignaciones.find(a=>a.id===c.asigId);
+    const m=db.materias.find(x=>x.id===asig?.materiaId);
+    const d=db.docentes.find(x=>x.id===asig?.docenteId);
+    const aprueba=c.promedio>=6;
+    return `<tr>
+      <td style="font-weight:500">${m?.nombre||'?'}</td>
+      <td class="text-mono text-muted" style="font-size:11px">${d?`${d.nombre[0]}. ${d.apPat}`:'-'}</td>
+      <td class="text-mono" style="text-align:center">${c.p1?.toFixed(1)||'-'}</td>
+      <td class="text-mono" style="text-align:center">${c.p2?.toFixed(1)||'-'}</td>
+      <td class="text-mono" style="text-align:center">${c.p3?.toFixed(1)||'-'}</td>
+      <td class="text-mono" style="text-align:center">${c.final?.toFixed(1)||'-'}</td>
+      <td class="${aprueba?'grade-pass':'grade-fail'} text-mono" style="text-align:center;font-size:15px">${c.promedio?.toFixed(1)||'-'}</td>
+      <td style="text-align:center"><span class="badge ${aprueba?'badge-green':'badge-red'}">${aprueba?'ACRED.':'N/ACRED.'}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('boleta-content').innerHTML=`
+  <div class="boleta" id="boleta-print">
+    <div class="boleta-header">
+      <div style="font-size:24px;margin-bottom:6px">🎓</div>
+      <div class="boleta-escola">Escuela Secundaria / Bachillerato</div>
+      <div class="boleta-sub">Sistema de Gestión Académica — Boleta Oficial</div>
+      <div class="boleta-sub">Ciclo Escolar 2024-2025</div>
+    </div>
+    <div class="boleta-alumno">
+      <div><div class="boleta-key">Alumno</div><div class="boleta-val">${al?.nombre} ${al?.apellidos}</div></div>
+      <div><div class="boleta-key">Matrícula</div><div class="boleta-val text-mono">${al?.matricula}</div></div>
+      <div><div class="boleta-key">Grupo</div><div class="boleta-val">${g?.nombre} — ${g?.turno}</div></div>
+      <div><div class="boleta-key">Grado</div><div class="boleta-val">${g?.grado}</div></div>
+    </div>
+    ${misCalif.length?`
+    <div class="table-wrap boleta-table">
+      <table>
+        <thead><tr><th>Materia</th><th>Docente</th><th style="text-align:center">P1</th><th style="text-align:center">P2</th><th style="text-align:center">P3</th><th style="text-align:center">Final</th><th style="text-align:center">Promedio</th><th style="text-align:center">Estado</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:20px;padding:14px;background:var(--surface2);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center">
+      <div><div class="text-muted" style="font-size:11px;margin-bottom:2px">Promedio General</div><div style="font-size:28px;font-family:var(--font-display);color:${+promGeneral>=6?'var(--green)':'var(--red)'}">${promGeneral}</div></div>
+      <div style="text-align:right"><span class="badge ${+promGeneral>=6?'badge-green':'badge-red'}" style="font-size:14px;padding:8px 16px">${+promGeneral>=6?'✅ APROBADO':'❌ NO APROBADO'}</span></div>
+    </div>`:'<div class="alert alert-warn">Este alumno no tiene calificaciones registradas aún.</div>'}
+    <div style="margin-top:20px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+      <span>Generado: ${new Date().toLocaleString('es-MX')}</span>
+      <span>SGA v1.0 — Documento oficial</span>
+    </div>
+  </div>`;
+}
+
+function imprimirBoleta() {
+  const content=document.getElementById('boleta-print');
+  if(!content){showToast('Primero cargue la boleta de un alumno','err');return;}
+  window.print();
+}
+
+function renderHistorial() {
+  document.getElementById('historial-tbody').innerHTML=db.historial.map(h=>{
+    const al=db.alumnos.find(x=>x.id===h.alumnoId);
+    const cal=db.calificaciones.find(c=>c.id===h.califId);
+    const asig=db.asignaciones.find(a=>a.id===cal?.asigId);
+    const m=db.materias.find(x=>x.id===asig?.materiaId);
+    return `<tr>
+      <td class="text-mono" style="font-size:11px;color:var(--text3)">${h.fecha}</td>
+      <td>${al?.nombre} ${al?.apellidos}</td>
+      <td>${m?.nombre||'?'}</td>
+      <td class="text-mono"><span class="badge badge-purple">${h.campo.toUpperCase()}</span></td>
+      <td class="text-mono grade-fail">${h.antes}</td>
+      <td class="text-mono grade-pass">${h.despues}</td>
+      <td style="max-width:200px;font-size:12px;color:var(--text2)">${h.motivo}</td>
+      <td style="font-size:12px">${h.modificadoPor}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  REPORTES
+// ═══════════════════════════════════════════════════════════
+function generarReporte(tipo) {
+  const out=document.getElementById('reporte-output');
+  if(tipo==='carga') {
+    out.innerHTML=`<div class="card"><div class="card-header"><span>📊</span><div class="card-title">Reporte: Carga Académica por Docente</div><div style="margin-left:auto;display:flex;gap:8px"><button class="btn btn-secondary btn-sm" onclick="showToast('Exportación Excel iniciada','ok')">📥 Excel</button><button class="btn btn-secondary btn-sm" onclick="showToast('Exportación PDF iniciada','ok')">📄 PDF</button></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Docente</th><th>Especialidad</th><th>Turno</th><th>Materias</th><th>Grupos</th><th>Horas Asig.</th><th>Horas Máx.</th><th>% Carga</th><th>Estado</th></tr></thead>
+    <tbody>${db.docentes.filter(d=>d.activo).map(d=>{
+      const asigs=db.asignaciones.filter(a=>a.docenteId===d.id);
+      const grupos=[...new Set(asigs.map(a=>a.grupoId))];
+      const pct=d.horas_max>0?Math.round(d.horas_asig/d.horas_max*100):0;
+      return`<tr><td style="font-weight:500">${d.nombre} ${d.apPat}</td><td><span class="badge badge-blue">${d.especialidad}</span></td><td>${d.turno}</td><td class="text-mono">${asigs.length}</td><td class="text-mono">${grupos.length}</td><td class="text-mono" style="color:${pct>100?'var(--red)':'var(--text)'}">${d.horas_asig}h</td><td class="text-mono">${d.horas_max}h</td>
+      <td><div class="flex-row"><div class="progress-bar-wrap" style="flex:1;min-width:80px"><div class="progress-bar progress-${pct>100?'red':pct>85?'yellow':'green'}" style="width:${Math.min(pct,100)}%"></div></div><span class="text-mono" style="font-size:11px;min-width:32px">${pct}%</span></div></td>
+      <td><span class="badge ${pct>100?'badge-red':pct>85?'badge-yellow':'badge-green'}">${pct>100?'Sobrecarga':pct>85?'Límite':'Normal'}</span></td></tr>`;
+    }).join('')}</tbody></table></div></div>`;
+  }
+  else if(tipo==='materias-grupo') {
+    out.innerHTML=`<div class="card"><div class="card-header"><span>📚</span><div class="card-title">Reporte: Materias por Grupo</div><div style="margin-left:auto;display:flex;gap:8px"><button class="btn btn-secondary btn-sm" onclick="showToast('Exportación Excel iniciada','ok')">📥 Excel</button></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Grupo</th><th>Grado</th><th>Turno</th><th>Materia</th><th>Docente</th><th>Horas</th><th>Tipo Asig.</th></tr></thead>
+    <tbody>${db.grupos.map(g=>db.asignaciones.filter(a=>a.grupoId===g.id).map(a=>{const m=db.materias.find(x=>x.id===a.materiaId);const d=db.docentes.find(x=>x.id===a.docenteId);return`<tr><td style="font-weight:600">${g.nombre}</td><td>${g.grado}</td><td>${g.turno}</td><td>${m?.nombre||'-'}</td><td>${d?`${d.nombre} ${d.apPat}`:'-'}</td><td class="text-mono">${a.horas}h</td><td><span class="badge ${a.tipo==='auto'?'badge-blue':'badge-purple'}">${a.tipo}</span></td></tr>`;}).join('')).join('')}</tbody></table></div></div>`;
+  }
+  else if(tipo==='promedio') {
+    const promedios=db.materias.filter(m=>m.activo).map(m=>{
+      const asigs=db.asignaciones.filter(a=>a.materiaId===m.id);
+      const califs=db.calificaciones.filter(c=>asigs.some(a=>a.id===c.asigId));
+      const prom=califs.length?(califs.reduce((s,c)=>s+c.promedio,0)/califs.length).toFixed(1):null;
+      return{...m,prom,numCalifs:califs.length};
+    });
+    out.innerHTML=`<div class="card"><div class="card-header"><span>📈</span><div class="card-title">Reporte: Promedio por Materia</div><div style="margin-left:auto"><button class="btn btn-secondary btn-sm" onclick="showToast('Exportación Excel iniciada','ok')">📥 Excel</button></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Materia</th><th>Grado</th><th>Área</th><th>Alumnos con calif.</th><th>Promedio General</th><th>Estado</th></tr></thead>
+    <tbody>${promedios.map(m=>`<tr><td style="font-weight:500">${m.nombre}</td><td>${m.grado}</td><td style="font-size:12px;color:var(--text3)">${m.area}</td><td class="text-mono">${m.numCalifs}</td>
+    <td class="${m.prom?+m.prom>=6?'grade-pass':'grade-fail':''} text-mono" style="font-size:16px">${m.prom||'—'}</td>
+    <td>${m.prom?`<span class="badge ${+m.prom>=8?'badge-green':+m.prom>=6?'badge-yellow':'badge-red'}">${+m.prom>=8?'Excelente':+m.prom>=6?'Aprobado':'En riesgo'}</span>`:'<span class="badge badge-gray">Sin datos</span>'}</td></tr>`).join('')}</tbody></table></div></div>`;
+  }
+  else if(tipo==='boletas') {
+    showToast('Generando boletas para todos los alumnos...','ok');
+    setTimeout(()=>showToast('320 boletas exportadas en PDF','ok'),1800);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ASIGNACIÓN AUTOMÁTICA
+// ═══════════════════════════════════════════════════════════
+function ejecutarAsignacionAuto() {
+  const btn=document.getElementById('btn-ejecutar-auto');
+  btn.disabled=true;btn.textContent='⏳ Procesando...';
+  document.getElementById('auto-progress').style.display='block';
+  document.getElementById('auto-result').innerHTML='';
+  const steps=['Cargando docentes disponibles...','Analizando compatibilidad de especialidades...','Construyendo grafo de candidatos...','Ordenando por restricciones (MRV)...','Ejecutando algoritmo CSP-Greedy...','Validando empalmes de horario...','Verificando límites de carga...','Persistiendo asignaciones...'];
+  let i=0;
+  const bar=document.getElementById('auto-bar');
+  const label=document.getElementById('auto-progress-label');
+  const interval=setInterval(()=>{
+    if(i<steps.length){label.textContent=steps[i];bar.style.width=`${Math.round((i+1)/steps.length*100)}%`;i++;}
+    else {
+      clearInterval(interval);
+      bar.style.width='100%';
+      label.textContent='✅ Completado';
+      setTimeout(()=>{
+        document.getElementById('auto-result').innerHTML=`
+          <div class="alert alert-ok">✅ Asignación automática completada</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px">
+            <div style="background:var(--green-dim);border:1px solid rgba(63,185,80,.3);border-radius:var(--radius);padding:12px;text-align:center">
+              <div style="font-size:24px;font-family:var(--font-display);color:var(--green)">18</div>
+              <div style="font-size:11px;color:var(--text3)">Materias asignadas</div>
+            </div>
+            <div style="background:var(--yellow-dim);border:1px solid rgba(210,153,34,.3);border-radius:var(--radius);padding:12px;text-align:center">
+              <div style="font-size:24px;font-family:var(--font-display);color:var(--yellow)">6</div>
+              <div style="font-size:11px;color:var(--text3)">Sin candidato disponible</div>
+            </div>
+            <div style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:12px;text-align:center">
+              <div style="font-size:24px;font-family:var(--font-display);color:var(--accent)">75%</div>
+              <div style="font-size:11px;color:var(--text3)">Cobertura lograda</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text3)">Materias sin candidato: <span style="color:var(--yellow)">Física II (3°A), Química II (3°A), Cálculo (3°A), Física I (2°C), Química I (2°C), Inglés III (3°A)</span></div>`;
+        btn.disabled=false;btn.textContent='⚡ Ejecutar de Nuevo';
+        showToast('Asignación automática completada al 75%','ok');
+      },400);
+    }
+  },320);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════════
+function switchTab(btn, panelId) {
+  const container=btn.closest('.view')||btn.closest('.modal-body');
+  const view=btn.closest('.view');
+  if(view){
+    view.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    view.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  }
+  btn.classList.add('active');
+  document.getElementById(panelId)?.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════════════
+function openModal(id) {
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('open');
+  if(id==='modal-docente') buildMateriasCheck();
+  document.getElementById('modal-docente-title').textContent='Nuevo Docente';
+}
+
+function closeModal(id) {
+  document.getElementById(id)?.classList.remove('open');
+}
+
+function buildMateriasCheck() {
+  const wrap=document.getElementById('d-materias-check');
+  if(!wrap)return;
+  wrap.innerHTML=db.materias.filter(m=>m.activo).map(m=>`<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--text);font-weight:400"><input type="checkbox"> ${m.nombre}</label>`).join('');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════
+function showToast(msg, type='ok') {
+  const icons={ok:'✅',err:'❌',warn:'⚠️'};
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  t.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',3000);
+  setTimeout(()=>t.remove(),3300);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+renderDashboard();
+</script>
+</body>
+</html>

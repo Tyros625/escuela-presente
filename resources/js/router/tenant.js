@@ -59,6 +59,8 @@ const SpecialtyView = () =>
   import("@/views/tenants/specialties/SpecialtyView.vue");
 const IncidentView = () => import("@/views/tenants/incidents/IncidentView.vue");
 const GradeView = () => import("@/views/tenants/grades/GradeView.vue");
+const QualificationRecordView = () =>
+  import("@/views/tenants/grades/QualificationRecordView.vue");
 const SectionView = () => import("@/views/tenants/sections/SectionView.vue");
 const SchoolCycleView = () =>
   import("@/views/tenants/school-cycles/SchoolCycleView.vue");
@@ -341,6 +343,12 @@ const routes = [
         path: "grades",
         name: "grades",
         component: GradeView,
+        beforeEnter: requireAuth,
+      },
+      {
+        path: "grades/qualification-record",
+        name: "grades.qualification-record",
+        component: QualificationRecordView,
         beforeEnter: requireAuth,
       },
       {
