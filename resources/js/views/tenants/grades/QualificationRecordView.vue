@@ -93,14 +93,17 @@ async function updatePartial(row, field, value) {
     return;
   }
 
+  const reason = window.prompt("Motivo del cambio de calificación:");
+  if (reason === null || String(reason).trim() === "") {
+    return;
+  }
+
   try {
-    const { data } = await api.put(
-      `qualification/grades/${row.grade_id}`,
-      {
-        field,
-        value: numericValue,
-      }
-    );
+    const { data } = await api.put(`qualification/grades/${row.grade_id}`, {
+      field,
+      value: numericValue,
+      reason,
+    });
     const updated = data.data;
     row.partial_1 = updated.partial_1;
     row.partial_2 = updated.partial_2;

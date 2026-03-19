@@ -92,9 +92,9 @@ export function menuAdmin(userStore) {
       "Calificaciones",
       "fa-solid fa-chart-line",
       [
-        sub("blank-page", "Registrar evaluaciones"),
+        sub("grades.qualification-record", "Registrar evaluaciones"),
         sub("blank-page", "Configurar ponderaciones"),
-        sub("blank-page", "Consultar notas"),
+        sub("grades.qualification-record", "Consultar notas"),
       ],
       true
     ),
@@ -159,8 +159,8 @@ export function menuTeacher(userStore) {
       "Calificaciones",
       "fa-solid fa-chart-line",
       [
-        sub("blank-page", "Registrar evaluaciones"),
-        sub("blank-page", "Consultar notas"),
+        sub("grades.qualification-record", "Registrar evaluaciones"),
+        sub("grades.qualification-record", "Consultar notas"),
       ],
       true
     ),

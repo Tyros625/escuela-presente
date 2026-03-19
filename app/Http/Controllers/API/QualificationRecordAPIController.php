@@ -11,6 +11,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Tenants\GeneralConfiguration;
 
 class QualificationRecordAPIController extends AppBaseController
 {
@@ -48,6 +51,14 @@ class QualificationRecordAPIController extends AppBaseController
             /** @var StudentGrade|null $grade */
             $grade = $grades->get($student->id);
 
+            if (! $grade) {
+                $grade = StudentGrade::create([
+                    'student_id' => $student->id,
+                    'academic_group_id' => $group->id,
+                ]);
+                $grades->put($student->id, $grade);
+            }
+
             $listNumber = $index + 1;
             $name = trim($student->last_name_father.' '.$student->last_name_mother.', '.$student->name);
 
@@ -84,7 +95,7 @@ class QualificationRecordAPIController extends AppBaseController
         $validated = $request->validate([
             'field' => 'required|in:partial_1,partial_2,partial_3',
             'value' => 'required|numeric|min:0|max:10',
-            'reason' => 'nullable|string',
+            'reason' => 'required|string',
         ]);
 
         $field = $validated['field'];
@@ -152,9 +163,14 @@ class QualificationRecordAPIController extends AppBaseController
         ];
 
         if ($request->get('format') === 'pdf') {
-            // PDF generation is application specific; for now we just return JSON
-            // to avoid introducing third-party dependencies or breaking builds.
-            return $this->sendResponse($payload, 'PDF generation not implemented');
+            $generalConfiguration = GeneralConfiguration::first();
+
+            $pdf = Pdf::loadView('qualification-receipt', [
+                'data' => $payload,
+                'generalConfiguration' => $generalConfiguration,
+            ])->setPaper('letter');
+
+            return $pdf->download('boleta-'.$grade->student->enrollment.'.pdf');
         }
 
         return $this->sendResponse($payload, 'Receipt retrieved successfully');
