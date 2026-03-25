@@ -155,8 +155,31 @@ async function fetchReceipt() {
 
 async function exportReceiptPdf() {
   if (!selectedReceiptGradeId.value) return;
-  const url = `${window.location.origin}/api/qualification/grades/${selectedReceiptGradeId.value}/receipt?format=pdf`;
-  window.open(url, "_blank");
+  try {
+    const res = await api.get(
+      `qualification/grades/${selectedReceiptGradeId.value}/receipt`,
+      {
+        params: { format: "pdf" },
+        responseType: "blob",
+        headers: { Accept: "application/pdf" },
+      }
+    );
+
+    const blob = new Blob([res.data], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    // Open in new tab (works even when auth is required)
+    window.open(url, "_blank");
+
+    // Best-effort cleanup
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (error) {
+    console.error(error);
+    Toast.fire({
+      icon: "error",
+      title: "No se pudo generar el PDF",
+    });
+  }
 }
 
 async function fetchHistory() {
