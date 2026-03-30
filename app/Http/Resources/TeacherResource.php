@@ -29,6 +29,8 @@ class TeacherResource extends JsonResource
             'address' => $this->address,
             'specialty_id' => $this->specialty_id,
             'specialty' => $this->specialty?->description,
+            'subject_id' => $this->subject_id,
+            'subject' => $this->subject?->description,
             'max_hours_per_week' => $this->max_hours_per_week,
             'available_hours' => $this->available_hours,
             'display_name' => $this->display_name,

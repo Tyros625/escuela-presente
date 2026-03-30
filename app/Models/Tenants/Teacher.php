@@ -33,6 +33,7 @@ class Teacher extends Model
         'phone',
         'address',
         'specialty_id',
+        'subject_id',
         'max_hours_per_week',
         'available_hours',
     ];
@@ -70,6 +71,7 @@ class Teacher extends Model
         'phone' => 'nullable|string',
         'address' => 'nullable|string',
         'specialty_id' => 'nullable',
+        'subject_id' => 'nullable',
         'max_hours_per_week' => 'nullable|numeric|min:0',
         'available_hours' => 'nullable|string',
     ];
@@ -103,5 +105,10 @@ class Teacher extends Model
     public function specialty(): BelongsTo
     {
         return $this->belongsTo(Specialty::class);
+    }
+
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Specialty::class, 'subject_id');
     }
 }
