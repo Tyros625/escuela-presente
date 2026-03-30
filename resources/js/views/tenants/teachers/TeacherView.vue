@@ -107,10 +107,10 @@
               <!-- ESPECIALIDAD -->
               <td>
                 <span
-                  v-if="row.specialty"
+                  v-if="row.specialization"
                   class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2"
                 >
-                  {{ row.specialty }}
+                  {{ row.specialization }}
                 </span>
                 <span v-else class="text-muted">-</span>
               </td>
@@ -324,7 +324,7 @@ const formModel = {
   last_name_father: '',
   last_name_mother: '',
   rfc: '',
-  specialty_id: '',
+  specialization_id: '',
   subject_id: '',
   max_hours_per_week: '',
   available_hours: '',
@@ -336,8 +336,8 @@ const formSchema = [
   { type: 'input', inputType: 'text', label: 'Apellido Paterno', model: 'last_name_father', class: 'col-md-6' },
   { type: 'input', inputType: 'text', label: 'Apellido Materno', model: 'last_name_mother', class: 'col-md-6' },
   { type: 'input', inputType: 'text', label: 'RFC', model: 'rfc', class: 'col-md-6' },
-  { type: 'select', label: 'Especialidad', model: 'specialty_id', class: 'col-md-6', labelApi: 'description', values: [] },
-  { type: 'select', label: 'Subject', model: 'subject_id', class: 'col-md-6', labelApi: 'description', values: [] },
+  { type: 'select', label: 'Especialidad', model: 'specialization_id', class: 'col-md-6', labelApi: 'description', values: [] },
+  { type: 'select', label: 'Materia', model: 'subject_id', class: 'col-md-6', labelApi: 'description', values: [] },
   { type: 'input', inputType: 'number', label: 'Horas máximas por semana', model: 'max_hours_per_week', class: 'col-md-6' },
   { type: 'input', inputType: 'text', label: 'Horarios disponibles', model: 'available_hours', class: 'col-md-6' },
   { type: 'input', inputType: 'email', label: 'Correo institucional', model: 'institutional_email', class: 'col-md-6' },
@@ -390,7 +390,8 @@ const filteredTeachers = computed(() => {
         (t.institutional_email || '').toLowerCase().includes(q) ||
         (t.email || '').toLowerCase().includes(q) ||
         (t.rfc || '').toLowerCase().includes(q) ||
-        (t.specialty || '').toLowerCase().includes(q)
+        (t.specialization || '').toLowerCase().includes(q) ||
+        (t.subject || '').toLowerCase().includes(q)
     );
   }
   if (turno) {
@@ -411,16 +412,21 @@ watch(filteredTeachers, () => {
 });
 
 onMounted(() => {
-  getSpecialties();
+  getSpecializations();
+  getSubjects();
   getData();
 });
 
-const getSpecialties = async () => {
+const getSpecializations = async () => {
+  const { data } = await api.get('/lists/specializations');
+  const schema = formSchema.find((f) => f.model === 'specialization_id');
+  if (schema) schema.values = data;
+};
+
+const getSubjects = async () => {
   const { data } = await api.get('/lists/specialties');
-  const specialtySchema = formSchema.find((f) => f.model === 'specialty_id');
-  const subjectSchema = formSchema.find((f) => f.model === 'subject_id');
-  if (specialtySchema) specialtySchema.values = data;
-  if (subjectSchema) subjectSchema.values = data;
+  const schema = formSchema.find((f) => f.model === 'subject_id');
+  if (schema) schema.values = data;
 };
 
 const getData = async () => {

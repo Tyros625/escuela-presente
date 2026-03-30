@@ -32,7 +32,7 @@ class Teacher extends Model
         'institutional_email',
         'phone',
         'address',
-        'specialty_id',
+        'specialization_id',
         'subject_id',
         'max_hours_per_week',
         'available_hours',
@@ -70,7 +70,7 @@ class Teacher extends Model
         'institutional_email' => 'nullable|email',
         'phone' => 'nullable|string',
         'address' => 'nullable|string',
-        'specialty_id' => 'nullable',
+        'specialization_id' => 'nullable',
         'subject_id' => 'nullable',
         'max_hours_per_week' => 'nullable|numeric|min:0',
         'available_hours' => 'nullable|string',
@@ -102,9 +102,9 @@ class Teacher extends Model
         return $this->hasMany(IncidentsReport::class, 'teacher_id');
     }
 
-    public function specialty(): BelongsTo
+    public function specialization(): BelongsTo
     {
-        return $this->belongsTo(Specialty::class);
+        return $this->belongsTo(Specialization::class, 'specialization_id');
     }
 
     public function subject(): BelongsTo

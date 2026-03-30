@@ -3,7 +3,7 @@
 namespace App\Imports;
 
 use App\Helper;
-use App\Models\Tenants\Specialty;
+use App\Models\Tenants\Specialization;
 use App\Models\Tenants\Teacher;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -19,11 +19,11 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
 {
     use Importable;
 
-    private $specialty;
+    private $specializations;
 
     public function __construct()
     {
-        $this->specialty = Specialty::pluck('id', 'description');
+        $this->specializations = Specialization::pluck('id', 'description');
     }
 
     public function collection(Collection $rows)
@@ -45,7 +45,7 @@ class TeacherImport implements SkipsOnError, ToCollection, WithBatchInserts, Wit
                     'institutional_email' => $row['correo_institucional'] ?? null,
                     'phone' => $row['telefono'] ?? null,
                     'address' => $row['direccion'] ?? null,
-                    'specialty_id' => $this->specialty[$row['especialidad']] ?? null,
+                    'specialization_id' => $this->specializations[$row['especialidad']] ?? null,
                     'max_hours_per_week' => $row['horas_maximas_semana'] ?? null,
                     'available_hours' => $row['horarios_disponibles'] ?? null,
                 ]

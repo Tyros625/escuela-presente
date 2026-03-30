@@ -11,6 +11,7 @@ use App\Models\Tenants\Role;
 use App\Models\Tenants\SchoolCycle;
 use App\Models\Tenants\Section;
 use App\Models\Tenants\Specialty;
+use App\Models\Tenants\Specialization;
 use App\Models\Tenants\Student;
 use App\Models\Tenants\Teacher;
 use Illuminate\Http\Request;
@@ -34,6 +35,8 @@ class SelectListController extends Controller
                 return $this->getTeachers($search);
             case 'specialties':
                 return $this->getSpecialties($search);
+            case 'specializations':
+                return $this->getSpecializations($search);
             case 'roles':
                 return $this->getRoles($search);
             case 'grades':
@@ -101,6 +104,17 @@ class SelectListController extends Controller
         }
 
         return $query->get();
+    }
+
+    public function getSpecializations($search)
+    {
+        $query = Specialization::select('id', 'description');
+
+        if (! empty($search)) {
+            $query->where('description', 'like', '%'.$search.'%');
+        }
+
+        return $query->orderBy('description')->get();
     }
 
     public function getTeachers($search)
