@@ -36,6 +36,7 @@ class Teacher extends Model
         'subject_id',
         'max_hours_per_week',
         'available_hours',
+        'schedule_availability',
     ];
 
     protected $appends = ['display_name'];
@@ -54,6 +55,7 @@ class Teacher extends Model
         'address' => 'string',
         'max_hours_per_week' => 'decimal:2',
         'available_hours' => 'string',
+        'schedule_availability' => 'array',
         'created_at' => ActualTimeZone::class,
         'updated_at' => ActualTimeZone::class,
     ];
@@ -74,6 +76,7 @@ class Teacher extends Model
         'subject_id' => 'nullable',
         'max_hours_per_week' => 'nullable|numeric|min:0',
         'available_hours' => 'nullable|string',
+        'schedule_availability' => 'nullable|array',
     ];
 
     public static function booted()

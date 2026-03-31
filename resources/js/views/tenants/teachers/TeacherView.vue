@@ -214,7 +214,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
   >
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modal-teachers-label">
@@ -250,7 +250,109 @@
                   :disabled="isLoading"
                 />
               </div>
-              <div class="col-md-12 mt-3 text-end">
+
+              <!-- Schedule Availability -->
+              <div class="col-12 mt-4">
+                <div class="schedule-availability-section">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-calendar-days text-primary"></i>
+                    <span class="fw-semibold">Disponibilidad de Horario</span>
+                  </div>
+
+                  <div class="d-flex gap-4 mb-3">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="turno-morning"
+                        v-model="form.turno_morning"
+                      />
+                      <label class="form-check-label fw-medium" for="turno-morning">
+                        <i class="fa-solid fa-sun text-warning me-1"></i>Matutino
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="turno-evening"
+                        v-model="form.turno_evening"
+                      />
+                      <label class="form-check-label fw-medium" for="turno-evening">
+                        <i class="fa-solid fa-moon text-primary me-1"></i>Vespertino
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Morning Grid -->
+                  <div v-if="form.turno_morning" class="mb-4">
+                    <p class="text-muted fs-sm fw-semibold mb-2 text-uppercase letter-spacing-1">
+                      <i class="fa-solid fa-sun text-warning me-1"></i>Turno Matutino
+                    </p>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-bordered schedule-grid">
+                        <thead>
+                          <tr>
+                            <th class="schedule-time-col">Hora</th>
+                            <th v-for="label in DAY_LABELS" :key="label" class="text-center">{{ label }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="slot in MORNING_SLOTS" :key="slot">
+                            <td class="schedule-time-col text-nowrap">{{ slot }}</td>
+                            <td v-for="day in DAYS" :key="day" class="text-center schedule-cell">
+                              <input
+                                type="checkbox"
+                                class="form-check-input schedule-check"
+                                v-model="form.schedule_availability.morning[slot][day]"
+                              />
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- Evening Grid -->
+                  <div v-if="form.turno_evening" class="mb-2">
+                    <p class="text-muted fs-sm fw-semibold mb-2 text-uppercase letter-spacing-1">
+                      <i class="fa-solid fa-moon text-primary me-1"></i>Turno Vespertino
+                    </p>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-bordered schedule-grid">
+                        <thead>
+                          <tr>
+                            <th class="schedule-time-col">Hora</th>
+                            <th v-for="label in DAY_LABELS" :key="label" class="text-center">{{ label }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="slot in EVENING_SLOTS" :key="slot">
+                            <td class="schedule-time-col text-nowrap">{{ slot }}</td>
+                            <td v-for="day in DAYS" :key="day" class="text-center schedule-cell">
+                              <input
+                                type="checkbox"
+                                class="form-check-input schedule-check"
+                                v-model="form.schedule_availability.evening[slot][day]"
+                              />
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div
+                    v-if="!form.turno_morning && !form.turno_evening"
+                    class="text-muted fs-sm py-2 px-3 rounded schedule-placeholder"
+                  >
+                    <i class="fa-solid fa-circle-info me-1"></i>
+                    Selecciona Matutino o Vespertino para configurar la disponibilidad de horario.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12 mt-4 text-end">
                 <button type="submit" class="btn btn-primary" :disabled="isLoading">
                   <i class="fa fa-cog fa-spin" v-if="isLoading"></i>
                   <i class="fa-solid fa-floppy-disk" v-else></i>
@@ -319,18 +421,104 @@ const routeFetch = 'teachers';
 const routeName = 'teachers';
 const showImport = true;
 
-const formModel = {
-  name: '',
-  last_name_father: '',
-  last_name_mother: '',
-  rfc: '',
-  specialization_id: '',
-  subject_id: '',
-  max_hours_per_week: '',
-  available_hours: '',
-  institutional_email: '',
-};
+// ─── Schedule constants ───────────────────────────────────────────────────────
+const MORNING_SLOTS = [
+  '7:30-8:20', '8:20-9:10', '9:10-10:00', '10:00-10:50',
+  '10:50-11:40', '11:40-12:30', '12:30-13:20',
+];
 
+const EVENING_SLOTS = [
+  '14:00-14:50', '14:50-15:40', '15:40-16:30', '16:30-17:20',
+  '17:20-18:10', '18:10-19:00', '19:00-19:50', '19:50-20:40',
+];
+
+const DAYS = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+
+function createEmptySchedule() {
+  const schedule = { morning: {}, evening: {} };
+  MORNING_SLOTS.forEach((slot) => {
+    schedule.morning[slot] = {};
+    DAYS.forEach((day) => { schedule.morning[slot][day] = false; });
+  });
+  EVENING_SLOTS.forEach((slot) => {
+    schedule.evening[slot] = {};
+    DAYS.forEach((day) => { schedule.evening[slot][day] = false; });
+  });
+  return schedule;
+}
+
+function mergeSchedule(saved) {
+  const empty = createEmptySchedule();
+  if (!saved) return empty;
+  MORNING_SLOTS.forEach((slot) => {
+    if (saved.morning?.[slot]) {
+      DAYS.forEach((day) => {
+        if (typeof saved.morning[slot][day] === 'boolean') {
+          empty.morning[slot][day] = saved.morning[slot][day];
+        }
+      });
+    }
+  });
+  EVENING_SLOTS.forEach((slot) => {
+    if (saved.evening?.[slot]) {
+      DAYS.forEach((day) => {
+        if (typeof saved.evening[slot][day] === 'boolean') {
+          empty.evening[slot][day] = saved.evening[slot][day];
+        }
+      });
+    }
+  });
+  return empty;
+}
+
+function computeAvailableHours() {
+  if (form.turno_morning && form.turno_evening) return 'Ambos';
+  if (form.turno_morning) return 'Matutino';
+  if (form.turno_evening) return 'Vespertino';
+  return '';
+}
+
+function getInitialForm() {
+  return {
+    name: '',
+    last_name_father: '',
+    last_name_mother: '',
+    rfc: '',
+    specialization_id: '',
+    subject_id: '',
+    max_hours_per_week: '',
+    available_hours: '',
+    institutional_email: '',
+    turno_morning: false,
+    turno_evening: false,
+    schedule_availability: createEmptySchedule(),
+  };
+}
+
+function resetForm() {
+  const fresh = getInitialForm();
+  Object.keys(fresh).forEach((key) => {
+    form[key] = fresh[key];
+  });
+}
+
+function getFormData() {
+  return {
+    name: form.name,
+    last_name_father: form.last_name_father,
+    last_name_mother: form.last_name_mother,
+    rfc: form.rfc,
+    specialization_id: form.specialization_id,
+    subject_id: form.subject_id,
+    max_hours_per_week: form.max_hours_per_week,
+    institutional_email: form.institutional_email,
+    available_hours: computeAvailableHours(),
+    schedule_availability: form.schedule_availability,
+  };
+}
+
+// ─── Form schema (available_hours managed by schedule section) ────────────────
 const formSchema = [
   { type: 'input', inputType: 'text', label: 'Nombres', model: 'name', class: 'col-md-6' },
   { type: 'input', inputType: 'text', label: 'Apellido Paterno', model: 'last_name_father', class: 'col-md-6' },
@@ -339,11 +527,10 @@ const formSchema = [
   { type: 'select', label: 'Especialidad', model: 'specialization_id', class: 'col-md-6', labelApi: 'description', values: [] },
   { type: 'select', label: 'Materia', model: 'subject_id', class: 'col-md-6', labelApi: 'description', values: [] },
   { type: 'input', inputType: 'number', label: 'Horas máximas por semana', model: 'max_hours_per_week', class: 'col-md-6' },
-  { type: 'input', inputType: 'text', label: 'Horarios disponibles', model: 'available_hours', class: 'col-md-6' },
   { type: 'input', inputType: 'email', label: 'Correo institucional', model: 'institutional_email', class: 'col-md-6' },
 ];
 
-const form = reactive({ ...formModel });
+const form = reactive(getInitialForm());
 const dataFetched = ref([]);
 const errors = ref([]);
 const modalType = ref('add');
@@ -466,10 +653,10 @@ function importXLS() {
 function saveData() {
   isLoading.value = true;
   api
-    .post(`/${routeName}`, form)
+    .post(`/${routeName}`, getFormData())
     .then(() => {
       isLoading.value = false;
-      Object.assign(form, formModel);
+      resetForm();
       errors.value = [];
       Toast.fire({ icon: 'success', title: 'Guardado correctamente' });
       getData();
@@ -508,7 +695,18 @@ function getDataID() {
   api
     .get(`/${routeFetch}/${rowSelected.value}`)
     .then((res) => {
-      if (res.status === 200) Object.assign(form, res.data.data || {});
+      if (res.status === 200) {
+        const data = res.data.data || {};
+        const savedTurno = data.available_hours || '';
+        Object.keys(data).forEach((key) => {
+          if (key in form && key !== 'schedule_availability') {
+            form[key] = data[key];
+          }
+        });
+        form.turno_morning = savedTurno === 'Matutino' || savedTurno === 'Ambos';
+        form.turno_evening = savedTurno === 'Vespertino' || savedTurno === 'Ambos';
+        form.schedule_availability = mergeSchedule(data.schedule_availability);
+      }
     })
     .catch(() => {});
 }
@@ -516,9 +714,9 @@ function getDataID() {
 function updateData() {
   isLoading.value = true;
   api
-    .put(`/${routeName}/${rowSelected.value}`, form)
+    .put(`/${routeName}/${rowSelected.value}`, getFormData())
     .then(() => {
-      Object.assign(form, formModel);
+      resetForm();
       Toast.fire({ icon: 'success', title: 'Actualizado correctamente' });
       modalHide('modal-teachers');
       getData();
@@ -538,7 +736,7 @@ function modalShow(modalName, data) {
   errors.value = [];
   if (!data) {
     modalType.value = 'add';
-    Object.assign(form, formModel);
+    resetForm();
   } else {
     modalType.value = 'edit';
     rowSelected.value = data;
@@ -600,5 +798,65 @@ import Swal from "sweetalert2";
 
 .bg-dark-subtle {
   background-color: rgba(var(--bs-dark-rgb), 0.1);
+}
+
+.schedule-availability-section {
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+}
+
+.schedule-grid {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+
+  thead th {
+    background: var(--bs-tertiary-bg);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.04);
+  }
+}
+
+.schedule-time-col {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--bs-secondary-color);
+  min-width: 95px;
+  padding: 0.35rem 0.6rem;
+}
+
+.schedule-cell {
+  padding: 0.35rem 0.5rem;
+  vertical-align: middle;
+}
+
+.schedule-check {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+
+  &:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+  }
+}
+
+.schedule-placeholder {
+  border: 1px dashed var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 0.06em;
 }
 </style>
