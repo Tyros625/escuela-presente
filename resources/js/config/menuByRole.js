@@ -52,8 +52,8 @@ export function menuAdmin(userStore) {
       "fa-solid fa-chalkboard-user",
       [
         sub("teachers", "Registro de docentes", can("read teacher")),
-        sub("blank-page", "Asignación de materias", can("read teacher")),
-        sub("blank-page", "Carga académica", can("read teacher")),
+        sub("teaching-assignments", "Asignación de materias", can("read teacher")),
+        sub("teaching-assignments", "Carga académica", can("read teacher")),
       ],
       can("read teacher")
     ),

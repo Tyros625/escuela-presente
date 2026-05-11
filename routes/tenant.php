@@ -22,6 +22,7 @@ use App\Http\Controllers\API\SelectListController;
 use App\Http\Controllers\API\SpecialtyAPIController;
 use App\Http\Controllers\API\StudentAPIController;
 use App\Http\Controllers\API\TeacherAPIController;
+use App\Http\Controllers\API\TeachingAssignmentAPIController;
 use App\Http\Controllers\API\QualificationRecordAPIController;
 use App\Http\Controllers\API\UserAPIController;
 use App\Http\Controllers\RedirectController;
@@ -143,6 +144,10 @@ Route::prefix('api')->middleware([
             // Teachers
             Route::apiResource('teachers', TeacherAPIController::class);
             Route::post('teachers/import', [TeacherAPIController::class, 'import']);
+
+            Route::get('teaching-assignments', [TeachingAssignmentAPIController::class, 'index']);
+            Route::post('teaching-assignments', [TeachingAssignmentAPIController::class, 'store']);
+            Route::delete('teaching-assignments/{id}', [TeachingAssignmentAPIController::class, 'destroy']);
 
             // Qualification Record (Grades by student and history)
             Route::get('qualification/groups', [QualificationRecordAPIController::class, 'groups']);

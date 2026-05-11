@@ -55,6 +55,8 @@ const DinnerIndex = () => import("@/views/tenants/dinner/IndexView.vue");
 
 //Maestros
 const TeacherView = () => import("@/views/tenants/teachers/TeacherView.vue");
+const TeachingAssignmentView = () =>
+  import("@/views/tenants/teachers/TeachingAssignmentView.vue");
 const SpecialtyView = () =>
   import("@/views/tenants/specialties/SpecialtyView.vue");
 const IncidentView = () => import("@/views/tenants/incidents/IncidentView.vue");
@@ -295,6 +297,12 @@ const routes = [
         path: "teachers",
         name: "teachers",
         component: TeacherView,
+        beforeEnter: requireAuth,
+      },
+      {
+        path: "teaching-assignments",
+        name: "teaching-assignments",
+        component: TeachingAssignmentView,
         beforeEnter: requireAuth,
       },
       {

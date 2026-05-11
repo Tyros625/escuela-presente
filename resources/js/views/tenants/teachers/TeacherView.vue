@@ -422,9 +422,15 @@ const routeName = 'teachers';
 const showImport = true;
 
 // ─── Schedule constants ───────────────────────────────────────────────────────
+const LEGACY_MORNING_SLOT_MAP = {
+  '10:50-11:40': '11:10-12:00',
+  '11:40-12:30': '12:00-12:50',
+  '12:30-13:20': '12:50-13:40',
+};
+
 const MORNING_SLOTS = [
   '7:30-8:20', '8:20-9:10', '9:10-10:00', '10:00-10:50',
-  '10:50-11:40', '11:40-12:30', '12:30-13:20',
+  '11:10-12:00', '12:00-12:50', '12:50-13:40',
 ];
 
 const EVENING_SLOTS = [
@@ -451,15 +457,25 @@ function createEmptySchedule() {
 function mergeSchedule(saved) {
   const empty = createEmptySchedule();
   if (!saved) return empty;
+
+  const rawMorning = saved.morning || {};
   MORNING_SLOTS.forEach((slot) => {
-    if (saved.morning?.[slot]) {
+    const merged = { ...(rawMorning[slot] || {}) };
+    Object.entries(LEGACY_MORNING_SLOT_MAP).forEach(([oldS, newS]) => {
+      if (newS !== slot || !rawMorning[oldS]) return;
       DAYS.forEach((day) => {
-        if (typeof saved.morning[slot][day] === 'boolean') {
-          empty.morning[slot][day] = saved.morning[slot][day];
+        if (rawMorning[oldS][day] === true) {
+          merged[day] = true;
         }
       });
-    }
+    });
+    DAYS.forEach((day) => {
+      if (typeof merged[day] === 'boolean') {
+        empty.morning[slot][day] = merged[day];
+      }
+    });
   });
+
   EVENING_SLOTS.forEach((slot) => {
     if (saved.evening?.[slot]) {
       DAYS.forEach((day) => {
