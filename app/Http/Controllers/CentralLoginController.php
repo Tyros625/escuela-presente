@@ -41,7 +41,7 @@ class CentralLoginController extends BaseController
 
             return $this->handleResponse($success, 'Inicio Correcto');
         } else {
-            return $this->handleError(__('auth.unauthorized'), ['error' => __('auth.unauthorized')]);
+            return $this->handleError(__('auth.unauthorized'), ['error' => __('auth.unauthorized')], 401);
         }
     }
 

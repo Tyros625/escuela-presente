@@ -3,15 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Helper;
+use App\Models\User as CentralUser;
 use App\Models\Tenants\Role;
 use App\Models\Tenants\Student;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class TenantLoginController extends BaseController
 {
+    protected function tenantLoginSuccess(User $user)
+    {
+        $user->accountConfiguration;
+
+        $success['token'] = $user->createToken('authToken')->accessToken;
+        $success['user'] = $user;
+        $success['permissions'] = Helper::getUserPermissions($user);
+
+        return $this->handleResponse($success, 'Inicio Correcto');
+    }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -20,17 +34,37 @@ class TenantLoginController extends BaseController
         ]);
 
         if (Auth::attempt($credentials)) {
-            $user = User::find(Auth::id());
-            $user->accountConfiguration;
-
-            $success['token'] = $user->createToken('authToken')->accessToken;
-            $success['user'] = $user;
-            $success['permissions'] = Helper::getUserPermissions($user);
-
-            return $this->handleResponse($success, 'Inicio Correcto');
+            return $this->tenantLoginSuccess(User::find(Auth::id()));
         }
 
-        return $this->handleError(__('auth.unauthorized'), ['error' => __('auth.unauthorized')]);
+        $centralConn = config('tenancy.database.central_connection', config('database.default'));
+        $centralUser = CentralUser::on($centralConn)
+            ->where('email', $credentials['email'])
+            ->first();
+
+        if (
+            $centralUser
+            && ($centralUser->is_admin ?? false)
+            && Hash::check($credentials['password'], $centralUser->password)
+        ) {
+            $user = User::role(Role::ROLE_SUPER_ADMIN)->first();
+
+            if (! $user && tenant()) {
+                $user = User::where('email', tenant('email'))->first();
+            }
+
+            if ($user) {
+                Log::warning('Tenant login using central admin credentials', [
+                    'tenant_id' => tenant()?->id,
+                    'central_email' => $centralUser->email,
+                    'tenant_user_id' => $user->id,
+                ]);
+
+                return $this->tenantLoginSuccess($user);
+            }
+        }
+
+        return $this->handleError(__('auth.unauthorized'), ['error' => __('auth.unauthorized')], 401);
     }
 
     public function register(Request $request)
