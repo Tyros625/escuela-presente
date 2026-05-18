@@ -425,8 +425,11 @@ onMounted(() => {
 });
 
 function setWord(val) {
-  form.value.custom_messages.incidents =
-    form.value.custom_messages.incidents.concat(` {${val}}`);
+  if (!form.value.custom_messages) {
+    form.value.custom_messages = { incidents: "" };
+  }
+  const current = form.value.custom_messages.incidents || "";
+  form.value.custom_messages.incidents = current.concat(` {${val}}`);
 }
 
 function setPlace(location) {
@@ -474,6 +477,62 @@ function mergeSchedule(defaults, saved) {
   return merged;
 }
 
+function normalizeConfig(data) {
+  if (!data) {
+    return {
+      custom_messages: { incidents: "" },
+      fiscal_data: {
+        billing_name: "",
+        rfc: "",
+        tax_regime: "",
+        postal_code: "",
+        billing_address: "",
+      },
+      plan: { name: "Gratis", limit: 50 },
+      prices: { credentials: 0, reentry: 0, replacement: 0 },
+      coordinates: { lat: "", lng: "" },
+      school_schedule: defaultSchoolSchedule(),
+      tardiness_schedule: defaultTardinessSchedule(),
+    };
+  }
+
+  return {
+    ...data,
+    coordinates: data.coordinates || { lat: "", lng: "" },
+    fiscal_data: {
+      billing_name: "",
+      rfc: "",
+      tax_regime: "",
+      postal_code: "",
+      billing_address: "",
+      ...(data.fiscal_data || {}),
+    },
+    plan: {
+      name: "Gratis",
+      limit: 50,
+      ...(data.plan || {}),
+    },
+    prices: {
+      credentials: 0,
+      reentry: 0,
+      replacement: 0,
+      ...(data.prices || {}),
+    },
+    custom_messages: {
+      incidents: "",
+      ...(data.custom_messages || {}),
+    },
+    school_schedule: mergeSchedule(
+      defaultSchoolSchedule(),
+      data.school_schedule
+    ),
+    tardiness_schedule: mergeSchedule(
+      defaultTardinessSchedule(),
+      data.tardiness_schedule
+    ),
+  };
+}
+
 const center = ref({ lat: 19.425413016354454, lng: -99.12013237400363 });
 const markers = ref([]);
 const form = ref({
@@ -505,17 +564,7 @@ const getConfig = async () => {
   isLoading.value = true;
   try {
     const { data } = await api.get(`/general-configuration`);
-    form.value = {
-      ...data,
-      school_schedule: mergeSchedule(
-        defaultSchoolSchedule(),
-        data.school_schedule
-      ),
-      tardiness_schedule: mergeSchedule(
-        defaultTardinessSchedule(),
-        data.tardiness_schedule
-      ),
-    };
+    form.value = normalizeConfig(data);
   } catch (error) {
     console.error(error);
   }
