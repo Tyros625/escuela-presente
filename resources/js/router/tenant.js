@@ -80,6 +80,8 @@ const PaymentView = () => import("@/views/tenants/payments/PaymentView.vue");
 
 // Reports
 const AssistsReport = () => import("@/views/tenants/reports/AssistsReport.vue");
+const TardinessReport = () =>
+  import("@/views/tenants/reports/TardinessReport.vue");
 const IncidentReportIndex = () =>
   import("@/views/tenants/incident-reports/IncidentReportIndex.vue");
 const IncidentReportAdd = () =>
@@ -321,6 +323,12 @@ const routes = [
         path: "reports/assists",
         name: "reports.assists",
         component: AssistsReport,
+        beforeEnter: requireAuth,
+      },
+      {
+        path: "reports/tardiness",
+        name: "reports.tardiness",
+        component: TardinessReport,
         beforeEnter: requireAuth,
       },
       {

@@ -301,6 +301,96 @@
             </div>
           </div>
         </div>
+        <div class="row items-push">
+          <div class="col-lg-4">
+            <p class="fs-sm text-muted">Configure the School Schedule:</p>
+          </div>
+          <div class="col-lg-8">
+            <div
+              v-for="shift in scheduleShifts"
+              :key="`school-${shift.key}`"
+              class="row mb-3 align-items-center"
+            >
+              <div class="col-md-3">
+                <div class="form-check">
+                  <input
+                    :id="`school-${shift.key}`"
+                    v-model="form.school_schedule[shift.key].enabled"
+                    class="form-check-input"
+                    type="checkbox"
+                    :disabled="isLoading"
+                  />
+                  <label class="form-check-label" :for="`school-${shift.key}`">
+                    {{ shift.label }}:
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label mb-0">De:</label>
+                <input
+                  v-model="form.school_schedule[shift.key].start"
+                  type="time"
+                  class="form-control"
+                  :disabled="isLoading || !form.school_schedule[shift.key].enabled"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label mb-0">A:</label>
+                <input
+                  v-model="form.school_schedule[shift.key].end"
+                  type="time"
+                  class="form-control"
+                  :disabled="isLoading || !form.school_schedule[shift.key].enabled"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row items-push">
+          <div class="col-lg-4">
+            <p class="fs-sm text-muted">
+              Configure the Tardiness Schedule for Students:
+            </p>
+            <p class="fs-sm text-muted">
+              Los alumnos que registren asistencia después de esta hora se
+              considerarán en retardo.
+            </p>
+          </div>
+          <div class="col-lg-8">
+            <div
+              v-for="shift in scheduleShifts"
+              :key="`tardiness-${shift.key}`"
+              class="row mb-3 align-items-center"
+            >
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input
+                    :id="`tardiness-${shift.key}`"
+                    v-model="form.tardiness_schedule[shift.key].enabled"
+                    class="form-check-input"
+                    type="checkbox"
+                    :disabled="isLoading"
+                  />
+                  <label
+                    class="form-check-label"
+                    :for="`tardiness-${shift.key}`"
+                  >
+                    {{ shift.label }}:
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label mb-0">Hora límite:</label>
+                <input
+                  v-model="form.tardiness_schedule[shift.key].time"
+                  type="time"
+                  class="form-control"
+                  :disabled="isLoading || !form.tardiness_schedule[shift.key].enabled"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row push">
           <div class="col-lg-4"></div>
 
@@ -357,6 +447,33 @@ function updatePosition(location) {
   form.value.coordinates = center;
 }
 
+const scheduleShifts = [
+  { key: "morning", label: "Matutino" },
+  { key: "afternoon", label: "Vespertino" },
+  { key: "fulltime", label: "Tiempo completo" },
+];
+
+const defaultSchoolSchedule = () => ({
+  morning: { enabled: true, start: "07:00", end: "13:40" },
+  afternoon: { enabled: false, start: "", end: "" },
+  fulltime: { enabled: false, start: "", end: "" },
+});
+
+const defaultTardinessSchedule = () => ({
+  morning: { enabled: true, time: "07:41" },
+  afternoon: { enabled: false, time: "" },
+  fulltime: { enabled: false, time: "" },
+});
+
+function mergeSchedule(defaults, saved) {
+  const merged = { ...defaults };
+  if (!saved) return merged;
+  for (const key of Object.keys(merged)) {
+    merged[key] = { ...merged[key], ...(saved[key] || {}) };
+  }
+  return merged;
+}
+
 const center = ref({ lat: 19.425413016354454, lng: -99.12013237400363 });
 const markers = ref([]);
 const form = ref({
@@ -377,6 +494,8 @@ const form = ref({
   plan: {},
   prices: {},
   custom_messages: {},
+  school_schedule: defaultSchoolSchedule(),
+  tardiness_schedule: defaultTardinessSchedule(),
 });
 const isLoading = ref(false);
 const logo = ref();
@@ -386,7 +505,17 @@ const getConfig = async () => {
   isLoading.value = true;
   try {
     const { data } = await api.get(`/general-configuration`);
-    form.value = data;
+    form.value = {
+      ...data,
+      school_schedule: mergeSchedule(
+        defaultSchoolSchedule(),
+        data.school_schedule
+      ),
+      tardiness_schedule: mergeSchedule(
+        defaultTardinessSchedule(),
+        data.tardiness_schedule
+      ),
+    };
   } catch (error) {
     console.error(error);
   }

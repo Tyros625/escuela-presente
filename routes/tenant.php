@@ -124,6 +124,7 @@ Route::prefix('api')->middleware([
             Route::get('balances/{enrollment}', [BalancesAPIController::class, 'show']);
 
             // Assists
+            Route::get('assists/tardiness', [AssistAPIController::class, 'tardiness']);
             Route::get('assists', [AssistAPIController::class, 'index']);
             Route::post('assists/{enrollment}', [AssistAPIController::class, 'store']);
             Route::get('assists/{enrollment}', [AssistAPIController::class, 'show']);

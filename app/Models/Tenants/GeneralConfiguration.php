@@ -36,6 +36,8 @@ class GeneralConfiguration extends Model
         'plan',
         'prices',
         'custom_messages',
+        'school_schedule',
+        'tardiness_schedule',
     ];
 
     protected $casts = [
@@ -53,6 +55,8 @@ class GeneralConfiguration extends Model
         'plan' => Json::class,
         'prices' => Json::class,
         'custom_messages' => Json::class,
+        'school_schedule' => Json::class,
+        'tardiness_schedule' => Json::class,
         'created_at' => ActualTimeZone::class,
         'updated_at' => ActualTimeZone::class,
     ];
@@ -69,5 +73,7 @@ class GeneralConfiguration extends Model
         'fiscal_data' => 'required',
         'logo' => 'nullable',
         'last_enrollment' => 'required',
+        'school_schedule' => 'nullable|array',
+        'tardiness_schedule' => 'nullable|array',
     ];
 }

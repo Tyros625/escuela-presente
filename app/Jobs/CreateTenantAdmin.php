@@ -6,6 +6,7 @@ use App\Models\Tenant;
 use App\Models\Tenants\GeneralConfiguration;
 use App\Models\Tenants\Role;
 use App\Models\Tenants\User;
+use App\Services\TardinessService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -60,6 +61,8 @@ class CreateTenantAdmin implements ShouldQueue
                     'replacement' => 50,
                 ],
                 'last_enrollment' => '1000000',
+                'school_schedule' => TardinessService::defaultSchoolSchedule(),
+                'tardiness_schedule' => TardinessService::defaultTardinessSchedule(),
             ]);
         });
     }

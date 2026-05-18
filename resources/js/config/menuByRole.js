@@ -114,6 +114,7 @@ export function menuAdmin(userStore) {
       [
         sub("blank-page", "Boletines"),
         sub("reports.assists", "Estadísticas", can("read assist")),
+        sub("reports.tardiness", "Retardo", can("read assist")),
         sub("reports.incidents", "Reportes administrativos", can("read incidents")),
       ],
       can("read assist") || can("read incidents")
@@ -179,6 +180,7 @@ export function menuTeacher(userStore) {
       [
         sub("blank-page", "Listas de estudiantes"),
         sub("reports.assists", "Reportes de asistencia", can("read assist")),
+        sub("reports.tardiness", "Retardo", can("read assist")),
       ],
       can("read assist")
     ),

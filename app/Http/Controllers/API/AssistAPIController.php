@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Resources\AssistResource;
+use App\Http\Resources\TardinessReportResource;
 use App\Models\Tenants\Assist;
 use App\Models\Tenants\GeneralConfiguration;
 use App\Models\Tenants\Student;
+use App\Services\TardinessService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +16,40 @@ use Illuminate\Http\Request;
 
 class AssistAPIController extends AppBaseController
 {
+    public function __construct(private readonly TardinessService $tardinessService)
+    {
+    }
+
+    public function tardiness(Request $request): JsonResponse
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|in:morning,afternoon,fulltime',
+        ]);
+
+        $config = GeneralConfiguration::first();
+        $threshold = $config
+            ? $this->tardinessService->thresholdForShift($config, $request->query('shift'))
+            : null;
+
+        if ($threshold === null) {
+            return $this->sendError(
+                'No hay horario de retardo configurado para este turno. Configure los parámetros del sistema.',
+                422
+            );
+        }
+
+        $assists = $this->tardinessService->lateAssistsForDate(
+            $request->query('date'),
+            $request->query('shift')
+        );
+
+        return $this->sendResponse(
+            TardinessReportResource::collection($assists),
+            'Tardiness report retrieved successfully'
+        );
+    }
+
     public function index(Request $request): JsonResponse
     {
         $assists = Assist::when($request->query('date_start'), function ($query, $date_start) {
