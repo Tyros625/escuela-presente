@@ -16,7 +16,14 @@ class TeacherAPIController extends AppBaseController
 {
     public function index(Request $request): JsonResponse
     {
-        $teachers = Teacher::all();
+        $teachers = Teacher::query()
+            ->with(['specialization', 'subject'])
+            ->withCount([
+                'teachingAssignments as assigned_hours_count' => function ($query) {
+                    $query->where('is_active', true);
+                },
+            ])
+            ->get();
 
         return $this->sendResponse(TeacherResource::collection($teachers), 'Teachers retrieved successfully');
     }

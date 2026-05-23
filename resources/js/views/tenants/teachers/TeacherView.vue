@@ -126,14 +126,20 @@
               </td>
               <!-- HORAS DISP. -->
               <td>
-                <span v-if="row.max_hours_per_week">
-                  {{ row.max_hours_per_week }}h
+                <span v-if="row.hours_available != null">
+                  {{ formatHours(row.hours_available) }}
+                </span>
+                <span v-else-if="row.max_hours_per_week">
+                  {{ formatHours(row.max_hours_per_week) }}
                 </span>
                 <span v-else class="text-muted">-</span>
               </td>
               <!-- HORAS ASIG. -->
               <td>
-                <span class="text-muted">-</span>
+                <span v-if="row.assigned_hours != null && row.assigned_hours > 0">
+                  {{ formatHours(row.assigned_hours) }}
+                </span>
+                <span v-else class="text-muted">-</span>
               </td>
               <!-- ESTADO -->
               <td>
@@ -579,6 +585,12 @@ function getAvatarColor(name) {
   }
   const idx = Math.abs(hash) % AVATAR_COLORS.length;
   return AVATAR_COLORS[idx];
+}
+
+function formatHours(value) {
+  const num = Number(value);
+  if (Number.isNaN(num)) return '-';
+  return `${Number.isInteger(num) ? num : num.toFixed(2)}h`;
 }
 
 const filteredTeachers = computed(() => {

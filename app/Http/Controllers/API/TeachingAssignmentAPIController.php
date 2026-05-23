@@ -66,6 +66,53 @@ class TeachingAssignmentAPIController extends AppBaseController
         );
     }
 
+    public function update($id, StoreTeachingAssignmentRequest $request, TeachingAssignmentValidator $validator): JsonResponse
+    {
+        $assignment = TeachingAssignment::find($id);
+
+        if (empty($assignment)) {
+            return $this->sendError('Asignación no encontrada');
+        }
+
+        $data = $request->validated();
+        $teacher = Teacher::findOrFail($data['teacher_id']);
+        $group = AcademicGroup::findOrFail($data['academic_group_id']);
+
+        $ignoreAssignmentId = $assignment->id;
+        if ((int) $data['teacher_id'] !== (int) $assignment->teacher_id) {
+            $ignoreAssignmentId = null;
+        }
+
+        $error = $validator->validateNewAssignment(
+            $teacher,
+            $group,
+            $data['shift'],
+            $data['day_of_week'],
+            $data['time_slot'],
+            $ignoreAssignmentId
+        );
+
+        if ($error !== null) {
+            return $this->sendError($error, 422);
+        }
+
+        $assignment->update([
+            'teacher_id' => $data['teacher_id'],
+            'specialty_id' => $data['specialty_id'],
+            'academic_group_id' => $data['academic_group_id'],
+            'shift' => $data['shift'],
+            'day_of_week' => $data['day_of_week'],
+            'time_slot' => $data['time_slot'],
+        ]);
+
+        $assignment->load(['teacher', 'specialty', 'academicGroup.grade', 'academicGroup.section']);
+
+        return $this->sendResponse(
+            new TeachingAssignmentResource($assignment),
+            'Asignación actualizada correctamente'
+        );
+    }
+
     public function destroy($id): JsonResponse
     {
         $assignment = TeachingAssignment::find($id);

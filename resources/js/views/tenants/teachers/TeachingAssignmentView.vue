@@ -84,9 +84,7 @@
 								<td class="fw-semibold">{{ a.teacher_name || '—' }}</td>
 								<td>{{ a.subject_name || '—' }}</td>
 								<td>{{ a.cluster_name || '—' }}</td>
-								<td class="text-center text-muted">
-									{{ a.specialty_hours_per_week != null ? `${a.specialty_hours_per_week}h` : '—' }}
-								</td>
+								<td class="text-center text-muted">1h</td>
 								<td>
 									<span class="badge rounded-pill bg-info">{{ shiftLabel(a.shift) }}</span>
 								</td>
@@ -101,15 +99,25 @@
 									</span>
 								</td>
 								<td class="text-end">
-									<button
-										type="button"
-										class="btn btn-sm btn-alt-danger"
-										@click="confirmRemove(a)"
-										title="Quitar"
-									>
-										<i class="fa-solid fa-trash"></i>
-										Quitar
-									</button>
+									<div class="d-inline-flex gap-1">
+										<button
+											type="button"
+											class="btn btn-sm btn-warning"
+											@click="openEditModal(a)"
+											title="Editar"
+										>
+											<i class="fa-solid fa-pencil"></i>
+										</button>
+										<button
+											type="button"
+											class="btn btn-sm btn-alt-danger"
+											@click="confirmRemove(a)"
+											title="Quitar"
+										>
+											<i class="fa-solid fa-trash"></i>
+											Quitar
+										</button>
+									</div>
 								</td>
 							</tr>
 							<tr v-if="!filteredAssignments.length">
@@ -135,87 +143,23 @@
 								</h5>
 								<p class="text-muted fs-sm mb-0 mt-2">
 									Al guardar se valida que el docente y el grupo no tengan otro clase en el mismo
-									horario y que el docente tenga disponibilidad marcada en ese día y franja.
+									horario, que el docente tenga disponibilidad marcada en ese día y franja, y que
+									cuenta con horas disponibles (1h por franja).
 								</p>
 							</div>
 							<div class="card-body">
-								<form @submit.prevent="saveManual" class="row g-3">
-									<div class="col-md-6">
-										<label class="form-label fw-semibold">Docente</label>
-										<select v-model="manual.teacher_id" class="form-select" required :disabled="isSaving">
-											<option disabled value="">— Seleccionar —</option>
-											<option v-for="t in teachers" :key="t.id" :value="t.id">
-												{{ t.display_name || formatTeacherName(t) }}
-											</option>
-										</select>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label fw-semibold">Materia</label>
-										<select v-model="manual.specialty_id" class="form-select" required :disabled="isSaving">
-											<option disabled value="">— Seleccionar —</option>
-											<option v-for="s in specialties" :key="s.id" :value="s.id">
-												{{ s.description }}
-											</option>
-										</select>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label fw-semibold">Grupo</label>
-										<select
-											v-model="manual.academic_group_id"
-											class="form-select"
-											required
-											:disabled="isSaving"
-										>
-											<option disabled value="">— Seleccionar —</option>
-											<option v-for="g in groupsForShift" :key="g.id" :value="g.id">
-												{{ g.name || g.group_label || 'Grupo' }} — {{ shiftLabel(g.shift) }}
-											</option>
-										</select>
-										<div v-if="manual.shift && !groupsForShift.length" class="form-text text-warning">
-											No hay grupos registrados para este turno.
-										</div>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label fw-semibold">Turno</label>
-										<select v-model="manual.shift" class="form-select" required :disabled="isSaving">
-											<option value="morning">Matutino</option>
-											<option value="afternoon">Vespertino</option>
-										</select>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label fw-semibold">Día</label>
-										<select v-model="manual.day_of_week" class="form-select" required :disabled="isSaving">
-											<option v-for="d in DAY_OPTIONS" :key="d.value" :value="d.value">
-												{{ d.label }}
-											</option>
-										</select>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label fw-semibold">Hora (franja)</label>
-										<select v-model="manual.time_slot" class="form-select" required :disabled="isSaving">
-											<option disabled value="">— Seleccionar —</option>
-											<option v-for="slot in slotOptions" :key="slot" :value="slot">
-												{{ slot }}
-											</option>
-										</select>
-									</div>
-									<div class="col-12 d-flex flex-wrap gap-2 justify-content-end pt-2">
-										<button
-											type="button"
-											class="btn btn-alt-secondary"
-											@click="resetManual"
-											:disabled="isSaving"
-										>
-											<i class="fa-solid fa-eraser me-1"></i>
-											Limpiar
-										</button>
-										<button type="submit" class="btn btn-primary" :disabled="isSaving">
-											<i class="fa fa-cog fa-spin me-1" v-if="isSaving"></i>
-											<i class="fa-solid fa-floppy-disk me-1" v-else></i>
-											Guardar asignación
-										</button>
-									</div>
-								</form>
+								<TeachingAssignmentForm
+									:form="manual"
+									:teachers="teachers"
+									:specialties="specialties"
+									:academic-groups="academicGroups"
+									:day-options="DAY_OPTIONS"
+									:morning-slots="MORNING_SLOTS"
+									:evening-slots="EVENING_SLOTS"
+									:disabled="isSaving"
+									@submit="saveManual"
+									@reset="resetManual"
+								/>
 							</div>
 						</div>
 					</div>
@@ -223,10 +167,60 @@
 			</div>
 		</BaseBlock>
 	</div>
+
+	<!-- Modal Editar -->
+	<div
+		class="modal fade"
+		id="modal-edit-assignment"
+		tabindex="-1"
+		aria-labelledby="modal-edit-assignment-label"
+		aria-hidden="true"
+		data-bs-backdrop="static"
+	>
+		<div class="modal-dialog modal-lg modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title d-flex align-items-center gap-2" id="modal-edit-assignment-label">
+						<i class="fa-solid fa-pencil text-warning"></i>
+						Editar asignación
+					</h5>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+						@click="closeEditModal"
+					></button>
+				</div>
+				<div class="modal-body">
+					<p class="text-muted fs-sm">
+						Al guardar se valida que el docente y el grupo no tengan otra clase en el mismo horario,
+						que el docente tenga disponibilidad marcada en ese día y franja, y que cuenta con horas
+						disponibles (1h por franja).
+					</p>
+					<TeachingAssignmentForm
+						v-if="editingId"
+						:form="editForm"
+						:teachers="teachers"
+						:specialties="specialties"
+						:academic-groups="academicGroups"
+						:day-options="DAY_OPTIONS"
+						:morning-slots="MORNING_SLOTS"
+						:evening-slots="EVENING_SLOTS"
+						:disabled="isSaving"
+						submit-label="Guardar cambios"
+						@submit="saveEdit"
+						@reset="resetEditForm"
+					/>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup>
 import api from '@/services/api';
+import TeachingAssignmentForm from '@/components/TeachingAssignmentForm.vue';
 import Swal from 'sweetalert2';
 
 const MORNING_SLOTS = [
@@ -262,28 +256,15 @@ const activeTab = ref('list');
 const searchQuery = ref('');
 const isLoadingList = ref(false);
 const isSaving = ref(false);
+const editingId = ref(null);
 
 const assignments = ref([]);
 const teachers = ref([]);
 const specialties = ref([]);
 const academicGroups = ref([]);
 
-const manual = reactive({
-	teacher_id: '',
-	specialty_id: '',
-	academic_group_id: '',
-	shift: 'morning',
-	day_of_week: 'lunes',
-	time_slot: MORNING_SLOTS[0],
-});
-
-const slotOptions = computed(() =>
-	manual.shift === 'morning' ? MORNING_SLOTS : EVENING_SLOTS
-);
-
-const groupsForShift = computed(() =>
-	academicGroups.value.filter((g) => g.shift === manual.shift)
-);
+const manual = reactive(getEmptyForm());
+const editForm = reactive(getEmptyForm());
 
 const filteredAssignments = computed(() => {
 	const q = searchQuery.value?.toLowerCase().trim() || '';
@@ -294,6 +275,17 @@ const filteredAssignments = computed(() => {
 	});
 });
 
+function getEmptyForm() {
+	return {
+		teacher_id: '',
+		specialty_id: '',
+		academic_group_id: '',
+		shift: 'morning',
+		day_of_week: 'lunes',
+		time_slot: MORNING_SLOTS[0],
+	};
+}
+
 function shiftLabel(shift) {
 	return shift === 'afternoon' ? 'Vespertino' : 'Matutino';
 }
@@ -303,21 +295,26 @@ function dayLabel(day) {
 	return d ? d.label : day || '—';
 }
 
-function formatTeacherName(t) {
-	const ln = [t.last_name_father, t.last_name_mother].filter(Boolean).join(' ');
-	return ln ? `${ln}, ${t.name || ''}` : t.name || '';
+function buildPayload(form) {
+	return {
+		teacher_id: Number(form.teacher_id),
+		specialty_id: Number(form.specialty_id),
+		academic_group_id: Number(form.academic_group_id),
+		shift: form.shift,
+		day_of_week: form.day_of_week,
+		time_slot: form.time_slot,
+		assignment_type: 'manual',
+	};
 }
 
-watch(
-	() => manual.shift,
-	() => {
-		manual.academic_group_id = '';
-		const slots = manual.shift === 'morning' ? MORNING_SLOTS : EVENING_SLOTS;
-		if (!slots.includes(manual.time_slot)) {
-			manual.time_slot = slots[0] || '';
-		}
-	}
-);
+function fillForm(target, assignment) {
+	target.teacher_id = assignment.teacher_id || '';
+	target.specialty_id = assignment.specialty_id || '';
+	target.academic_group_id = assignment.academic_group_id || '';
+	target.shift = assignment.shift || 'morning';
+	target.day_of_week = assignment.day_of_week || 'lunes';
+	target.time_slot = assignment.time_slot || MORNING_SLOTS[0];
+}
 
 async function loadAssignments() {
 	isLoadingList.value = true;
@@ -348,44 +345,75 @@ async function loadLookups() {
 }
 
 function resetManual() {
-	manual.teacher_id = '';
-	manual.specialty_id = '';
-	manual.academic_group_id = '';
-	manual.shift = 'morning';
-	manual.day_of_week = 'lunes';
-	manual.time_slot = MORNING_SLOTS[0];
+	Object.assign(manual, getEmptyForm());
+}
+
+function resetEditForm() {
+	if (!editingId.value) return;
+	const assignment = assignments.value.find((a) => a.id === editingId.value);
+	if (assignment) fillForm(editForm, assignment);
+}
+
+function showEditModal() {
+	const el = document.getElementById('modal-edit-assignment');
+	if (el) bootstrap.Modal.getOrCreateInstance(el).show();
+}
+
+function closeEditModal() {
+	const el = document.getElementById('modal-edit-assignment');
+	if (el) bootstrap.Modal.getOrCreateInstance(el)?.hide();
+	editingId.value = null;
+}
+
+function openEditModal(assignment) {
+	editingId.value = assignment.id;
+	fillForm(editForm, assignment);
+	showEditModal();
 }
 
 async function saveManual() {
 	isSaving.value = true;
 	try {
-		const { data } = await api.post(
-			'/teaching-assignments',
-			{
-				teacher_id: Number(manual.teacher_id),
-				specialty_id: Number(manual.specialty_id),
-				academic_group_id: Number(manual.academic_group_id),
-				shift: manual.shift,
-				day_of_week: manual.day_of_week,
-				time_slot: manual.time_slot,
-				assignment_type: 'manual',
-			},
-			{ showErrors: false }
-		);
+		const { data } = await api.post('/teaching-assignments', buildPayload(manual), { showErrors: false });
 
 		Toast.fire({ icon: 'success', title: data.message || 'Guardado correctamente' });
 		resetManual();
 		await loadAssignments();
 		activeTab.value = 'list';
 	} catch (err) {
-		const json = err?.data || {};
-		const msg = json.message;
-		const text =
-			typeof msg === 'string' ? msg : 'No se pudo guardar. Revise disponibilidad y conflictos de horario.';
-		Swal.fire({ icon: 'error', title: 'No se puede guardar', text });
+		showSaveError(err);
 	} finally {
 		isSaving.value = false;
 	}
+}
+
+async function saveEdit() {
+	if (!editingId.value) return;
+
+	isSaving.value = true;
+	try {
+		const { data } = await api.put(
+			`/teaching-assignments/${editingId.value}`,
+			buildPayload(editForm),
+			{ showErrors: false }
+		);
+
+		Toast.fire({ icon: 'success', title: data.message || 'Actualizado correctamente' });
+		closeEditModal();
+		await loadAssignments();
+	} catch (err) {
+		showSaveError(err);
+	} finally {
+		isSaving.value = false;
+	}
+}
+
+function showSaveError(err) {
+	const json = err?.data || {};
+	const msg = json.message;
+	const text =
+		typeof msg === 'string' ? msg : 'No se pudo guardar. Revise disponibilidad, horas y conflictos de horario.';
+	Swal.fire({ icon: 'error', title: 'No se puede guardar', text });
 }
 
 function confirmRemove(a) {

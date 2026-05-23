@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\TeacherHoursService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TeacherResource extends JsonResource
@@ -14,6 +15,14 @@ class TeacherResource extends JsonResource
      */
     public function toArray($request)
     {
+        $assignedHours = $this->assigned_hours_count
+            ?? app(TeacherHoursService::class)->assignedHours($this->id);
+
+        $hoursAvailable = null;
+        if ($this->max_hours_per_week !== null) {
+            $hoursAvailable = max(0, (float) $this->max_hours_per_week - $assignedHours);
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -33,6 +42,8 @@ class TeacherResource extends JsonResource
             'subject' => $this->subject?->description,
             'max_hours_per_week' => $this->max_hours_per_week,
             'available_hours' => $this->available_hours,
+            'assigned_hours' => $assignedHours,
+            'hours_available' => $hoursAvailable,
             'schedule_availability' => $this->schedule_availability,
             'display_name' => $this->display_name,
             'created_at' => $this->created_at,

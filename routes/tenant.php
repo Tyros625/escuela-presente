@@ -148,6 +148,7 @@ Route::prefix('api')->middleware([
 
             Route::get('teaching-assignments', [TeachingAssignmentAPIController::class, 'index']);
             Route::post('teaching-assignments', [TeachingAssignmentAPIController::class, 'store']);
+            Route::put('teaching-assignments/{id}', [TeachingAssignmentAPIController::class, 'update']);
             Route::delete('teaching-assignments/{id}', [TeachingAssignmentAPIController::class, 'destroy']);
 
             // Qualification Record (Grades by student and history)

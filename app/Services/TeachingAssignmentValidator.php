@@ -8,6 +8,10 @@ use App\Models\Tenants\TeachingAssignment;
 
 class TeachingAssignmentValidator
 {
+    public function __construct(
+        protected TeacherHoursService $hoursService
+    ) {}
+
     public function validateNewAssignment(
         Teacher $teacher,
         AcademicGroup $group,
@@ -47,6 +51,11 @@ class TeachingAssignmentValidator
 
         if ($this->groupHasConflict($group->id, $shift, $dayOfWeek, $timeSlot, $ignoreAssignmentId)) {
             return 'El grupo ya tiene otra materia asignada en ese mismo horario.';
+        }
+
+        $hoursError = $this->hoursService->validateCanTakeAssignment($teacher, $ignoreAssignmentId);
+        if ($hoursError !== null) {
+            return $hoursError;
         }
 
         return null;

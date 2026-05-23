@@ -114,4 +114,9 @@ class Teacher extends Model
     {
         return $this->belongsTo(Specialty::class, 'subject_id');
     }
+
+    public function teachingAssignments(): HasMany
+    {
+        return $this->hasMany(TeachingAssignment::class, 'teacher_id');
+    }
 }
