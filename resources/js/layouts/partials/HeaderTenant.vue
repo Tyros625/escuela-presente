@@ -13,19 +13,10 @@
               >
                 <i class="fa fa-fw fa-bars"></i>
               </button>
-
-              <button
-                type="button"
-                class="ep-icon-btn me-2 d-none d-lg-inline-flex"
-                @click="store.sidebarMini({ mode: 'toggle' })"
-                aria-label="Contraer menú"
-              >
-                <i class="fa fa-fw fa-angles-left"></i>
-              </button>
             </slot>
           </div>
 
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center ms-auto">
             <slot name="content-right">
               <div class="dropdown d-inline-block">
                 <button
@@ -50,10 +41,7 @@
                     <div class="text-muted fs-sm">{{ userStore.getUser?.role || "—" }}</div>
                   </div>
                   <div class="dropdown-divider my-1"></div>
-                  <RouterLink
-                    :to="{ name: 'general-config' }"
-                    class="dropdown-item"
-                  >
+                  <RouterLink :to="{ name: 'general-config' }" class="dropdown-item">
                     Configuración
                   </RouterLink>
                   <button type="button" class="dropdown-item" @click="modalShow('modal-password')">

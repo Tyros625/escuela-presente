@@ -14,39 +14,45 @@
   <nav id="sidebar" aria-label="Main Navigation">
     <slot>
       <!-- Side Header -->
-      <div class="content-header">
+      <div class="content-header ep-sidebar-header">
         <slot name="header">
           <!-- Logo -->
-          <RouterLink :to="{ name: 'landing' }" class="fw-semibold text-dual">
-            <span class="smini-visible">
-              <i class="fa fa-circle-notch text-primary"></i>
-            </span>
-            <span class="smini-hide fs-5 tracking-wider">
-              Escuela<span class="fw-normal">Presente</span>
-            </span>
+          <RouterLink :to="{ name: 'landing' }" class="ep-sidebar-brand smini-hide">
+            Escuela<span class="ep-sidebar-brand-light">Presente</span>
           </RouterLink>
-          <!-- END Logo -->
+          <RouterLink :to="{ name: 'landing' }" class="ep-sidebar-brand-mini smini-visible">
+            <span class="ep-sidebar-brand-mark">EP</span>
+          </RouterLink>
         </slot>
 
-        <!-- Extra -->
-        <div>
-          <!-- Close Sidebar, Visible only on mobile screens -->
+        <div class="ep-sidebar-header-actions">
           <button
             type="button"
-            class="d-lg-none btn btn-sm btn-alt-secondary ms-1"
-            @click="store.sidebar({ mode: 'close' })"
+            class="ep-sidebar-collapse d-none d-lg-inline-flex"
+            @click="store.sidebarMini({ mode: 'toggle' })"
+            :title="store.settings.sidebarMini ? 'Expandir menú' : 'Contraer menú'"
+            aria-label="Contraer menú"
           >
-            <i class="fa fa-fw fa-times"></i>
+            <i
+              class="fa-solid fa-chevron-left ep-sidebar-collapse-icon"
+              :class="{ 'is-collapsed': store.settings.sidebarMini }"
+            ></i>
           </button>
-          <!-- END Close Sidebar -->
+          <button
+            type="button"
+            class="ep-sidebar-close d-lg-none"
+            @click="store.sidebar({ mode: 'close' })"
+            aria-label="Cerrar menú"
+          >
+            <i class="fa fa-fw fa-xmark"></i>
+          </button>
         </div>
-        <!-- END Extra -->
       </div>
       <!-- END Side Header -->
 
       <!-- User info (wireframe) -->
-      <div v-if="userStore.isLoggedIn" class="content-side-content px-3 py-3 border-bottom">
-        <div class="fw-semibold text-dual smini-hide fs-sm">{{ userDisplayName }}</div>
+      <div v-if="userStore.isLoggedIn" class="content-side-content ep-sidebar-user px-3 py-3 border-bottom">
+        <div class="ep-sidebar-user-name smini-hide">{{ userDisplayName }}</div>
         <span class="ep-role-badge smini-hide mt-2">{{ roleLabel }}</span>
       </div>
       <!-- END User info -->

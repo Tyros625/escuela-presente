@@ -91,6 +91,21 @@ watch(
 );
 
 const domain = ref();
+const heroBgLoaded = ref(false);
+const HERO_BG_URL = "/assets/fonts/image/landing-back.png";
+
+onMounted(() => {
+  const img = new Image();
+  img.decoding = "async";
+  img.src = HERO_BG_URL;
+  if (img.complete) {
+    heroBgLoaded.value = true;
+  } else {
+    img.onload = () => {
+      heroBgLoaded.value = true;
+    };
+  }
+});
 
 const slugify = (str) =>
   str
@@ -110,6 +125,18 @@ const slugify = (str) =>
     <div class="central-landing-wrapper">
       <!-- Hero: only background + text (on mobile). On desktop, form-outer overlaps left. -->
       <div class="central-landing-hero">
+        <div class="central-landing-hero__bg" aria-hidden="true">
+          <div class="central-landing-hero__bg-fallback"></div>
+          <img
+            :src="HERO_BG_URL"
+            alt=""
+            class="central-landing-hero__bg-img"
+            :class="{ 'is-loaded': heroBgLoaded }"
+            decoding="async"
+            fetchpriority="high"
+            @load="heroBgLoaded = true"
+          />
+        </div>
         <div class="central-landing-hero__overlay"></div>
         <div class="central-landing-hero__content">
           <div class="central-landing-hero__container">
@@ -291,15 +318,38 @@ const slugify = (str) =>
   min-height: 100vh;
   display: flex;
   align-items: center;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(99, 91, 255, 0.35), transparent 42%),
-    radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.18), transparent 35%),
-    linear-gradient(135deg, #0a2540 0%, #1a365d 48%, #243b53 100%);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  overflow: hidden;
   padding-top: 0;
   margin-top: 0;
+}
+
+.central-landing-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.central-landing-hero__bg-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(99, 91, 255, 0.28), transparent 42%),
+    linear-gradient(135deg, #0a2540 0%, #1a365d 50%, #243b53 100%);
+}
+
+.central-landing-hero__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.central-landing-hero__bg-img.is-loaded {
+  opacity: 1;
 }
 
 /* Form: on desktop positioned inside hero (left); on mobile below hero in its own section */
@@ -314,18 +364,20 @@ const slugify = (str) =>
 .central-landing-hero__overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(
     90deg,
-    rgba(10, 37, 64, 0.15) 0%,
-    rgba(10, 37, 64, 0.02) 50%,
-    rgba(10, 37, 64, 0.15) 100%
+    rgba(10, 37, 64, 0.82) 0%,
+    rgba(10, 37, 64, 0.35) 45%,
+    rgba(10, 37, 64, 0.35) 55%,
+    rgba(10, 37, 64, 0.82) 100%
   );
   pointer-events: none;
 }
 
 .central-landing-hero__content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: 100%;
   height: 100%;
   display: flex;
@@ -500,7 +552,7 @@ const slugify = (str) =>
     left: 0;
     right: 0;
     transform: translateY(-50%);
-    z-index: 2;
+    z-index: 3;
     pointer-events: none;
   }
   .central-landing-form-outer .central-landing-hero__container,

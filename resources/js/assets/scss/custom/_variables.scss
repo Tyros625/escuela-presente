@@ -25,20 +25,28 @@ $border-radius-pill: 9999px !default;
 
 // Typography
 $headings-color: #0a2540 !default;
-$font-size-base: 0.9375rem !default;
+$font-size-base: 1rem !default;
+$font-size-sm: 0.9375rem !default;
+$font-weight-normal: 500 !default;
+$font-weight-medium: 600 !default;
+$font-weight-semibold: 700 !default;
+$font-weight-bold: 700 !default;
 
 // Forms
-$input-border-color: #e6ebf1 !default;
+$input-border-color: #d8dee9 !default;
 $input-bg: #ffffff !default;
 $input-focus-border-color: #635bff !default;
 $input-focus-box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.18) !default;
-$input-padding-y: 0.625rem !default;
-$input-padding-x: 0.875rem !default;
+$input-padding-y: 0.6875rem !default;
+$input-padding-x: 0.9375rem !default;
+$input-font-size: 0.9375rem !default;
+$input-font-weight: 500 !default;
+$input-line-height: 1.5 !default;
 
 // Buttons
-$btn-padding-y: 0.5625rem !default;
-$btn-padding-x: 1rem !default;
-$btn-font-weight: 500 !default;
+$btn-padding-y: 0.625rem !default;
+$btn-padding-x: 1.125rem !default;
+$btn-font-weight: 600 !default;
 $btn-border-radius: 0.5rem !default;
 $btn-box-shadow: none !default;
 $btn-focus-box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.25) !default;
