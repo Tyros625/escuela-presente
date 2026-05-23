@@ -15,7 +15,7 @@ export const useTemplateStore = defineStore({
     layout: {
       header: true,
       sidebar: true,
-      sideOverlay: true,
+      sideOverlay: false,
       footer: true,
     },
 
@@ -27,7 +27,7 @@ export const useTemplateStore = defineStore({
       darkModeSystem: false,
       sidebarLeft: true,
       sidebarMini: false,
-      sidebarDark: true,
+      sidebarDark: false,
       sidebarVisibleDesktop: true,
       sidebarVisibleMobile: false,
       sideOverlayVisible: false,

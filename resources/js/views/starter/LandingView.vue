@@ -21,8 +21,7 @@
           </p>
           <RouterLink
             :to="{ name: 'dashboard' }"
-            class="btn landing-hero__cta px-4 py-3"
-            v-click-ripple
+            class="btn btn-primary landing-hero__cta px-4 py-3"
           >
             Ingresar
             <i class="fa fa-fw fa-arrow-right ms-2"></i>
@@ -40,10 +39,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("/assets/fonts/image/landing-back.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(99, 91, 255, 0.35), transparent 42%),
+    radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.18), transparent 35%),
+    linear-gradient(135deg, #0a2540 0%, #1a365d 48%, #243b53 100%);
 }
 
 .landing-hero__overlay {

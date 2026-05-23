@@ -1,5 +1,4 @@
 <script setup>
-// Component properties
 defineProps({
   title: {
     type: String,
@@ -13,18 +12,18 @@ defineProps({
 </script>
 
 <template>
-  <div class="bg-body-light">
+  <div class="ep-page-heading">
     <div class="content content-full">
       <slot>
-        <div v-if="title || $slots.extra"
-          class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+        <div
+          v-if="title || $slots.extra"
+          class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-3"
+        >
           <div class="flex-grow-1">
-            <h1 v-if="title" class="h3 fw-bold mb-2">{{ title }}</h1>
-            <h2 v-if="subtitle" class="fs-base lh-base fw-medium text-muted mb-0">
-              {{ subtitle }}
-            </h2>
+            <h1 v-if="title" class="ep-page-title">{{ title }}</h1>
+            <p v-if="subtitle" class="ep-page-subtitle">{{ subtitle }}</p>
           </div>
-          <div v-if="$slots.extra" class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3">
+          <div v-if="$slots.extra" class="flex-shrink-0 d-flex flex-wrap gap-2">
             <slot name="extra"></slot>
           </div>
         </div>

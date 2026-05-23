@@ -1,11 +1,70 @@
 //
-// Custom Variables
-//
-// Here you can add your own variables overrides
-//
-// The file is included before any other variable file,
-// so you can override them because they all use !default
+// EscuelaPresente — Stripe-inspired design tokens
 // --------------------------------------------------
 
-// For example, changing the primary color
-// $primary: #a48ad4;
+// Brand
+$primary: #635bff !default;
+$secondary: #697386 !default;
+$success: #09825d !default;
+$info: #0073e6 !default;
+$warning: #c87800 !default;
+$danger: #df1b41 !default;
+$light: #f6f9fc !default;
+$dark: #0a2540 !default;
+
+// Surfaces
+$body-bg: #f6f9fc !default;
+$body-color: #425466 !default;
+
+// Radii
+$border-radius: 0.5rem !default;
+$border-radius-sm: 0.375rem !default;
+$border-radius-lg: 0.75rem !default;
+$border-radius-xl: 1rem !default;
+$border-radius-pill: 9999px !default;
+
+// Typography
+$headings-color: #0a2540 !default;
+$font-size-base: 0.9375rem !default;
+
+// Forms
+$input-border-color: #e6ebf1 !default;
+$input-bg: #ffffff !default;
+$input-focus-border-color: #635bff !default;
+$input-focus-box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.18) !default;
+$input-padding-y: 0.625rem !default;
+$input-padding-x: 0.875rem !default;
+
+// Buttons
+$btn-padding-y: 0.5625rem !default;
+$btn-padding-x: 1rem !default;
+$btn-font-weight: 500 !default;
+$btn-border-radius: 0.5rem !default;
+$btn-box-shadow: none !default;
+$btn-focus-box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.25) !default;
+
+// Cards / blocks
+$card-border-width: 1px !default;
+$card-border-color: #e6ebf1 !default;
+$card-border-radius: 0.75rem !default;
+$card-box-shadow: 0 1px 2px rgba(10, 37, 64, 0.04), 0 1px 3px rgba(10, 37, 64, 0.06) !default;
+
+// Sidebar — light modern shell
+$sidebar-bg: #ffffff !default;
+$sidebar-dark-bg: #ffffff !default;
+$sidebar-width: 260px !default;
+
+// Header
+$header-bg: rgba(255, 255, 255, 0.92) !default;
+$header-height: 4rem !default;
+
+// Tables
+$table-border-color: #e6ebf1 !default;
+$table-striped-bg: rgba(246, 249, 252, 0.65) !default;
+$table-hover-bg: rgba(99, 91, 255, 0.04) !default;
+
+// Badges
+$badge-font-weight: 500 !default;
+$badge-border-radius: 9999px !default;
+$badge-padding-y: 0.35em !default;
+$badge-padding-x: 0.65em !default;

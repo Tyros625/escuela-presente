@@ -45,9 +45,9 @@
       <!-- END Side Header -->
 
       <!-- User info (wireframe) -->
-      <div v-if="userStore.isLoggedIn" class="content-side-content px-3 py-3 border-bottom border-sidebar">
-        <div class="fw-semibold text-dual smini-hide">{{ userDisplayName }}</div>
-        <span class="badge smini-hide mt-1" :class="roleBadgeClass">{{ roleLabel }}</span>
+      <div v-if="userStore.isLoggedIn" class="content-side-content px-3 py-3 border-bottom">
+        <div class="fw-semibold text-dual smini-hide fs-sm">{{ userDisplayName }}</div>
+        <span class="ep-role-badge smini-hide mt-2">{{ roleLabel }}</span>
       </div>
       <!-- END User info -->
 
@@ -99,15 +99,6 @@ const roleLabel = computed(() => {
     Usuario: "Usuario",
   };
   return map[r] || r;
-});
-
-const roleBadgeClass = computed(() => {
-  const r = String(userStore.getUser?.role || "").toLowerCase();
-  if (r === "administrador" || r === "admin" || r === "super admin") return "bg-warning text-dark";
-  if (r === "docente") return "bg-info";
-  if (r === "estudiante") return "bg-primary";
-  if (r === "padre/tutor" || r === "padre") return "bg-pink";
-  return "bg-secondary";
 });
 
 // Dark Mode preference helper for radios

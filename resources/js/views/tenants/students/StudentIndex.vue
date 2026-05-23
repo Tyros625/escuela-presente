@@ -2,21 +2,19 @@
 	<!-- <BasePageHeading title="Estudiantes" /> -->
 	<BasePageHeading title="Estudiantes">
 		<template #extra>
-			<div class="btn-group" role="group">
-				<button
-					type="button"
-					class="btn btn-success"
-					data-bs-toggle="modal"
-					data-bs-target="#exampleModal"
-				>
-					<i class="fa-solid fa-file-excel"></i> Importar
-				</button>
-				<router-link :to="{ name: `students.add` }">
-					<button type="button" class="btn btn-alt-primary" v-click-ripple>
-						<i class="fa fa-plus opacity-50 me-1"></i> Agregar
-					</button>
-				</router-link>
-			</div>
+			<button
+				type="button"
+				class="btn btn-outline-success btn-sm"
+				data-bs-toggle="modal"
+				data-bs-target="#exampleModal"
+			>
+				<i class="fa-solid fa-file-excel me-1"></i>
+				Importar
+			</button>
+			<router-link :to="{ name: `students.add` }" class="btn btn-primary btn-sm">
+				<i class="fa fa-plus me-1"></i>
+				Agregar estudiante
+			</router-link>
 		</template>
 	</BasePageHeading>
 
@@ -57,9 +55,9 @@
 					</div>
 
 					<div class="col-md-12 mt-3">
-						<button type="sucess" class="btn btn-primary" :disabled="isLoading">
-							<i class="fa fa-cog fa-spin" v-if="isLoading"></i>
-							<i class="fa-solid fa-magnifying-glass" v-else></i>
+						<button type="submit" class="btn btn-primary btn-sm" :disabled="isLoading">
+							<i class="fa fa-cog fa-spin me-1" v-if="isLoading"></i>
+							<i class="fa-solid fa-magnifying-glass me-1" v-else></i>
 							Consultar
 						</button>
 					</div>

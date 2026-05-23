@@ -405,21 +405,27 @@ async function uploadFile() {
 		</div>
 		<div class="col-md-6 mb-4">
 			<label class="form-label">Fotografía</label>
-			<input class="form-control" type="file" accept="image/*" @change="onChangeFile" />
-		</div>
-		<div class="col-md-2 mb-4">
-			<LoaderView v-if="studentStore.isLoading" />
-			<div v-else>
+			<div class="ep-file-upload">
+				<div class="ep-file-upload__control">
+					<input
+						class="form-control"
+						type="file"
+						accept="image/*"
+						@change="onChangeFile"
+					/>
+					<div class="form-text">JPG o PNG, máximo 2 MB recomendado.</div>
+				</div>
+				<LoaderView v-if="studentStore.isLoading" />
 				<img
-					v-if="studentStore.form.photo"
+					v-else-if="studentStore.form.photo"
 					:src="studentStore.form.photo"
-					style="max-width: 100%"
+					class="ep-photo-preview"
+					alt="Fotografía del estudiante"
+					loading="lazy"
 				/>
-				<img
-					v-else
-					style="max-width: 100%"
-					:src="'https://thumbs.dreamstime.com/b/no-image-available-icon-flat-vector-no-image-available-icon-flat-vector-illustration-132482953.jpg'"
-				/>
+				<div v-else class="ep-photo-placeholder" aria-hidden="true">
+					<i class="fa-regular fa-user"></i>
+				</div>
 			</div>
 		</div>
 	</div>

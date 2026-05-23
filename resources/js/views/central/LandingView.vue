@@ -291,7 +291,10 @@ const slugify = (str) =>
   min-height: 100vh;
   display: flex;
   align-items: center;
-  background-image: url("/assets/fonts/image/landing-back.png");
+  background:
+    radial-gradient(circle at 20% 20%, rgba(99, 91, 255, 0.35), transparent 42%),
+    radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.18), transparent 35%),
+    linear-gradient(135deg, #0a2540 0%, #1a365d 48%, #243b53 100%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -313,10 +316,9 @@ const slugify = (str) =>
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(15, 23, 42, 0.88) 0%,
-    rgba(30, 41, 59, 0.15) 45%,
-    rgba(30, 41, 59, 0.15) 55%,
-    rgba(15, 23, 42, 0.88) 100%
+    rgba(10, 37, 64, 0.15) 0%,
+    rgba(10, 37, 64, 0.02) 50%,
+    rgba(10, 37, 64, 0.15) 100%
   );
   pointer-events: none;
 }
@@ -353,44 +355,35 @@ const slugify = (str) =>
   font-size: 0.875rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 9999px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-   -webkit-text-stroke: 1px #0ea5e9;
-  paint-order: stroke fill;
 }
 
 .central-landing-hero__title {
   font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
-  letter-spacing: -0.025em;
-  line-height: 1.25;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   max-width: 100%;
-  -webkit-text-stroke: 1px #0ea5e9;
-  paint-order: stroke fill;
 }
 
 .central-landing-hero__subtitle {
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
-  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  color: rgba(255, 255, 255, 0.82);
   line-height: 1.65;
   max-width: 100%;
   margin: 0;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-  -webkit-text-stroke: 1px #22b8f3;
-  paint-order: stroke fill;
 }
 
 /* Compact form card on the side */
 .central-landing-form-card {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(20px);
-  border-radius: 1.5rem;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.25);
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 18px 45px rgba(10, 37, 64, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.65);
   overflow: hidden;
   max-width: 100%;
   margin: 0 auto;
@@ -399,23 +392,22 @@ const slugify = (str) =>
 
 .central-landing-form-card__header {
   padding: 1.25rem 1.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #e6ebf1;
+  background: #ffffff;
 }
 
 .central-landing-form-card__title {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: 600;
+  color: #0a2540;
   margin: 0 0 0.25rem 0;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.02em;
 }
 
 .central-landing-form-card__subtitle {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: #697386;
   margin: 0;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .central-landing-form-card__body {
@@ -429,12 +421,12 @@ const slugify = (str) =>
 .central-landing-form__field .form-control,
 .central-landing-form__field .form-select {
   border-radius: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e6ebf1;
+  background: #ffffff;
   font-size: 0.95rem;
   padding: 1.5rem 0.875rem 0.5rem;
   min-height: 3.5rem;
-  color: #1e293b;
+  color: #0a2540;
 }
 
 .central-landing-form__field label {
@@ -457,9 +449,9 @@ const slugify = (str) =>
 
 .central-landing-form__field .form-control:focus,
 .central-landing-form__field .form-select:focus {
-  border-color: #0ea5e9;
+  border-color: #635bff;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25);
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.18);
 }
 
 .central-landing-form__field .form-select {
@@ -476,29 +468,27 @@ const slugify = (str) =>
 .central-landing-form__submit {
   width: 100%;
   margin-top: 0.75rem;
-  padding: 0.7rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   font-weight: 600;
   font-size: 1rem;
-  background: #0369a1;
+  background: #635bff;
   border: none;
   border-radius: 0.5rem;
   color: #fff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.5);
-  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: none;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
 .central-landing-form__submit:hover:not(:disabled) {
-  background: #0284c7;
+  background: #5851ea;
   color: #fff !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.55);
 }
 
 .central-landing-form__submit:disabled {
-  opacity: 0.7;
+  opacity: 0.55;
   cursor: not-allowed;
-  background: #64748b;
+  background: #a3acb9;
   color: #fff !important;
 }
 

@@ -1,11 +1,9 @@
 <template>
 	<BasePageHeading title="Estudiantes">
 		<template #extra>
-			<router-link :to="{ name: 'students' }">
-				<button type="button" class="btn btn-alt-primary" v-click-ripple>
-					<i class="fa fa-arrow-left-long opacity-50 me-1"></i>
-					Regresar
-				</button>
+			<router-link :to="{ name: 'students' }" class="btn btn-secondary btn-sm">
+				<i class="fa fa-arrow-left-long me-1"></i>
+				Regresar
 			</router-link>
 		</template>
 	</BasePageHeading>
