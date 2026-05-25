@@ -312,8 +312,10 @@ class Student extends Model
 
     public function scopeName($query, $name): mixed
     {
-        return $query->where('name', 'like', '%'.$name.'%')
-            ->orWhere('last_name_father', 'like', '%'.$name.'%')
-            ->orWhere('last_name_mother', 'like', '%'.$name.'%');
+        return $query->where(function ($q) use ($name) {
+            $q->where('name', 'like', '%'.$name.'%')
+                ->orWhere('last_name_father', 'like', '%'.$name.'%')
+                ->orWhere('last_name_mother', 'like', '%'.$name.'%');
+        });
     }
 }

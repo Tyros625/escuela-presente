@@ -68,19 +68,24 @@ class AssistAPIController extends AppBaseController
         $student = Student::where('enrollment', $enrollment)->first();
 
         if (empty($student)) {
-            return $this->sendError('Student not found');
+            return $this->sendError('Estudiante no encontrado');
         }
 
-        $assists = Assist::where('student_id', $student->id)
+        $alreadyRegistered = Assist::where('student_id', $student->id)
             ->whereDate('created_at', Carbon::today())
-            ->get();
+            ->exists();
 
-        if ($assists->toArray()) {
+        if ($alreadyRegistered) {
             return $this->sendError('Ya ha registrado asistencia el día de hoy');
         }
 
         $assist = Assist::create([
             'student_id' => $student->id,
+        ]);
+
+        $assist->load([
+            'student.academicGroup.grade',
+            'student.academicGroup.section',
         ]);
 
         return $this->sendResponse(new AssistResource($assist), 'Assist saved successfully');

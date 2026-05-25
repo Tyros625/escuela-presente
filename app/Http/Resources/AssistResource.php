@@ -11,8 +11,8 @@ class AssistResource extends JsonResource
         return [
             'id' => $this->id,
             'student_id' => $this->student_id,
-            'grade' => $this->student->academicGroup->grade->description,
-            'group' => $this->student->academicGroup->section->description,
+            'grade' => $this->student->academicGroup->grade->description ?? null,
+            'group' => $this->student->academicGroup->section->description ?? null,
             'student' => new StudentResource($this->student),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
