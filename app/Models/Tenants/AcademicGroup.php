@@ -3,6 +3,7 @@
 namespace App\Models\Tenants;
 
 use App\Casts\ActualTimeZone;
+use App\Services\AcademicGroupColorService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,7 @@ class AcademicGroup extends Model
 
     public $fillable = [
         'name',
+        'color',
         'grade_id',
         'section_id',
         'school_cycle_id',
@@ -28,8 +30,21 @@ class AcademicGroup extends Model
         'subjects' => 'array',
     ];
 
+    public static function booted(): void
+    {
+        static::saving(function (AcademicGroup $group) {
+            if ($group->isDirty(['grade_id', 'section_id', 'name']) || empty($group->color)) {
+                $resolved = AcademicGroupColorService::resolveForGroup($group);
+                if ($resolved !== null) {
+                    $group->color = $resolved;
+                }
+            }
+        });
+    }
+
     public static $rules = [
         'name' => 'required|string|max:255',
+        'color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
         'grade_id' => 'required',
         'section_id' => 'nullable|exists:sections,id',
         'school_cycle_id' => 'required',

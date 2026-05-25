@@ -1,5 +1,8 @@
 <template>
-	<BasePageHeading title="Asignación de materias" subtitle="Docentes — carga por grupo y horario">
+	<BasePageHeading
+		title="Vista previa de horario"
+		subtitle="Asignaciones guardadas — revise, edite o genere el reporte PDF"
+	>
 		<template #extra>
 			<button
 				type="button"
@@ -129,6 +132,18 @@
 						</tbody>
 					</table>
 				</div>
+
+				<div class="d-flex justify-content-end pt-4 border-top mt-2">
+					<button
+						type="button"
+						class="btn btn-primary"
+						:disabled="isLoadingList || isExportingPdf"
+						@click="openSchedulePreviewPdf"
+					>
+						<i class="fa-solid fa-table" :class="{ 'fa-spin': isExportingPdf }"></i>
+						Schedule Preview
+					</button>
+				</div>
 			</div>
 
 			<!-- Manual -->
@@ -256,6 +271,7 @@ const activeTab = ref('list');
 const searchQuery = ref('');
 const isLoadingList = ref(false);
 const isSaving = ref(false);
+const isExportingPdf = ref(false);
 const editingId = ref(null);
 
 const assignments = ref([]);
@@ -414,6 +430,30 @@ function showSaveError(err) {
 	const text =
 		typeof msg === 'string' ? msg : 'No se pudo guardar. Revise disponibilidad, horas y conflictos de horario.';
 	Swal.fire({ icon: 'error', title: 'No se puede guardar', text });
+}
+
+async function openSchedulePreviewPdf() {
+	isExportingPdf.value = true;
+	try {
+		const res = await api.get('/teaching-assignments/schedule-preview/pdf', {
+			params: { shift: 'morning' },
+			responseType: 'blob',
+			headers: { Accept: 'application/pdf' },
+		});
+
+		const blob = new Blob([res.data], { type: 'application/pdf' });
+		const url = URL.createObjectURL(blob);
+		window.open(url, '_blank');
+		setTimeout(() => URL.revokeObjectURL(url), 60_000);
+	} catch {
+		Swal.fire({
+			icon: 'error',
+			title: 'No se pudo generar el PDF',
+			text: 'Verifique que existan asignaciones activas en turno matutino.',
+		});
+	} finally {
+		isExportingPdf.value = false;
+	}
 }
 
 function confirmRemove(a) {

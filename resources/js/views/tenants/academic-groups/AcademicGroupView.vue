@@ -45,6 +45,7 @@
 						<tr class="text-uppercase fs-xs">
 							<th>Grupo</th>
 							<th>Grado</th>
+							<th class="text-center">Color</th>
 							<th>Turno</th>
 							<th class="text-center">Alumnos</th>
 							<th class="text-center">Materias</th>
@@ -57,6 +58,19 @@
 						<tr v-for="g in filteredGroups" :key="g.id">
 							<td class="fw-semibold">{{ g.name || g.group_label }}</td>
 							<td>{{ g.grade }}</td>
+							<td class="text-center">
+								<span
+									v-if="g.color"
+									class="d-inline-block rounded border"
+									:title="g.color"
+									:style="{
+										width: '22px',
+										height: '22px',
+										backgroundColor: g.color,
+									}"
+								></span>
+								<span v-else class="text-muted">—</span>
+							</td>
 							<td>
 								<span
 									:class="[
@@ -115,7 +129,7 @@
 							</td>
 						</tr>
 						<tr v-if="!filteredGroups.length">
-							<td colspan="8" class="text-center text-muted py-5">
+							<td colspan="9" class="text-center text-muted py-5">
 								<i class="fa-solid fa-folder-open fa-2x d-block mb-2 opacity-50"></i>
 								Sin grupos registrados
 							</td>
@@ -174,6 +188,29 @@
 										{{ g.description }}
 									</option>
 								</select>
+							</div>
+
+							<div class="col-md-6">
+								<label class="form-label fw-semibold">Sección (cluster)</label>
+								<select class="form-select" v-model="form.section_id" :disabled="isSaving">
+									<option value="">Sin sección</option>
+									<option v-for="s in sections" :key="s.id" :value="s.id">
+										{{ s.description }}
+									</option>
+								</select>
+							</div>
+							<div class="col-md-6 d-flex align-items-end">
+								<div v-if="previewColor" class="d-flex align-items-center gap-2 pb-1">
+									<span
+										class="d-inline-block rounded border"
+										:style="{
+											width: '28px',
+											height: '28px',
+											backgroundColor: previewColor,
+										}"
+									></span>
+									<span class="text-muted fs-sm">Color por defecto: {{ previewColor }}</span>
+								</div>
 							</div>
 
 							<!-- Turno + Capacidad -->
@@ -267,8 +304,15 @@
 import api from '@/services/api';
 import Swal from 'sweetalert2';
 
+const GROUP_COLORS = {
+	1: { A: '#00FFFF', B: '#FFE4C4', C: '#8A2BE2', D: '#7FFF00', E: '#008B8B', F: '#A9A9A9' },
+	2: { A: '#008000', B: '#A52A2A', C: '#D2691E', D: '#BC8F8F', E: '#B8860B', F: '#BDB76B' },
+	3: { A: '#DEB887', B: '#FF7F50', C: '#6495ED', D: '#87CEFA', E: '#20B2AA', F: '#FFC0CB' },
+};
+
 const groups = ref([]);
 const grades = ref([]);
+const sections = ref([]);
 const schoolCycles = ref([]);
 const selectedSchoolCycleId = ref(null);
 
@@ -279,12 +323,41 @@ const isSaving = ref(false);
 const form = reactive({
 	name: '',
 	grade_id: '',
+	section_id: '',
 	school_cycle_id: '',
 	shift: 'morning',
 	student_limit: 40,
 	room_name: '',
 	subjects_count: 8,
 });
+
+const previewColor = computed(() => resolvePreviewColor());
+
+function resolveDegreeFromGradeId(gradeId) {
+	const g = grades.value.find((x) => x.id === gradeId);
+	if (!g) return null;
+	const order = Number(g.order);
+	if (order >= 1 && order <= 3) return order;
+	const parsed = parseInt(String(g.description || '').replace(/\D/g, ''), 10);
+	return parsed >= 1 && parsed <= 3 ? parsed : null;
+}
+
+function resolveClusterLetter() {
+	const section = sections.value.find((s) => s.id === form.section_id);
+	if (section?.description) {
+		const letter = String(section.description).trim().toUpperCase();
+		if (letter.length === 1 && letter >= 'A' && letter <= 'F') return letter;
+	}
+	const match = String(form.name || '').match(/(\d)\s*[°º]?\s*([A-F])/i);
+	return match ? match[2].toUpperCase() : null;
+}
+
+function resolvePreviewColor() {
+	const degree = resolveDegreeFromGradeId(form.grade_id);
+	const cluster = resolveClusterLetter();
+	if (!degree || !cluster) return null;
+	return GROUP_COLORS[degree]?.[cluster] ?? null;
+}
 
 const selectedCycleName = computed(() => {
 	if (!selectedSchoolCycleId.value) return '';
@@ -312,12 +385,14 @@ function coverageTextClass(p) {
 }
 
 async function fetchLists() {
-	const [g, c] = await Promise.all([
+	const [g, c, s] = await Promise.all([
 		api.get('/lists/grades'),
 		api.get('/lists/school-cycles'),
+		api.get('/sections'),
 	]);
 	grades.value = g.data;
 	schoolCycles.value = c.data;
+	sections.value = s.data?.data || s.data || [];
 }
 
 async function fetchGroups() {
@@ -329,6 +404,7 @@ function resetForm() {
 	Object.assign(form, {
 		name: '',
 		grade_id: '',
+		section_id: '',
 		school_cycle_id: selectedSchoolCycleId.value || '',
 		shift: 'morning',
 		student_limit: 40,
@@ -350,6 +426,7 @@ function openEditModal(g) {
 	Object.assign(form, {
 		name: g.name || g.group_label || '',
 		grade_id: g.grade_id,
+		section_id: g.section_id || '',
 		school_cycle_id: g.school_cycle_id,
 		shift: g.shift || 'morning',
 		student_limit: g.student_limit || 40,
@@ -380,7 +457,7 @@ async function onSubmit() {
 		const payload = {
 			name: form.name,
 			grade_id: form.grade_id,
-			section_id: null,
+			section_id: form.section_id || null,
 			school_cycle_id: form.school_cycle_id,
 			shift: form.shift,
 			room_name: form.room_name || null,

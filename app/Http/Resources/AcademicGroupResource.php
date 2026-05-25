@@ -19,6 +19,7 @@ class AcademicGroupResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'color' => $this->color,
             'grade_id' => $this->grade_id,
             'grade' => $gradeDescription,
             'section_id' => $this->section_id,

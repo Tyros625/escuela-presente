@@ -8,8 +8,12 @@ use App\Http\Resources\TeachingAssignmentResource;
 use App\Models\Tenants\AcademicGroup;
 use App\Models\Tenants\Teacher;
 use App\Models\Tenants\TeachingAssignment;
+use App\Services\ScheduleReportService;
 use App\Services\TeachingAssignmentValidator;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TeachingAssignmentAPIController extends AppBaseController
 {
@@ -124,5 +128,23 @@ class TeachingAssignmentAPIController extends AppBaseController
         $assignment->delete();
 
         return $this->sendSuccess('Asignación eliminada');
+    }
+
+    public function schedulePreviewPdf(Request $request, ScheduleReportService $reportService): Response
+    {
+        $shift = $request->get('shift', 'morning');
+        if (! in_array($shift, ['morning', 'afternoon'], true)) {
+            $shift = 'morning';
+        }
+
+        $data = $reportService->build($shift);
+
+        $pdf = Pdf::loadView('teaching-schedule-report', $data)
+            ->setPaper('legal', 'landscape');
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="horario-docentes.pdf"',
+        ]);
     }
 }

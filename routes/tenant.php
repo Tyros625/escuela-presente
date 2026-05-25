@@ -147,6 +147,7 @@ Route::prefix('api')->middleware([
             Route::post('teachers/import', [TeacherAPIController::class, 'import']);
 
             Route::get('teaching-assignments', [TeachingAssignmentAPIController::class, 'index']);
+            Route::get('teaching-assignments/schedule-preview/pdf', [TeachingAssignmentAPIController::class, 'schedulePreviewPdf']);
             Route::post('teaching-assignments', [TeachingAssignmentAPIController::class, 'store']);
             Route::put('teaching-assignments/{id}', [TeachingAssignmentAPIController::class, 'update']);
             Route::delete('teaching-assignments/{id}', [TeachingAssignmentAPIController::class, 'destroy']);
