@@ -45,7 +45,7 @@
 
 			<!-- Lista -->
 			<div v-show="activeTab === 'list'" class="pt-4">
-				<div class="row g-3 mb-4">
+				<div class="row g-3 mb-4 align-items-center">
 					<div class="col-md-6">
 						<div class="input-group">
 							<span class="input-group-text bg-body border-end-0">
@@ -59,11 +59,22 @@
 							/>
 						</div>
 					</div>
-					<div class="col-md-6 text-md-end">
-						<span class="badge bg-success-subtle text-success me-2">
-							<i class="fa-solid fa-check me-1"></i>
-							{{ filteredAssignments.length }} activas
-						</span>
+					<div class="col-md-6">
+						<div class="d-flex flex-wrap justify-content-md-end align-items-center gap-2">
+							<span class="badge bg-success-subtle text-success">
+								<i class="fa-solid fa-check me-1"></i>
+								{{ filteredAssignments.length }} activas
+							</span>
+							<button
+								type="button"
+								class="btn btn-primary"
+								:disabled="isLoadingList || isExportingPdf"
+								@click="openSchedulePreviewPdf"
+							>
+								<i class="fa-solid fa-table" :class="{ 'fa-spin': isExportingPdf }"></i>
+								Schedule Preview
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -131,18 +142,6 @@
 							</tr>
 						</tbody>
 					</table>
-				</div>
-
-				<div class="d-flex justify-content-end pt-4 border-top mt-2">
-					<button
-						type="button"
-						class="btn btn-primary"
-						:disabled="isLoadingList || isExportingPdf"
-						@click="openSchedulePreviewPdf"
-					>
-						<i class="fa-solid fa-table" :class="{ 'fa-spin': isExportingPdf }"></i>
-						Schedule Preview
-					</button>
 				</div>
 			</div>
 

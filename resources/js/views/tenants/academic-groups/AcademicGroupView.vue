@@ -335,7 +335,12 @@ const previewColor = computed(() => resolvePreviewColor());
 
 function parseDegreeClusterFromText(text) {
 	const trimmed = String(text || '').trim().toUpperCase();
-	const m = trimmed.match(/^(\d)\s*[°º]?\s*([A-F])\b/);
+	let m = trimmed.match(/^(\d)([A-F])(?=$|[^A-Z0-9])/);
+	if (m) {
+		const degree = parseInt(m[1], 10);
+		if (degree >= 1 && degree <= 3) return { degree, cluster: m[2] };
+	}
+	m = trimmed.match(/^(\d)\s*[°º]?\s*([A-F])(?=$|\s|[^A-Z0-9])/);
 	if (!m) return null;
 	const degree = parseInt(m[1], 10);
 	if (degree < 1 || degree > 3) return null;

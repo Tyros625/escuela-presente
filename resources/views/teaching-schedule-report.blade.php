@@ -45,8 +45,8 @@
             font-size: 6px;
         }
         .col-num { width: 14px; }
-        .col-teacher { width: 95px; text-align: left !important; font-size: 6px; }
-        .col-subject { width: 48px; text-align: left !important; font-size: 6px; }
+        .col-teacher { width: 130px; text-align: left !important; font-size: 7px; padding-left: 3px !important; }
+        .col-subject { width: 72px; text-align: left !important; font-size: 7px; padding-left: 3px !important; }
         .slot-head { font-size: 5px; line-height: 1.1; }
         .cell-filled {
             font-weight: bold;

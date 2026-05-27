@@ -105,6 +105,8 @@ class AcademicGroupColorService
     }
 
     /**
+     * Parses group codes like "1C", "1 C", "3C", "1°A" from the start of a label.
+     *
      * @return array{0: int, 1: string}|null
      */
     public static function parseDegreeClusterFromText(?string $text): ?array
@@ -115,7 +117,16 @@ class AcademicGroupColorService
 
         $trimmed = strtoupper(trim($text));
 
-        if (preg_match('/^(\d)\s*[°º]?\s*([A-F])\b/u', $trimmed, $m)) {
+        // Compact: 1C, 3C (no space between digit and letter — \b would fail here)
+        if (preg_match('/^(\d)([A-F])(?=$|[^A-Z0-9])/u', $trimmed, $m)) {
+            $degree = (int) $m[1];
+            if ($degree >= 1 && $degree <= 3) {
+                return [$degree, $m[2]];
+            }
+        }
+
+        // Spaced: "1 C", "1°A", "3 C"
+        if (preg_match('/^(\d)\s*[°º]?\s*([A-F])(?=$|\s|[^A-Z0-9])/u', $trimmed, $m)) {
             $degree = (int) $m[1];
             if ($degree >= 1 && $degree <= 3) {
                 return [$degree, $m[2]];

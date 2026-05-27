@@ -93,14 +93,21 @@ class ScheduleReportService
                 ];
             }
 
-            $generalSubject = $teacher->subject?->description
-                ?? $teacherAssignments->first()?->specialty?->description
+            /** @var TeachingAssignment $firstAssignment */
+            $firstAssignment = $teacherAssignments->sortBy('id')->first();
+
+            $generalSubject = $firstAssignment->specialty?->description
+                ?? $teacher->subject?->description
                 ?? '—';
+
+            $subjectOrder = (int) ($teacherAssignments
+                ->min(fn (TeachingAssignment $a) => $a->specialty_id) ?? $teacher->subject_id ?? PHP_INT_MAX);
 
             $rows[] = [
                 'teacher_name' => $teacher->name,
                 'subject_name' => $generalSubject,
-                'subject_order' => (int) ($teacher->subject_id ?? PHP_INT_MAX),
+                'subject_order' => $subjectOrder,
+                'teacher_order' => (int) ($teacherAssignments->min('id') ?? PHP_INT_MAX),
                 'cells' => $cells,
             ];
         }
@@ -111,12 +118,12 @@ class ScheduleReportService
                 return $bySubject;
             }
 
-            return strcasecmp($a['teacher_name'], $b['teacher_name']);
+            return $a['teacher_order'] <=> $b['teacher_order'];
         });
 
         foreach ($rows as $index => &$row) {
             $row['number'] = $index + 1;
-            unset($row['subject_order']);
+            unset($row['subject_order'], $row['teacher_order']);
         }
         unset($row);
 

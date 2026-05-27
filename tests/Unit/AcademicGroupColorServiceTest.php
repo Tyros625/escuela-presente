@@ -108,5 +108,23 @@ class AcademicGroupColorServiceTest extends TestCase
 
         $this->assertSame([3, 'C'], $parsed);
     }
+
+    public function test_parse_compact_group_code_without_space(): void
+    {
+        $this->assertSame([1, 'C'], AcademicGroupColorService::parseDegreeClusterFromText('1C'));
+        $this->assertSame([1, 'C'], AcademicGroupColorService::parseDegreeClusterFromText('1C PRIMERO C'));
+    }
+
+    public function test_one_c_group_gets_purple_not_three_c_blue_when_grade_section_wrong(): void
+    {
+        $grade = new Grade(['description' => 'TERCERO', 'order' => 3]);
+        $section = new Section(['description' => '3 C']);
+        $group = new AcademicGroup(['name' => '1C PRIMERO C']);
+        $group->setRelation('grade', $grade);
+        $group->setRelation('section', $section);
+
+        $this->assertSame('#8A2BE2', AcademicGroupColorService::resolveForGroup($group));
+        $this->assertNotSame('#6495ED', AcademicGroupColorService::resolveForGroup($group));
+    }
 }
 

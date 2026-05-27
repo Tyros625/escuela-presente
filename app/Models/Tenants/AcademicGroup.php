@@ -4,6 +4,7 @@ namespace App\Models\Tenants;
 
 use App\Casts\ActualTimeZone;
 use App\Services\AcademicGroupColorService;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,12 +34,19 @@ class AcademicGroup extends Model
     public static function booted(): void
     {
         static::saving(function (AcademicGroup $group) {
-            if ($group->isDirty(['grade_id', 'section_id', 'name']) || empty($group->color)) {
-                $resolved = AcademicGroupColorService::resolveForGroup($group);
-                if ($resolved !== null) {
-                    $group->color = $resolved;
-                }
+            $resolved = AcademicGroupColorService::resolveForGroup($group);
+            if ($resolved !== null) {
+                $group->attributes['color'] = $resolved;
             }
+        });
+    }
+
+    protected function color(): Attribute
+    {
+        return Attribute::get(function (?string $value) {
+            $resolved = AcademicGroupColorService::resolveForGroup($this);
+
+            return $resolved ?? $value;
         });
     }
 
