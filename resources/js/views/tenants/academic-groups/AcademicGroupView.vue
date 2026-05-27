@@ -333,6 +333,15 @@ const form = reactive({
 
 const previewColor = computed(() => resolvePreviewColor());
 
+function parseDegreeClusterFromText(text) {
+	const trimmed = String(text || '').trim().toUpperCase();
+	const m = trimmed.match(/^(\d)\s*[°º]?\s*([A-F])\b/);
+	if (!m) return null;
+	const degree = parseInt(m[1], 10);
+	if (degree < 1 || degree > 3) return null;
+	return { degree, cluster: m[2] };
+}
+
 function resolveDegreeFromGradeId(gradeId) {
 	const g = grades.value.find((x) => x.id === gradeId);
 	if (!g) return null;
@@ -342,21 +351,66 @@ function resolveDegreeFromGradeId(gradeId) {
 	return parsed >= 1 && parsed <= 3 ? parsed : null;
 }
 
-function resolveClusterLetter() {
+function resolveClusterLetterFallback() {
 	const section = sections.value.find((s) => s.id === form.section_id);
 	if (section?.description) {
+		const fromSection = parseDegreeClusterFromText(section.description);
+		if (fromSection) return fromSection.cluster;
 		const letter = String(section.description).trim().toUpperCase();
 		if (letter.length === 1 && letter >= 'A' && letter <= 'F') return letter;
+		const m = letter.match(/\b([A-F])\b/);
+		if (m) return m[1];
 	}
+	const fromName = parseDegreeClusterFromText(form.name);
+	if (fromName) return fromName.cluster;
 	const match = String(form.name || '').match(/(\d)\s*[°º]?\s*([A-F])/i);
 	return match ? match[2].toUpperCase() : null;
 }
 
-function resolvePreviewColor() {
+function resolveDegreeClusterForPreview() {
+	const fromName = parseDegreeClusterFromText(form.name);
+	if (fromName) return fromName;
+
+	const section = sections.value.find((s) => s.id === form.section_id);
+	if (section?.description) {
+		const fromSection = parseDegreeClusterFromText(section.description);
+		if (fromSection) return fromSection;
+	}
+
 	const degree = resolveDegreeFromGradeId(form.grade_id);
-	const cluster = resolveClusterLetter();
-	if (!degree || !cluster) return null;
-	return GROUP_COLORS[degree]?.[cluster] ?? null;
+	const cluster = resolveClusterLetterFallback();
+	if (degree && cluster) return { degree, cluster };
+	return null;
+}
+
+function groupConsistencyError() {
+	const fromName = parseDegreeClusterFromText(form.name);
+	if (!fromName) return null;
+
+	const section = sections.value.find((s) => s.id === form.section_id);
+	let fromGradeSection = section?.description
+		? parseDegreeClusterFromText(section.description)
+		: null;
+
+	if (!fromGradeSection) {
+		const degree = resolveDegreeFromGradeId(form.grade_id);
+		const cluster = resolveClusterLetterFallback();
+		if (degree && cluster) fromGradeSection = { degree, cluster };
+	}
+
+	if (
+		fromGradeSection &&
+		(fromName.degree !== fromGradeSection.degree || fromName.cluster !== fromGradeSection.cluster)
+	) {
+		return 'El nombre del grupo no coincide con el grado y la sección seleccionados.';
+	}
+	return null;
+}
+
+function resolvePreviewColor() {
+	const pair = resolveDegreeClusterForPreview();
+	if (!pair) return null;
+	return GROUP_COLORS[pair.degree]?.[pair.cluster] ?? null;
 }
 
 const selectedCycleName = computed(() => {
@@ -449,6 +503,12 @@ function hideModal() {
 }
 
 async function onSubmit() {
+	const consistencyMsg = groupConsistencyError();
+	if (consistencyMsg) {
+		Swal.fire({ icon: 'error', title: 'Error', text: consistencyMsg });
+		return;
+	}
+
 	isSaving.value = true;
 	try {
 		const count = Math.max(0, Math.min(20, Number(form.subjects_count || 0)));

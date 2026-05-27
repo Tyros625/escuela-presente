@@ -87,7 +87,9 @@ class ScheduleReportService
                 $group = $assignment->academicGroup;
                 $cells[$day][$slot] = [
                     'text' => TeachingScheduleAbbreviation::cellLabel($group, $assignment->specialty),
-                    'background' => $group?->color ?? '#FFFFFF',
+                    'background' => $group !== null
+                        ? (AcademicGroupColorService::resolveForGroup($group) ?? $group->color ?? '#FFFFFF')
+                        : '#FFFFFF',
                 ];
             }
 

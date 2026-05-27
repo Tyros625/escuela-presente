@@ -3,29 +3,39 @@
 namespace App\Http\Requests\API;
 
 use App\Models\Tenants\AcademicGroup;
+use App\Models\Tenants\Grade;
+use App\Models\Tenants\Section;
+use App\Services\AcademicGroupColorService;
 use InfyOm\Generator\Request\APIRequest;
 
 class UpdateAcademicGroupAPIRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
-        $rules = AcademicGroup::$rules;
+        return AcademicGroup::$rules;
+    }
 
-        return $rules;
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $grade = Grade::find($this->input('grade_id'));
+            $sectionId = $this->input('section_id');
+            $section = $sectionId ? Section::find($sectionId) : null;
+
+            $error = AcademicGroupColorService::consistencyError(
+                $this->input('name'),
+                $grade,
+                $section
+            );
+
+            if ($error !== null) {
+                $validator->errors()->add('name', $error);
+            }
+        });
     }
 }
