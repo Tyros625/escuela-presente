@@ -393,21 +393,15 @@ function groupConsistencyError() {
 	if (!fromName) return null;
 
 	const section = sections.value.find((s) => s.id === form.section_id);
-	let fromGradeSection = section?.description
+	const fromSection = section?.description
 		? parseDegreeClusterFromText(section.description)
 		: null;
 
-	if (!fromGradeSection) {
-		const degree = resolveDegreeFromGradeId(form.grade_id);
-		const cluster = resolveClusterLetterFallback();
-		if (degree && cluster) fromGradeSection = { degree, cluster };
-	}
-
 	if (
-		fromGradeSection &&
-		(fromName.degree !== fromGradeSection.degree || fromName.cluster !== fromGradeSection.cluster)
+		fromSection &&
+		(fromName.degree !== fromSection.degree || fromName.cluster !== fromSection.cluster)
 	) {
-		return 'El nombre del grupo no coincide con el grado y la sección seleccionados.';
+		return 'El nombre del grupo no coincide con la sección seleccionada (ej. nombre 1C con sección "3 C").';
 	}
 	return null;
 }

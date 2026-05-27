@@ -73,32 +73,23 @@ class AcademicGroupColorService
         return config("academic_group_colors.{$pair['degree']}.{$pair['cluster']}");
     }
 
+    /**
+     * Only blocks save when section has an explicit code (e.g. "3 C") that conflicts with the name (e.g. "1C").
+     */
     public static function consistencyError(?string $name, ?Grade $grade, ?Section $section): ?string
     {
         $fromName = self::parseDegreeClusterFromText($name);
-        if ($fromName === null) {
+        if ($fromName === null || $section === null) {
             return null;
         }
 
-        $fromGradeSection = null;
-        if ($section !== null) {
-            $fromGradeSection = self::parseDegreeClusterFromText($section->description);
-        }
-
-        if ($fromGradeSection === null) {
-            $degree = self::resolveDegree($grade);
-            $cluster = self::normalizeClusterLetter($section?->description);
-            if ($degree !== null && $cluster !== null) {
-                $fromGradeSection = [$degree, $cluster];
-            }
-        }
-
-        if ($fromGradeSection === null) {
+        $fromSection = self::parseDegreeClusterFromText($section->description);
+        if ($fromSection === null) {
             return null;
         }
 
-        if ($fromName[0] !== $fromGradeSection[0] || $fromName[1] !== $fromGradeSection[1]) {
-            return 'El nombre del grupo no coincide con el grado y la sección seleccionados.';
+        if ($fromName[0] !== $fromSection[0] || $fromName[1] !== $fromSection[1]) {
+            return 'El nombre del grupo no coincide con la sección seleccionada (ej. nombre 1C con sección "3 C").';
         }
 
         return null;
@@ -117,7 +108,6 @@ class AcademicGroupColorService
 
         $trimmed = strtoupper(trim($text));
 
-        // Compact: 1C, 3C (no space between digit and letter — \b would fail here)
         if (preg_match('/^(\d)([A-F])(?=$|[^A-Z0-9])/u', $trimmed, $m)) {
             $degree = (int) $m[1];
             if ($degree >= 1 && $degree <= 3) {
@@ -125,7 +115,6 @@ class AcademicGroupColorService
             }
         }
 
-        // Spaced: "1 C", "1°A", "3 C"
         if (preg_match('/^(\d)\s*[°º]?\s*([A-F])(?=$|\s|[^A-Z0-9])/u', $trimmed, $m)) {
             $degree = (int) $m[1];
             if ($degree >= 1 && $degree <= 3) {
