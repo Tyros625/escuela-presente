@@ -68,5 +68,18 @@ if (useTenantApp) {
   app.use(centralRoutes);
 }
 
+function dismissAppSplash() {
+  const splash = document.getElementById("app-splash");
+  if (!splash) return;
+  splash.style.transition = "opacity 0.5s ease, visibility 0.5s ease";
+  splash.style.opacity = "0";
+  splash.style.visibility = "hidden";
+  splash.setAttribute("aria-busy", "false");
+  const remove = () => splash.remove();
+  splash.addEventListener("transitionend", remove, { once: true });
+  window.setTimeout(remove, 600);
+}
+
 // ..and finally mount it!
 app.mount("#app");
+requestAnimationFrame(() => requestAnimationFrame(dismissAppSplash));
