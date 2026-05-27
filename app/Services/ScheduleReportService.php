@@ -96,16 +96,25 @@ class ScheduleReportService
                 ?? '—';
 
             $rows[] = [
-                'teacher_name' => $teacher->display_name,
+                'teacher_name' => $teacher->name,
                 'subject_name' => $generalSubject,
+                'subject_order' => (int) ($teacher->subject_id ?? PHP_INT_MAX),
                 'cells' => $cells,
             ];
         }
 
-        usort($rows, static fn (array $a, array $b) => strcmp($a['teacher_name'], $b['teacher_name']));
+        usort($rows, static function (array $a, array $b): int {
+            $bySubject = $a['subject_order'] <=> $b['subject_order'];
+            if ($bySubject !== 0) {
+                return $bySubject;
+            }
+
+            return strcasecmp($a['teacher_name'], $b['teacher_name']);
+        });
 
         foreach ($rows as $index => &$row) {
             $row['number'] = $index + 1;
+            unset($row['subject_order']);
         }
         unset($row);
 

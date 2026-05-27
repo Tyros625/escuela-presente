@@ -77,16 +77,16 @@ class TeachingScheduleAbbreviation
 
         $group->loadMissing(['grade', 'section']);
 
+        $name = trim((string) ($group->name ?? ''));
+        if ($name !== '' && preg_match('/^(\d)\s*[°º]?\s*([A-Fa-f])\b/u', $name, $m)) {
+            return $m[1].strtoupper($m[2]);
+        }
+
         $degree = AcademicGroupColorService::resolveDegree($group->grade);
         $cluster = AcademicGroupColorService::resolveCluster($group->section, $group->name);
 
         if ($degree !== null && $cluster !== null) {
             return $degree.$cluster;
-        }
-
-        $name = trim((string) ($group->name ?? ''));
-        if ($name !== '' && preg_match('/^(\d)\s*([A-Fa-f])\b/u', $name, $m)) {
-            return $m[1].strtoupper($m[2]);
         }
 
         if ($name !== '') {

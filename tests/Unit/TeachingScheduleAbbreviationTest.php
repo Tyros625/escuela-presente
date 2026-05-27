@@ -30,4 +30,15 @@ class TeachingScheduleAbbreviationTest extends TestCase
 
         $this->assertSame('SERV', TeachingScheduleAbbreviation::subjectKey($specialty));
     }
+
+    public function test_group_abbrev_prefers_name_prefix_over_grade_and_section(): void
+    {
+        $grade = new Grade(['description' => '2', 'order' => 2]);
+        $section = new Section(['description' => 'B']);
+        $group = new AcademicGroup(['name' => '1B PRIMERO B']);
+        $group->setRelation('grade', $grade);
+        $group->setRelation('section', $section);
+
+        $this->assertSame('1B', TeachingScheduleAbbreviation::groupAbbrev($group));
+    }
 }
