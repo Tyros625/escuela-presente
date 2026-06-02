@@ -1,5 +1,5 @@
 <template>
-	<BaseBlock class="mb-4">
+	<BaseBlock class="mb-4 subject-assignment-grade-block">
 		<template #header>
 			<div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2 py-1">
 				<div class="d-flex align-items-center gap-2">
@@ -132,13 +132,26 @@ const gradePercent = computed(() =>
 </script>
 
 <style scoped>
+:deep(.subject-assignment-grade-block.block) {
+	overflow: visible;
+}
+
+:deep(.subject-assignment-grade-block .block-content) {
+	overflow: visible;
+}
+
 .subject-assignment-table-wrap {
+	width: 100%;
 	overflow: auto;
-	max-height: 420px;
+	max-height: min(70vh, 560px);
+	-webkit-overflow-scrolling: touch;
+	border-radius: 0 0 0.75rem 0.75rem;
 }
 
 .subject-assignment-table {
-	min-width: max-content;
+	width: max-content;
+	min-width: 100%;
+	table-layout: auto;
 }
 
 .subject-assignment-table thead th {
@@ -154,31 +167,37 @@ const gradePercent = computed(() =>
 	left: 0;
 	z-index: 3;
 	background: var(--bs-body-bg, #fff);
-	min-width: 4.5rem;
+	min-width: 6.5rem;
+	box-shadow: 2px 0 4px rgba(10, 37, 64, 0.06);
 }
 
 .group-col {
 	z-index: 4;
+	min-width: 6.5rem;
+	max-width: 10rem;
+	white-space: normal;
+	word-break: break-word;
 }
 
 .specialty-col {
-	min-width: 7.5rem;
-	max-width: 8rem;
+	min-width: 11rem;
+	width: 11rem;
 }
 
 .specialty-head {
-	display: inline-block;
-	max-width: 100%;
+	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
 .assignment-cell {
-	padding: 0.25rem !important;
+	padding: 0.375rem !important;
 	vertical-align: middle;
-	min-width: 8rem;
+	min-width: 11rem;
+	width: 11rem;
 	background: var(--bs-tertiary-bg, #f8f9fa);
+	overflow: visible;
 }
 
 .assignment-cell-filled {

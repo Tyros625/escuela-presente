@@ -7,7 +7,7 @@
 			<div class="d-flex flex-wrap gap-2 align-items-center">
 				<label class="form-label mb-0 me-1 text-muted fs-sm">Período</label>
 				<select
-					class="form-select form-select-sm w-auto"
+					class="form-select form-select-sm ep-period-select"
 					v-model="selectedSchoolCycleId"
 					:disabled="isLoading"
 				>
@@ -415,6 +415,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.ep-period-select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	min-width: min(18rem, 100%);
+	max-width: 100%;
+	padding-right: 2.25rem;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23697386' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.65rem center;
+	background-size: 0.875rem;
+}
+
 .subject-assignment-save-bar {
 	position: fixed;
 	left: 0;

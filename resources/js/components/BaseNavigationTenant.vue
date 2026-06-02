@@ -1,11 +1,34 @@
 <script setup>
-import { computed } from "vue";
+import { computed, onBeforeUnmount, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 
 // Main store and Route
 const store = useTemplateStore();
 const route = useRoute();
+
+function isSidebarMiniDesktop() {
+  return window.innerWidth >= 992 && store.settings.sidebarMini;
+}
+
+function closeMiniFlyouts() {
+  document
+    .querySelectorAll("#sidebar .nav-main > .nav-main-item.open")
+    .forEach((item) => item.classList.remove("open"));
+}
+
+function onDocumentClick(event) {
+  if (!isSidebarMiniDesktop()) {
+    return;
+  }
+
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar?.contains(event.target)) {
+    return;
+  }
+
+  closeMiniFlyouts();
+}
 
 // Component properties
 const props = defineProps({
@@ -86,6 +109,19 @@ function linkClicked(e, submenu) {
         ((props.horizontal && props.horizontalHover) || props.disableClick)
       )
     ) {
+      if (isSidebarMiniDesktop()) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (el.classList.contains("open")) {
+          el.classList.remove("open");
+        } else {
+          closeMiniFlyouts();
+          el.classList.add("open");
+        }
+        return;
+      }
+
       if (el.classList.contains("open")) {
         // If submenu is open, close it..
         el.classList.remove("open");
@@ -103,8 +139,20 @@ function linkClicked(e, submenu) {
     if (window.innerWidth < 992) {
       store.sidebar({ mode: "close" });
     }
+
+    if (isSidebarMiniDesktop()) {
+      closeMiniFlyouts();
+    }
   }
 }
+
+onMounted(() => {
+  document.addEventListener("click", onDocumentClick);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", onDocumentClick);
+});
 </script>
 
 <template>

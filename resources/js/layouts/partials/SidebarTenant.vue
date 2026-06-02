@@ -23,15 +23,6 @@
             />
             <div class="ep-sidebar-header-compact smini-visible">
               <EpBrandLogo :to="{ name: 'landing' }" variant="mini" />
-              <button
-                type="button"
-                class="ep-sidebar-expand-btn d-none d-lg-inline-flex"
-                @click="store.sidebarMini({ mode: 'toggle' })"
-                title="Expandir menú"
-                aria-label="Expandir menú"
-              >
-                <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
-              </button>
             </div>
           </div>
         </slot>
@@ -68,6 +59,17 @@
       <!-- Sidebar Scrolling -->
       <div class="ep-sidebar-scroll js-sidebar-scroll">
         <slot name="content">
+          <div class="ep-sidebar-mini-toolbar smini-visible">
+            <button
+              type="button"
+              class="ep-sidebar-expand-btn d-none d-lg-inline-flex"
+              @click="store.sidebarMini({ mode: 'toggle' })"
+              title="Expandir menú"
+              aria-label="Expandir menú"
+            >
+              <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
+            </button>
+          </div>
           <!-- Side Navigation -->
           <div class="content-side">
             <MenuView />
