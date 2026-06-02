@@ -179,7 +179,11 @@ onMounted(() => {
     <!-- Main Container -->
     <div id="main-container">
       <slot name="page-top-content"></slot>
-      <RouterView />
+      <RouterView v-slot="{ Component, route }">
+        <transition name="ep-page-fade" mode="out-in">
+          <component :is="Component" :key="route.fullPath" />
+        </transition>
+      </RouterView>
     </div>
     <!-- END Main Container -->
 

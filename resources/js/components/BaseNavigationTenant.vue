@@ -214,13 +214,20 @@ onBeforeUnmount(() => {
             :active-class="node.to && node.to !== '#' ? 'active' : ''"
           >
             <i v-if="node.icon" :class="`nav-main-link-icon ${node.icon}`"></i>
-            <span v-if="node.name && !subMenu" class="nav-main-link-name ep-nav-top-label">
+            <span
+              v-if="node.name"
+              class="nav-main-link-name"
+              :class="{ 'ep-nav-top-label': !subMenu }"
+            >
               {{ node.name }}
             </span>
             <span
               v-if="node.badge"
-              class="nav-main-link-badge badge rounded-pill ep-nav-top-label"
-              :class="node['badge-variant'] ? `bg-${node['badge-variant']}` : 'bg-primary'"
+              class="nav-main-link-badge badge rounded-pill"
+              :class="[
+                node['badge-variant'] ? `bg-${node['badge-variant']}` : 'bg-primary',
+                { 'ep-nav-top-label': !subMenu },
+              ]"
             >
               {{ node.badge }}
             </span>
@@ -235,13 +242,20 @@ onBeforeUnmount(() => {
           @click.prevent="linkClicked($event, true, node)"
         >
           <i v-if="node.icon" :class="`nav-main-link-icon ${node.icon}`"></i>
-          <span v-if="node.name && !subMenu" class="nav-main-link-name ep-nav-top-label">
+          <span
+            v-if="node.name"
+            class="nav-main-link-name"
+            :class="{ 'ep-nav-top-label': !subMenu }"
+          >
             {{ node.name }}
           </span>
           <span
             v-if="node.badge"
-            class="nav-main-link-badge badge rounded-pill ep-nav-top-label"
-            :class="node['badge-variant'] ? `bg-${node['badge-variant']}` : 'bg-primary'"
+            class="nav-main-link-badge badge rounded-pill"
+            :class="[
+              node['badge-variant'] ? `bg-${node['badge-variant']}` : 'bg-primary',
+              { 'ep-nav-top-label': !subMenu },
+            ]"
           >
             {{ node.badge }}
           </span>

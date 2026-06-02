@@ -1,0 +1,44 @@
+//
+// Route change: top progress bar + soft content fade (no full-screen overlay)
+// --------------------------------------------------
+
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  height: 3px;
+  background: linear-gradient(90deg, #635bff 0%, #00d4ff 45%, #635bff 90%);
+  background-size: 220% 100%;
+  animation: ep-route-progress-bar 1.1s linear infinite;
+}
+
+#nprogress .peg {
+  display: none;
+}
+
+@keyframes ep-route-progress-bar {
+  to {
+    background-position: 220% 0;
+  }
+}
+
+.ep-page-fade-enter-active {
+  transition: opacity 0.22s ease;
+}
+
+.ep-page-fade-leave-active {
+  transition: opacity 0.14s ease;
+}
+
+.ep-page-fade-enter-from,
+.ep-page-fade-leave-to {
+  opacity: 0;
+}
+
+#page-container.dark-mode {
+  #nprogress .bar {
+    background: linear-gradient(90deg, #635bff 0%, #67e8f9 45%, #a5b4fc 90%);
+    background-size: 220% 100%;
+  }
+}

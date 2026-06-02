@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-import NProgress from "nprogress/nprogress.js";
+import { attachRouterPageTransition } from "@/router/pageTransition";
 
 // Main layouts
 import LayoutBackend from "@/layouts/variations/Backend.vue";
@@ -413,18 +413,6 @@ const router = createRouter({
   routes,
 });
 
-// NProgress
-/*eslint-disable no-unused-vars*/
-NProgress.configure({ showSpinner: false });
-
-router.beforeResolve((to, from, next) => {
-  NProgress.start();
-  next();
-});
-
-router.afterEach((to, from) => {
-  NProgress.done();
-});
-/*eslint-enable no-unused-vars*/
+attachRouterPageTransition(router);
 
 export default router;
