@@ -20,6 +20,7 @@ declare module '@vue/runtime-core' {
     LoaderView: typeof import('./components/LoaderView.vue')['default']
     MenuView: typeof import('./components/MenuView.vue')['default']
     ModalChangePassword: typeof import('./components/ModalChangePassword.vue')['default']
+    PageRouteProgress: typeof import('./components/PageRouteProgress.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SubjectAssignmentGradeTable: typeof import('./components/SubjectAssignmentGradeTable.vue')['default']

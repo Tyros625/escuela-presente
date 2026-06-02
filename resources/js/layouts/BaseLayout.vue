@@ -11,6 +11,7 @@ import BaseSidebar from "@/layouts/partials/Sidebar.vue";
 import BaseSidebarTenant from "@/layouts/partials/SidebarTenant.vue";
 import BaseSideFilter from "@/layouts/partials/SideFilter.vue";
 import BaseFooter from "@/layouts/partials/Footer.vue";
+import PageRouteProgress from "@/components/PageRouteProgress.vue";
 
 // Main store
 const store = useTemplateStore();
@@ -87,6 +88,8 @@ onMounted(() => {
 
 <template>
   <div id="page-container" :class="classContainer">
+    <PageRouteProgress />
+
     <!-- Page Loader -->
     <div id="page-loader" :class="{ show: store.settings.pageLoader }"></div>
 
@@ -179,11 +182,7 @@ onMounted(() => {
     <!-- Main Container -->
     <div id="main-container">
       <slot name="page-top-content"></slot>
-      <RouterView v-slot="{ Component, route }">
-        <transition name="ep-page-fade" mode="out-in">
-          <component :is="Component" :key="route.fullPath" />
-        </transition>
-      </RouterView>
+      <RouterView />
     </div>
     <!-- END Main Container -->
 
