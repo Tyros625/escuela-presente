@@ -3,7 +3,7 @@
 		<button
 			type="button"
 			class="form-select text-start d-flex align-items-center justify-content-between"
-			:class="{ 'text-muted': !selectedTeacher }"
+			:class="{ 'text-muted': !selectedTeacher, 'teacher-select-compact': compact }"
 			:disabled="disabled"
 			@click="toggleOpen"
 			@keydown.escape="closeMenu"
@@ -15,6 +15,14 @@
 		</button>
 
 		<div v-if="isOpen && !disabled" class="teacher-select-menu shadow-sm">
+			<button
+				type="button"
+				class="teacher-select-option teacher-select-clear"
+				:class="{ active: !modelValue }"
+				@click="clearSelection"
+			>
+				— Sin asignar —
+			</button>
 			<div
 				v-for="teacher in teachers"
 				:key="teacher.id"
@@ -59,6 +67,10 @@ const props = defineProps({
 		type: String,
 		default: '— Seleccionar —',
 	},
+	compact: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -101,6 +113,11 @@ function selectTeacher(teacher) {
 	closeMenu();
 }
 
+function clearSelection() {
+	emit('update:modelValue', '');
+	closeMenu();
+}
+
 function onHover(event, teacher) {
 	const specialty = teacher.specialization || teacher.subject;
 	if (!specialty) {
@@ -140,6 +157,20 @@ onBeforeUnmount(() => {
 <style scoped>
 .teacher-select-wrapper {
 	position: relative;
+}
+
+.teacher-select-compact {
+	font-size: 0.75rem;
+	padding: 0.2rem 0.45rem;
+	min-height: 1.85rem;
+}
+
+.teacher-select-clear {
+	width: 100%;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	color: var(--bs-secondary-color, #6c757d);
 }
 
 .teacher-select-menu {

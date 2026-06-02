@@ -101,13 +101,14 @@ class ScheduleReportService
                 ?? '—';
 
             $subjectOrder = (int) ($teacherAssignments
-                ->min(fn (TeachingAssignment $a) => $a->specialty_id) ?? $teacher->subject_id ?? PHP_INT_MAX);
+                ->min(fn ($a) => $a->specialty_id) ?? $teacher->subject_id ?? PHP_INT_MAX);
 
             $rows[] = [
-                'teacher_name' => $teacher->name,
+                'teacher_name' => self::teacherReportLabel($teacher),
                 'subject_name' => $generalSubject,
                 'subject_order' => $subjectOrder,
                 'teacher_order' => (int) ($teacherAssignments->min('id') ?? PHP_INT_MAX),
+                'latest_assignment_id' => (int) $teacherAssignments->max('id'),
                 'cells' => $cells,
             ];
         }
@@ -118,16 +119,36 @@ class ScheduleReportService
                 return $bySubject;
             }
 
+            $byLatest = $b['latest_assignment_id'] <=> $a['latest_assignment_id'];
+            if ($byLatest !== 0) {
+                return $byLatest;
+            }
+
             return $a['teacher_order'] <=> $b['teacher_order'];
         });
 
         foreach ($rows as $index => &$row) {
             $row['number'] = $index + 1;
-            unset($row['subject_order'], $row['teacher_order']);
+            unset($row['subject_order'], $row['teacher_order'], $row['latest_assignment_id']);
         }
         unset($row);
 
         return $rows;
+    }
+
+    private static function teacherReportLabel(\App\Models\Tenants\Teacher $teacher): string
+    {
+        $father = trim((string) ($teacher->last_name_father ?? $teacher->last_name ?? ''));
+        $mother = trim((string) ($teacher->last_name_mother ?? ''));
+        $first = trim((string) $teacher->name);
+
+        if ($father !== '' || $mother !== '') {
+            $last = trim($father.' '.$mother);
+
+            return $first !== '' ? "{$last}, {$first}" : $last;
+        }
+
+        return $first !== '' ? $first : trim((string) $teacher->display_name);
     }
 
     private static function dayLabelEs(string $day): string

@@ -1,22 +1,40 @@
 <template>
 	<BasePageHeading
 		title="Vista previa de horario"
-		subtitle="Asignaciones guardadas — revise, edite o genere el reporte PDF"
+		subtitle="Lista por registro (más reciente arriba) y reporte en cuadrícula por docente"
 	>
 		<template #extra>
-			<button
-				type="button"
-				class="btn btn-sm btn-alt-secondary"
-				@click="loadAssignments"
-				:disabled="isLoadingList"
-			>
-				<i class="fa-solid fa-rotate" :class="{ 'fa-spin': isLoadingList }"></i>
-				Actualizar
-			</button>
+			<div class="d-flex flex-wrap gap-2 align-items-center">
+				<label class="form-label mb-0 me-1 text-muted fs-sm">Período</label>
+				<select
+					class="form-select form-select-sm w-auto"
+					v-model="selectedSchoolCycleId"
+					:disabled="isLoadingLookups"
+				>
+					<option disabled value="">— Seleccionar —</option>
+					<option v-for="c in schoolCycles" :key="c.id" :value="c.id">
+						{{ c.description }}
+					</option>
+				</select>
+				<button
+					type="button"
+					class="btn btn-sm btn-alt-secondary"
+					@click="loadAssignments"
+					:disabled="isLoadingList"
+				>
+					<i class="fa-solid fa-rotate" :class="{ 'fa-spin': isLoadingList }"></i>
+					Actualizar
+				</button>
+			</div>
 		</template>
 	</BasePageHeading>
 
 	<div class="content">
+		<div v-if="!selectedSchoolCycleId" class="alert alert-info d-flex align-items-center gap-2">
+			<i class="fa-solid fa-circle-info"></i>
+			<span>Seleccione un período escolar para crear asignaciones manuales.</span>
+		</div>
+
 		<BaseBlock content-full>
 			<ul class="nav nav-tabs nav-tabs-block" role="tablist">
 				<li class="nav-item">
@@ -28,6 +46,17 @@
 					>
 						<i class="fa-solid fa-list me-1"></i>
 						Lista de asignaciones
+					</button>
+				</li>
+				<li class="nav-item">
+					<button
+						type="button"
+						class="nav-link"
+						:class="{ active: activeTab === 'grid' }"
+						@click="activeTab = 'grid'"
+					>
+						<i class="fa-solid fa-table me-1"></i>
+						Reporte de horario
 					</button>
 				</li>
 				<li class="nav-item">
@@ -65,14 +94,17 @@
 								<i class="fa-solid fa-check me-1"></i>
 								{{ filteredAssignments.length }} activas
 							</span>
+							<span class="text-muted fs-sm d-none d-md-inline">
+								Orden: último registro arriba
+							</span>
 							<button
 								type="button"
-								class="btn btn-primary"
-								:disabled="isLoadingList || isExportingPdf"
-								@click="openSchedulePreviewPdf"
+								class="btn btn-alt-primary"
+								:disabled="isLoadingList"
+								@click="activeTab = 'grid'"
 							>
-								<i class="fa-solid fa-table" :class="{ 'fa-spin': isExportingPdf }"></i>
-								Schedule Preview
+								<i class="fa-solid fa-table me-1"></i>
+								Ver cuadrícula
 							</button>
 						</div>
 					</div>
@@ -98,7 +130,7 @@
 								<td class="fw-semibold">{{ a.teacher_name || '—' }}</td>
 								<td>{{ a.subject_name || '—' }}</td>
 								<td>{{ a.cluster_name || '—' }}</td>
-								<td class="text-center text-muted">1h</td>
+								<td class="text-center text-muted">{{ hoursLabel(a) }}</td>
 								<td>
 									<span class="badge rounded-pill bg-info">{{ shiftLabel(a.shift) }}</span>
 								</td>
@@ -145,6 +177,15 @@
 				</div>
 			</div>
 
+			<!-- Reporte cuadrícula -->
+			<div v-show="activeTab === 'grid'" class="pt-4">
+				<TeachingScheduleGridPreview
+					ref="gridPreviewRef"
+					:initial-shift="previewShift"
+					@export-pdf="openSchedulePreviewPdf"
+				/>
+			</div>
+
 			<!-- Manual -->
 			<div v-show="activeTab === 'manual'" class="pt-4">
 				<div class="row justify-content-center">
@@ -158,7 +199,8 @@
 								<p class="text-muted fs-sm mb-0 mt-2">
 									Al guardar se valida que el docente y el grupo no tengan otro clase en el mismo
 									horario, que el docente tenga disponibilidad marcada en ese día y franja, y que
-									cuenta con horas disponibles (1h por franja).
+									cuenta con horas disponibles (1h por franja). Al elegir docente, materia y grupo
+									se toman de Asignación de materias; SERVICIO usa automáticamente SIN GRUPO.
 								</p>
 							</div>
 							<div class="card-body">
@@ -166,11 +208,13 @@
 									:form="manual"
 									:teachers="teachers"
 									:specialties="specialties"
-									:academic-groups="academicGroups"
+									:academic-groups="academicGroupsForCycle"
+									:subject-links="subjectLinks"
+									:sin-grupo-group-ids="sinGrupoGroupIds"
 									:day-options="DAY_OPTIONS"
 									:morning-slots="MORNING_SLOTS"
 									:evening-slots="EVENING_SLOTS"
-									:disabled="isSaving"
+									:disabled="isSaving || !selectedSchoolCycleId"
 									@submit="saveManual"
 									@reset="resetManual"
 								/>
@@ -217,11 +261,13 @@
 						:form="editForm"
 						:teachers="teachers"
 						:specialties="specialties"
-						:academic-groups="academicGroups"
+						:academic-groups="academicGroupsForCycle"
+						:subject-links="subjectLinks"
+						:sin-grupo-group-ids="sinGrupoGroupIds"
 						:day-options="DAY_OPTIONS"
 						:morning-slots="MORNING_SLOTS"
 						:evening-slots="EVENING_SLOTS"
-						:disabled="isSaving"
+						:disabled="isSaving || !selectedSchoolCycleId"
 						submit-label="Guardar cambios"
 						@submit="saveEdit"
 						@reset="resetEditForm"
@@ -235,7 +281,10 @@
 <script setup>
 import api from '@/services/api';
 import TeachingAssignmentForm from '@/components/TeachingAssignmentForm.vue';
+import TeachingScheduleGridPreview from '@/components/TeachingScheduleGridPreview.vue';
 import Swal from 'sweetalert2';
+
+const CYCLE_STORAGE_KEY = 'subject-assignment-school-cycle-id';
 
 const MORNING_SLOTS = [
 	'7:30-8:20',
@@ -267,6 +316,8 @@ const DAY_OPTIONS = [
 ];
 
 const activeTab = ref('list');
+const previewShift = ref('morning');
+const gridPreviewRef = ref(null);
 const searchQuery = ref('');
 const isLoadingList = ref(false);
 const isSaving = ref(false);
@@ -274,21 +325,49 @@ const isExportingPdf = ref(false);
 const editingId = ref(null);
 
 const assignments = ref([]);
+const schoolCycles = ref([]);
+const selectedSchoolCycleId = ref('');
 const teachers = ref([]);
 const specialties = ref([]);
 const academicGroups = ref([]);
+const subjectLinks = ref([]);
+const sinGrupoGroupIds = ref({});
+const isLoadingLookups = ref(false);
 
 const manual = reactive(getEmptyForm());
 const editForm = reactive(getEmptyForm());
 
+const sortedAssignments = computed(() =>
+	[...assignments.value].sort((a, b) => Number(b.id) - Number(a.id))
+);
+
 const filteredAssignments = computed(() => {
 	const q = searchQuery.value?.toLowerCase().trim() || '';
-	if (!q) return assignments.value;
-	return assignments.value.filter((a) => {
+	const rows = sortedAssignments.value;
+	if (!q) return rows;
+	return rows.filter((a) => {
 		const hay = `${a.teacher_name || ''} ${a.subject_name || ''} ${a.cluster_name || ''}`.toLowerCase();
 		return hay.includes(q);
 	});
 });
+
+const academicGroupsForCycle = computed(() => {
+	if (!selectedSchoolCycleId.value) {
+		return academicGroups.value;
+	}
+
+	return academicGroups.value.filter(
+		(group) => Number(group.school_cycle_id) === Number(selectedSchoolCycleId.value)
+	);
+});
+
+function hoursLabel(assignment) {
+	const hours = Number(assignment.specialty_hours_per_week);
+	if (hours > 0) {
+		return `${hours}h`;
+	}
+	return '1h';
+}
 
 function getEmptyForm() {
 	return {
@@ -345,17 +424,53 @@ async function loadAssignments() {
 }
 
 async function loadLookups() {
+	isLoadingLookups.value = true;
 	try {
-		const [tRes, sRes, gRes] = await Promise.all([
+		const [cycleRes, tRes, sRes, gRes] = await Promise.all([
+			api.get('/lists/school-cycles'),
 			api.get('/teachers'),
 			api.get('/specialties'),
 			api.get('/academic-groups'),
 		]);
+		schoolCycles.value = cycleRes.data.data ?? cycleRes.data ?? [];
 		teachers.value = tRes.data.data || [];
 		specialties.value = sRes.data.data || [];
 		academicGroups.value = gRes.data.data || [];
+
+		if (!selectedSchoolCycleId.value && schoolCycles.value.length) {
+			const stored = localStorage.getItem(CYCLE_STORAGE_KEY);
+			const match = schoolCycles.value.find((cycle) => String(cycle.id) === stored);
+			selectedSchoolCycleId.value = match ? match.id : schoolCycles.value[0].id;
+		}
 	} catch {
 		Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar catálogos (docentes, materias, grupos).' });
+	} finally {
+		isLoadingLookups.value = false;
+	}
+}
+
+async function loadFormContext() {
+	if (!selectedSchoolCycleId.value) {
+		subjectLinks.value = [];
+		sinGrupoGroupIds.value = {};
+		return;
+	}
+
+	try {
+		const { data } = await api.get('/teaching-assignments/form-context', {
+			params: { school_cycle_id: selectedSchoolCycleId.value },
+		});
+
+		subjectLinks.value = data.data?.subject_links || [];
+		sinGrupoGroupIds.value = data.data?.sin_grupo_group_ids || {};
+	} catch {
+		subjectLinks.value = [];
+		sinGrupoGroupIds.value = {};
+		Swal.fire({
+			icon: 'error',
+			title: 'Error',
+			text: 'No se pudo cargar el contexto de asignación de materias.',
+		});
 	}
 }
 
@@ -394,6 +509,7 @@ async function saveManual() {
 		Toast.fire({ icon: 'success', title: data.message || 'Guardado correctamente' });
 		resetManual();
 		await loadAssignments();
+		gridPreviewRef.value?.loadPreview?.();
 		activeTab.value = 'list';
 	} catch (err) {
 		showSaveError(err);
@@ -416,6 +532,7 @@ async function saveEdit() {
 		Toast.fire({ icon: 'success', title: data.message || 'Actualizado correctamente' });
 		closeEditModal();
 		await loadAssignments();
+		gridPreviewRef.value?.loadPreview?.();
 	} catch (err) {
 		showSaveError(err);
 	} finally {
@@ -431,11 +548,12 @@ function showSaveError(err) {
 	Swal.fire({ icon: 'error', title: 'No se puede guardar', text });
 }
 
-async function openSchedulePreviewPdf() {
+async function openSchedulePreviewPdf(shift = previewShift.value) {
+	previewShift.value = shift;
 	isExportingPdf.value = true;
 	try {
 		const res = await api.get('/teaching-assignments/schedule-preview/pdf', {
-			params: { shift: 'morning' },
+			params: { shift },
 			responseType: 'blob',
 			headers: { Accept: 'application/pdf' },
 		});
@@ -469,14 +587,32 @@ function confirmRemove(a) {
 			await api.delete(`/teaching-assignments/${a.id}`);
 			Toast.fire({ icon: 'success', title: 'Asignación eliminada' });
 			await loadAssignments();
+			gridPreviewRef.value?.loadPreview?.();
 		} catch {
 			Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo eliminar la asignación.' });
 		}
 	});
 }
 
+watch(activeTab, (tab) => {
+	if (tab === 'grid') {
+		gridPreviewRef.value?.loadPreview?.();
+	}
+});
+
+watch(selectedSchoolCycleId, async (cycleId) => {
+	if (!cycleId) {
+		return;
+	}
+
+	localStorage.setItem(CYCLE_STORAGE_KEY, String(cycleId));
+	await loadFormContext();
+	resetManual();
+});
+
 onMounted(async () => {
 	await loadLookups();
+	await loadFormContext();
 	await loadAssignments();
 });
 </script>

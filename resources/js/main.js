@@ -1,6 +1,8 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import { useTemplateStore } from "@/stores/template";
+import { initThemeFromStorage } from "@/services/themePreference";
 
 // You can use the following starter router instead of the default one as a clean starting point
 import tenantRoutes from "./router/tenant";
@@ -58,6 +60,7 @@ app.directive("user-can", {
 
 // Use Pinia and Vue Router
 app.use(createPinia());
+initThemeFromStorage(useTemplateStore());
 
 // Prefer server-set tenant flag so tenant menu shows even when URL is not a subdomain
 const useTenantApp = window.__TENANT_APP === true || isSubdomain();
@@ -68,16 +71,30 @@ if (useTenantApp) {
   app.use(centralRoutes);
 }
 
+const SPLASH_MIN_VISIBLE_MS = 1000;
+
 function dismissAppSplash() {
   const splash = document.getElementById("app-splash");
   if (!splash) return;
-  splash.style.transition = "opacity 0.5s ease, visibility 0.5s ease";
-  splash.style.opacity = "0";
-  splash.style.visibility = "hidden";
-  splash.setAttribute("aria-busy", "false");
-  const remove = () => splash.remove();
-  splash.addEventListener("transitionend", remove, { once: true });
-  window.setTimeout(remove, 600);
+
+  const shownAt = window.__APP_SPLASH_AT ?? Date.now();
+  const waitMs = Math.max(0, SPLASH_MIN_VISIBLE_MS - (Date.now() - shownAt));
+
+  const runDismiss = () => {
+    splash.style.transition = "opacity 0.5s ease, visibility 0.5s ease";
+    splash.style.opacity = "0";
+    splash.style.visibility = "hidden";
+    splash.setAttribute("aria-busy", "false");
+    const remove = () => splash.remove();
+    splash.addEventListener("transitionend", remove, { once: true });
+    window.setTimeout(remove, 600);
+  };
+
+  if (waitMs > 0) {
+    window.setTimeout(runDismiss, waitMs);
+  } else {
+    runDismiss();
+  }
 }
 
 // ..and finally mount it!

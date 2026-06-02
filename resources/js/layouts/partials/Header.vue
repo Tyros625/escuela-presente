@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import ThemeToggle from "@/components/ThemeToggle.vue";
 import { useTemplateStore } from "@/stores/template";
 
 // Grab example data
@@ -85,6 +86,7 @@ onUnmounted(() => {
           <!-- Right Section -->
           <div class="d-flex align-items-center">
             <slot name="content-right">
+              <ThemeToggle class="me-2" />
               <!-- User Dropdown -->
               <div class="dropdown d-inline-block ms-2">
                 <button type="button" class="btn btn-sm btn-alt-secondary d-flex align-items-center"

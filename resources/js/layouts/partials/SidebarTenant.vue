@@ -11,18 +11,21 @@
     Adding 'smini-visible' to an element will show it (display: inline-block) only when the sidebar is in mini mode
     Adding 'smini-visible-block' to an element will show it (display: block) only when the sidebar is in mini mode
   -->
-  <nav id="sidebar" aria-label="Main Navigation">
+  <nav id="sidebar" class="ep-sidebar-shell" aria-label="Main Navigation">
     <slot>
       <!-- Side Header -->
       <div class="content-header ep-sidebar-header">
         <slot name="header">
           <!-- Logo -->
-          <RouterLink :to="{ name: 'landing' }" class="ep-sidebar-brand smini-hide">
-            Escuela<span class="ep-sidebar-brand-light">Presente</span>
-          </RouterLink>
-          <RouterLink :to="{ name: 'landing' }" class="ep-sidebar-brand-mini smini-visible">
-            <span class="ep-sidebar-brand-mark">EP</span>
-          </RouterLink>
+          <EpBrandLogo
+            :to="{ name: 'landing' }"
+            link-class="smini-hide"
+          />
+          <EpBrandLogo
+            :to="{ name: 'landing' }"
+            variant="mini"
+            link-class="smini-visible"
+          />
         </slot>
 
         <div class="ep-sidebar-header-actions">
@@ -31,7 +34,7 @@
             class="ep-sidebar-collapse d-none d-lg-inline-flex"
             @click="store.sidebarMini({ mode: 'toggle' })"
             :title="store.settings.sidebarMini ? 'Expandir menú' : 'Contraer menú'"
-            aria-label="Contraer menú"
+            :aria-label="store.settings.sidebarMini ? 'Expandir menú' : 'Contraer menú'"
           >
             <i
               class="fa-solid fa-chevron-left ep-sidebar-collapse-icon"
@@ -58,7 +61,7 @@
       <!-- END User info -->
 
       <!-- Sidebar Scrolling -->
-      <div id="simplebar-sidebar" class="js-sidebar-scroll">
+      <div class="ep-sidebar-scroll js-sidebar-scroll">
         <slot name="content">
           <!-- Side Navigation -->
           <div class="content-side">
@@ -75,12 +78,10 @@
 
 <script setup>
 import MenuView from "@/components/MenuView.vue";
+import EpBrandLogo from "@/components/EpBrandLogo.vue";
 import { useTemplateStore } from "@/stores/template";
 import { useUserStore } from "@/stores/user";
 import { computed } from "vue";
-
-// SimpleBar, for more info and examples you can check out https://github.com/Grsmto/simplebar/tree/master/packages/simplebar-vue
-import SimpleBar from "simplebar";
 
 // Main store
 const store = useTemplateStore();
@@ -107,54 +108,4 @@ const roleLabel = computed(() => {
   return map[r] || r;
 });
 
-// Dark Mode preference helper for radios
-const radioDarkMode = ref();
-
-// Sets default dark mode preferences for radios
-function setDarkModeRadioDefault() {
-  if (store.settings.darkModeSystem) {
-    radioDarkMode.value = "system";
-  } else {
-    if (store.settings.darkMode) {
-      radioDarkMode.value = "dark";
-    } else {
-      radioDarkMode.value = "light";
-    }
-  }
-}
-
-// When the user sets dark mode preference through the radios
-function onDarkModeRadioChange() {
-  if (radioDarkMode.value === "system") {
-    store.darkModeSystem({ mode: "on" });
-  } else {
-    store.darkModeSystem({ mode: "off" });
-
-    if (radioDarkMode.value === "dark") {
-      store.darkMode({ mode: "on" });
-    } else {
-      store.darkMode({ mode: "off" });
-    }
-  }
-}
-
-// Set dark mode preference radios default and watch for changes to store
-setDarkModeRadioDefault();
-watch(
-  () => store.settings.darkModeSystem,
-  () => {
-    setDarkModeRadioDefault();
-  }
-);
-watch(
-  () => store.settings.darkMode,
-  () => {
-    setDarkModeRadioDefault();
-  }
-);
-
-// Init SimpleBar (custom scrolling)
-onMounted(() => {
-  new SimpleBar(document.getElementById("simplebar-sidebar"));
-});
 </script>

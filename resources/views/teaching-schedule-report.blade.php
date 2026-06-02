@@ -44,9 +44,25 @@
             font-weight: bold;
             font-size: 6px;
         }
-        .col-num { width: 14px; }
-        .col-teacher { width: 130px; text-align: left !important; font-size: 7px; padding-left: 3px !important; }
-        .col-subject { width: 72px; text-align: left !important; font-size: 7px; padding-left: 3px !important; }
+        .col-num { width: 18px; }
+        .col-teacher {
+            width: 22%;
+            min-width: 155px;
+            text-align: left !important;
+            font-size: 7px;
+            padding-left: 4px !important;
+            white-space: normal;
+            line-height: 1.2;
+        }
+        .col-subject {
+            width: 11%;
+            min-width: 88px;
+            text-align: left !important;
+            font-size: 7px;
+            padding-left: 4px !important;
+            white-space: normal;
+            line-height: 1.2;
+        }
         .slot-head { font-size: 5px; line-height: 1.1; }
         .cell-filled {
             font-weight: bold;

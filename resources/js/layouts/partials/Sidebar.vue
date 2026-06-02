@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from "vue";
 import { useTemplateStore } from "@/stores/template";
 
 import BaseNavigation from "@/components/BaseNavigation.vue";
+import EpBrandLogo from "@/components/EpBrandLogo.vue";
 
 // SimpleBar, for more info and examples you can check out https://github.com/Grsmto/simplebar/tree/master/packages/simplebar-vue
 import SimpleBar from "simplebar";
@@ -99,14 +100,12 @@ onMounted(() => {
       <div class="content-header">
         <slot name="header">
           <!-- Logo -->
-          <RouterLink :to="{ name: 'landing' }" class="fw-semibold text-dual">
-            <span class="smini-visible">
-              <i class="fa fa-circle-notch text-primary"></i>
-            </span>
-            <span class="smini-hide fs-5 tracking-wider">
-              Escuela<span class="fw-normal">Presente</span>
-            </span>
-          </RouterLink>
+          <EpBrandLogo :to="{ name: 'landing' }" link-class="smini-hide" />
+          <EpBrandLogo
+            :to="{ name: 'landing' }"
+            variant="mini"
+            link-class="smini-visible"
+          />
           <!-- END Logo -->
         </slot>
 

@@ -3,6 +3,7 @@ import { useTemplateStore } from "@/stores/template";
 import { onMounted, onUnmounted } from "vue";
 
 import BaseLayout from "@/layouts/BaseLayout.vue";
+import ThemeToggle from "@/components/ThemeToggle.vue";
 
 // Main store
 const store = useTemplateStore();
@@ -48,6 +49,7 @@ onUnmounted(() => {
 
     <!-- Header Content Right -->
     <template #header-content-right>
+      <ThemeToggle variant="landing" class="me-2" />
       <RouterLink :to="{ name: 'login' }" class="landing-header__login">
         <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>
         <span class="d-none d-sm-inline">Iniciar Sesión</span>

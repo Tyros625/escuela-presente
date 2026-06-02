@@ -16,8 +16,9 @@
             </slot>
           </div>
 
-          <div class="d-flex align-items-center ms-auto">
+          <div class="d-flex align-items-center ms-auto gap-2">
             <slot name="content-right">
+              <ThemeToggle class="me-1" />
               <div class="dropdown d-inline-block">
                 <button
                   type="button"
@@ -75,6 +76,7 @@
 </template>
 
 <script setup>
+import ThemeToggle from "@/components/ThemeToggle.vue";
 import { useTemplateStore } from "@/stores/template";
 import { useUserStore } from "@/stores/user";
 

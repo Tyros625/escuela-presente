@@ -26,4 +26,4 @@ return new class extends Migration
         // Colors remain; no rollback needed.
     }
 };
-
+

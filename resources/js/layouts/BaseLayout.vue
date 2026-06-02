@@ -1,6 +1,7 @@
 <script setup>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useTemplateStore } from "@/stores/template";
+import { syncDocumentTheme } from "@/services/themePreference";
 import { isSubdomain } from "@/services/host";
 
 // Import all layout partials
@@ -62,8 +63,14 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e)
   }
 });
 
+watch(
+  () => store.settings.darkMode,
+  (isDark) => syncDocumentTheme(isDark)
+);
+
 // Remove side transitions on window resizing
 onMounted(() => {
+  syncDocumentTheme(store.settings.darkMode);
   let winResize = false;
 
   window.addEventListener("resize", () => {

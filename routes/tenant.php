@@ -22,6 +22,7 @@ use App\Http\Controllers\API\SelectListController;
 use App\Http\Controllers\API\SpecialtyAPIController;
 use App\Http\Controllers\API\StudentAPIController;
 use App\Http\Controllers\API\TeacherAPIController;
+use App\Http\Controllers\API\GroupSubjectAssignmentAPIController;
 use App\Http\Controllers\API\TeachingAssignmentAPIController;
 use App\Http\Controllers\API\QualificationRecordAPIController;
 use App\Http\Controllers\API\UserAPIController;
@@ -146,7 +147,12 @@ Route::prefix('api')->middleware([
             Route::apiResource('teachers', TeacherAPIController::class);
             Route::post('teachers/import', [TeacherAPIController::class, 'import']);
 
+            Route::get('group-subject-assignments/matrix', [GroupSubjectAssignmentAPIController::class, 'matrix']);
+            Route::put('group-subject-assignments/bulk', [GroupSubjectAssignmentAPIController::class, 'bulkStore']);
+
+            Route::get('teaching-assignments/form-context', [TeachingAssignmentAPIController::class, 'formContext']);
             Route::get('teaching-assignments', [TeachingAssignmentAPIController::class, 'index']);
+            Route::get('teaching-assignments/schedule-preview', [TeachingAssignmentAPIController::class, 'schedulePreview']);
             Route::get('teaching-assignments/schedule-preview/pdf', [TeachingAssignmentAPIController::class, 'schedulePreviewPdf']);
             Route::post('teaching-assignments', [TeachingAssignmentAPIController::class, 'store']);
             Route::put('teaching-assignments/{id}', [TeachingAssignmentAPIController::class, 'update']);

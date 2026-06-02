@@ -12,6 +12,7 @@ declare module '@vue/runtime-core' {
     BaseNavigation: typeof import('./components/BaseNavigation.vue')['default']
     BaseNavigationTenant: typeof import('./components/BaseNavigationTenant.vue')['default']
     BasePageHeading: typeof import('./components/BasePageHeading.vue')['default']
+    EpBrandLogo: typeof import('./components/EpBrandLogo.vue')['default']
     ErrorsView: typeof import('./components/ErrorsView.vue')['default']
     Index3View: typeof import('./components/Index3View.vue')['default']
     IndexTenantView: typeof import('./components/IndexTenantView.vue')['default']
@@ -21,5 +22,10 @@ declare module '@vue/runtime-core' {
     ModalChangePassword: typeof import('./components/ModalChangePassword.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SubjectAssignmentGradeTable: typeof import('./components/SubjectAssignmentGradeTable.vue')['default']
+    TeacherSelectWithTooltip: typeof import('./components/TeacherSelectWithTooltip.vue')['default']
+    TeachingAssignmentForm: typeof import('./components/TeachingAssignmentForm.vue')['default']
+    TeachingScheduleGridPreview: typeof import('./components/TeachingScheduleGridPreview.vue')['default']
+    ThemeToggle: typeof import('./components/ThemeToggle.vue')['default']
   }
 }

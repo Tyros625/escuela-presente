@@ -12,10 +12,13 @@
 					</option>
 				</select>
 
-				<button type="button" class="btn btn-sm btn-alt-primary btn-icon-center" disabled>
-					<i class="fa-solid fa-wand-magic-sparkles"></i>
+				<RouterLink
+					:to="{ name: 'subject-assignments' }"
+					class="btn btn-sm btn-alt-primary btn-icon-center"
+				>
+					<i class="fa-solid fa-user-plus"></i>
 					Asignación
-				</button>
+				</RouterLink>
 
 				<button type="button" class="btn btn-sm btn-primary btn-icon-center" @click="openCreateModal">
 					<i class="fa fa-plus opacity-50"></i>

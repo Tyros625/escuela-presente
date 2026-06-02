@@ -82,4 +82,9 @@ class AcademicGroup extends Model
     {
         return $this->hasMany(Student::class, 'academic_group_id');
     }
+
+    public function subjectAssignments(): HasMany
+    {
+        return $this->hasMany(GroupSubjectAssignment::class, 'academic_group_id');
+    }
 }

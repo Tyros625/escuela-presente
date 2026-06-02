@@ -2,6 +2,7 @@
 import { useTemplateStore } from "@/stores/template";
 
 import BaseLayout from "@/layouts/BaseLayout.vue";
+import ThemeToggle from "@/components/ThemeToggle.vue";
 
 // Main store
 const store = useTemplateStore();
@@ -20,4 +21,5 @@ store.mainContent({ mode: "full" });
 
 <template>
   <BaseLayout />
+  <ThemeToggle variant="ghost" class="ep-theme-toggle--floating" />
 </template>

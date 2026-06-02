@@ -18,7 +18,25 @@
     <link rel="apple-touch-icon" sizes="180x180"
         href="{{ global_asset('/assets/media/favicons/apple-touch-icon-180x180.png') }}">
 
+    <script>
+        (function () {
+            try {
+                var pref = localStorage.getItem('ep-color-scheme');
+                var dark = pref === 'dark' || (pref === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (dark) {
+                    document.documentElement.classList.add('ep-dark');
+                    document.documentElement.dataset.colorScheme = 'dark';
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <style>
+        html.ep-dark body {
+            background-color: #1e2442;
+            color: #e4e7ef;
+        }
+
         #app-splash {
             --splash-bg-1: #0f172a;
             --splash-bg-2: #1e3a5f;
@@ -177,14 +195,6 @@
             to { background-position: 200% center; }
         }
 
-        #app-splash .splash-sub {
-            margin: -0.75rem 0 0;
-            font-size: 0.95rem;
-            color: var(--splash-muted);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
         #app-splash .splash-dots {
             display: flex;
             gap: 0.5rem;
@@ -239,6 +249,8 @@
             to continue.</strong>
     </noscript>
 
+    <script>window.__APP_SPLASH_AT = Date.now();</script>
+
     <div id="app-splash" aria-live="polite" aria-busy="true">
         <div class="splash-orb splash-orb--1" aria-hidden="true"></div>
         <div class="splash-orb splash-orb--2" aria-hidden="true"></div>
@@ -250,10 +262,7 @@
                 <div class="splash-ring splash-ring--inner"></div>
                 <div class="splash-core">EP</div>
             </div>
-            <div>
-                <h1 class="splash-title"><span>Escuela Presente</span></h1>
-                <p class="splash-sub">Cargando</p>
-            </div>
+            <h1 class="splash-title"><span>Escuela Presente</span></h1>
             <div class="splash-dots" aria-hidden="true">
                 <span></span><span></span><span></span>
             </div>

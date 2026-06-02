@@ -123,6 +123,7 @@ function linkClicked(e, submenu) {
         <!-- Normal Link -->
         <div v-if="!node.heading && !node.sub" @click="linkClicked($event)">
           <RouterLink :to="node.to && node.to !== '#' ? { name: node.to } : '#'" class="nav-main-link"
+            :title="node.name"
             :active-class="node.to && node.to !== '#' ? 'active' : ''">
             <i v-if="node.icon" :class="`nav-main-link-icon ${node.icon}`"></i>
             <span v-if="node.name" class="nav-main-link-name">
@@ -139,6 +140,7 @@ function linkClicked(e, submenu) {
 
         <!-- Submenu Link -->
         <a v-else-if="!node.heading && node.sub" href="#" class="nav-main-link nav-main-link-submenu"
+          :title="node.name"
           @click.prevent="linkClicked($event, true)">
           <i v-if="node.icon" :class="`nav-main-link-icon ${node.icon}`"></i>
           <span v-if="node.name" class="nav-main-link-name">{{

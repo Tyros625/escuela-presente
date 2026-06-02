@@ -119,17 +119,20 @@ async function uploadFile() {
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="form-floating mb-4">
-				<input
-					type="date"
-					v-model="studentStore.form.date_birth"
-					class="form-control"
-					:disabled="studentStore.isLoading"
-					:class="{
-						'is-invalid': !studentStore.form.date_birth,
-					}"
-				/>
-				<label>Fecha de Nacimiento</label>
+			<div class="mb-4 ep-date-field">
+				<label class="form-label">Fecha de Nacimiento</label>
+				<div
+					class="ep-date-field__input"
+					:class="{ 'ep-date-field__input--empty': !studentStore.form.date_birth }"
+				>
+					<input
+						type="date"
+						v-model="studentStore.form.date_birth"
+						class="form-control ep-date-input"
+						:class="{ 'is-invalid': !studentStore.form.date_birth }"
+						:disabled="studentStore.isLoading"
+					/>
+				</div>
 			</div>
 		</div>
 		<div class="col-md-4">

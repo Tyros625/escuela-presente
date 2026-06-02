@@ -17,6 +17,10 @@ store.setLayout({
 // Set various template options for this layout variation
 store.headerStyle({ mode: "light" });
 store.mainContent({ mode: "narrow" });
+
+if (localStorage.getItem("ep-sidebar-mini") === "1") {
+  store.sidebarMini({ mode: "on" });
+}
 </script>
 
 <template>

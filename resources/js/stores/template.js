@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { persistThemePreference } from "@/services/themePreference";
 
 // Main Pinia Store
 export const useTemplateStore = defineStore({
@@ -83,6 +84,11 @@ export const useTemplateStore = defineStore({
         } else if (payload.mode === "toggle") {
           this.settings.sidebarMini = !this.settings.sidebarMini;
         }
+
+        localStorage.setItem(
+          "ep-sidebar-mini",
+          this.settings.sidebarMini ? "1" : "0"
+        );
       }
     },
     // Sets sidebar position (left, right, toggle)
@@ -205,6 +211,7 @@ export const useTemplateStore = defineStore({
       } else if (payload.mode === "toggle") {
         this.settings.darkMode = !this.settings.darkMode;
       }
+      persistThemePreference(this.settings);
     },
     // Dark Mode System based
     darkModeSystem(payload) {
@@ -223,6 +230,7 @@ export const useTemplateStore = defineStore({
       } else if (payload.mode === "off") {
         this.settings.darkModeSystem = false;
       }
+      persistThemePreference(this.settings);
     },
     // Sets active color theme
     setColorTheme(payload) {

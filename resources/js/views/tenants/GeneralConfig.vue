@@ -5,13 +5,6 @@
     <BaseBlock title="Configuración General" class="h-100">
       <form @submit.prevent="updateData">
         <div class="row push">
-          <div class="col-lg-4">
-            <p class="fs-sm text-center">
-              <LoaderView v-if="isLoading" />
-              <img v-else :src="`${form.logo}`" style="width: 50%" />
-            </p>
-          </div>
-
           <div class="col-lg-8 col-xl-5">
             <div class="mb-4">
               <label class="form-label">CCT</label>
@@ -286,17 +279,6 @@
                   placeholder="Textarea content.."
                   :disabled="isLoading"
                 />
-                <sub class="text-danger">
-                  Puede reemplazar estas palabras comodin para personalizar el
-                  mensaje:
-                  <span @click="setWord('INCIDENCIA')">{INCIDENCIA}</span>,
-                  <span @click="setWord('FECHA')">{FECHA}</span>,
-                  <span @click="setWord('PROFESOR')">{PROFESOR}</span>,
-                  <span @click="setWord('ESPECIALIDAD')">{ESPECIALIDAD}</span>,
-                  <span @click="setWord('OBSERVACIONES')">{OBSERVACIONES}</span
-                  >,
-                  <span @click="setWord('ARCHIVO_URL')">{ARCHIVO_URL}</span>
-                </sub>
               </div>
             </div>
           </div>
@@ -423,14 +405,6 @@ onMounted(() => {
     position: center,
   });
 });
-
-function setWord(val) {
-  if (!form.value.custom_messages) {
-    form.value.custom_messages = { incidents: "" };
-  }
-  const current = form.value.custom_messages.incidents || "";
-  form.value.custom_messages.incidents = current.concat(` {${val}}`);
-}
 
 function setPlace(location) {
   console.log(location);
