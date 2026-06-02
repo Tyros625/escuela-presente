@@ -1,68 +1,169 @@
 //
-// Route change: centered blue progress (splash-style, no backdrop)
+// Route change: blurred backdrop + splash EP loader (same as #app-splash emblem)
 // --------------------------------------------------
 
 .ep-route-progress {
+  --splash-accent: #38bdf8;
+  --splash-gold: #fbbf24;
   position: fixed;
   inset: 0;
   z-index: 99990;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  pointer-events: all;
 }
 
-.ep-route-progress__panel {
-  width: min(18rem, 72vw);
-  padding: 0 1rem;
+.ep-route-progress__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.ep-route-progress__track {
-  height: 5px;
+.ep-route-progress__stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+// Emblem (mirrors resources/views/app.blade.php #app-splash)
+.ep-splash-emblem {
+  position: relative;
+  width: 112px;
+  height: 112px;
+}
+
+.ep-splash-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.ep-splash-ring--outer {
+  border-top-color: var(--splash-accent);
+  border-right-color: rgba(56, 189, 248, 0.25);
+  animation: ep-splash-spin 2.4s linear infinite;
+}
+
+.ep-splash-ring--mid {
+  inset: 14px;
+  border-bottom-color: var(--splash-gold);
+  border-left-color: rgba(251, 191, 36, 0.2);
+  animation: ep-splash-spin 1.8s linear infinite reverse;
+}
+
+.ep-splash-ring--inner {
+  inset: 28px;
+  border-top-color: rgba(255, 255, 255, 0.5);
+  animation: ep-splash-spin 1.2s linear infinite;
+}
+
+@keyframes ep-splash-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ep-splash-core {
+  position: absolute;
+  inset: 38px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06));
+  box-shadow:
+    0 0 40px rgba(56, 189, 248, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.06em;
+  color: #fff;
+  animation: ep-splash-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ep-splash-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 40px rgba(56, 189, 248, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  50% {
+    transform: scale(1.04);
+    box-shadow:
+      0 0 56px rgba(56, 189, 248, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+.ep-splash-bar {
+  width: min(220px, 70vw);
+  height: 3px;
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
   overflow: hidden;
-  background: rgba(37, 99, 235, 0.18);
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.15);
 }
 
-.ep-route-progress__bar {
+.ep-splash-bar::after {
+  content: "";
+  display: block;
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%);
-  background-size: 200% 100%;
-  animation: ep-route-progress-shimmer 1.2s ease-in-out infinite;
-  transition: width 0.28s ease-out;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.45);
+  width: 40%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--splash-accent), var(--splash-gold));
+  animation: ep-splash-bar 1.6s ease-in-out infinite;
 }
 
-.ep-route-progress__bar--done {
-  animation: none;
-  background: #2563eb;
-}
-
-@keyframes ep-route-progress-shimmer {
+@keyframes ep-splash-bar {
   0% {
-    background-position: 100% 0;
+    transform: translateX(-100%);
   }
 
   100% {
-    background-position: -100% 0;
+    transform: translateX(350%);
   }
 }
 
+.ep-route-overlay-enter-active,
+.ep-route-overlay-leave-active {
+  transition: opacity 0.28s ease;
+}
+
+.ep-route-overlay-enter-from,
+.ep-route-overlay-leave-to {
+  opacity: 0;
+}
+
+.ep-route-overlay-enter-active .ep-route-progress__backdrop,
+.ep-route-overlay-leave-active .ep-route-progress__backdrop {
+  transition: backdrop-filter 0.28s ease, background-color 0.28s ease;
+}
+
+body.ep-route-loading {
+  overflow: hidden;
+}
+
 #page-container.dark-mode {
-  .ep-route-progress__track {
-    background: rgba(96, 165, 250, 0.22);
-    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.12);
+  .ep-route-progress__backdrop {
+    background: rgba(15, 23, 42, 0.55);
   }
 
-  .ep-route-progress__bar {
-    background: linear-gradient(90deg, #2563eb 0%, #60a5fa 50%, #93c5fd 100%);
-    background-size: 200% 100%;
-    box-shadow: 0 0 14px rgba(96, 165, 250, 0.5);
+  .ep-splash-core {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
   }
 
-  .ep-route-progress__bar--done {
-    background: #3b82f6;
+  .ep-splash-bar {
+    background: rgba(255, 255, 255, 0.14);
   }
 }

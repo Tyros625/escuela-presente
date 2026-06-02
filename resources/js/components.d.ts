@@ -13,6 +13,7 @@ declare module '@vue/runtime-core' {
     BaseNavigationTenant: typeof import('./components/BaseNavigationTenant.vue')['default']
     BasePageHeading: typeof import('./components/BasePageHeading.vue')['default']
     EpBrandLogo: typeof import('./components/EpBrandLogo.vue')['default']
+    EpSplashEmblem: typeof import('./components/EpSplashEmblem.vue')['default']
     ErrorsView: typeof import('./components/ErrorsView.vue')['default']
     Index3View: typeof import('./components/Index3View.vue')['default']
     IndexTenantView: typeof import('./components/IndexTenantView.vue')['default']

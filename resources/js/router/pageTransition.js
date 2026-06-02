@@ -1,22 +1,16 @@
 import { ref } from "vue";
 
-/** Center splash-style route progress (visible ~1–2s, no full-screen backdrop). */
+/** Full-screen blur + splash EP loader while the next route loads. */
 export const routeProgressVisible = ref(false);
-export const routeProgressValue = ref(0);
 
-const MIN_DURATION_MS = 1500;
-const HIDE_AFTER_COMPLETE_MS = 280;
+const MIN_DURATION_MS = 1200;
+const HIDE_AFTER_COMPLETE_MS = 400;
 
 let startedAt = 0;
-let tickTimer = null;
 let finishTimer = null;
 let hideTimer = null;
 
 function clearTimers() {
-  if (tickTimer) {
-    clearInterval(tickTimer);
-    tickTimer = null;
-  }
   if (finishTimer) {
     clearTimeout(finishTimer);
     finishTimer = null;
@@ -35,37 +29,22 @@ function shouldAnimate(from, to) {
   return to.fullPath !== from.fullPath;
 }
 
+function setBodyLoading(active) {
+  document.body.classList.toggle("ep-route-loading", active);
+}
+
 function startRouteProgress() {
   clearTimers();
   startedAt = Date.now();
+  setBodyLoading(true);
   routeProgressVisible.value = true;
-  routeProgressValue.value = 10;
-
-  tickTimer = window.setInterval(() => {
-    const elapsed = Date.now() - startedAt;
-    const cap = elapsed < MIN_DURATION_MS * 0.75 ? 82 : 94;
-
-    if (routeProgressValue.value < cap) {
-      routeProgressValue.value = Math.min(
-        cap,
-        routeProgressValue.value + 2 + Math.random() * 5
-      );
-    }
-  }, 100);
 }
 
 function finishRouteProgress() {
-  if (tickTimer) {
-    clearInterval(tickTimer);
-    tickTimer = null;
-  }
-
   const runComplete = () => {
-    routeProgressValue.value = 100;
-
     hideTimer = window.setTimeout(() => {
       routeProgressVisible.value = false;
-      routeProgressValue.value = 0;
+      setBodyLoading(false);
       hideTimer = null;
     }, HIDE_AFTER_COMPLETE_MS);
   };
@@ -91,7 +70,7 @@ export function attachRouterPageTransition(router) {
     if (!shouldAnimate(from, to)) {
       clearTimers();
       routeProgressVisible.value = false;
-      routeProgressValue.value = 0;
+      setBodyLoading(false);
       return;
     }
 
