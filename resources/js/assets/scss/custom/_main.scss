@@ -1099,76 +1099,43 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
       display: none !important;
     }
 
-    // Top-level row labels only — submenu flyout keeps text visible
-    .nav-main > .nav-main-item > .nav-main-link > .nav-main-link-name,
-    .nav-main > .nav-main-item > .nav-main-link > .nav-main-link-badge {
+    // Kill OneUI hover slide-out (shows labels + breaks alignment)
+    &:hover .content-header,
+    &:hover .content-side,
+    &:not(:hover) .content-header,
+    &:not(:hover) .content-side {
+      transform: none !important;
+      width: 100% !important;
+    }
+
+    .nav-main .nav-main-link-name,
+    .nav-main .nav-main-link-badge,
+    .ep-nav-top-label {
       display: none !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      max-width: 0 !important;
+      opacity: 0 !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      pointer-events: none !important;
     }
 
     .nav-main-link.nav-main-link-submenu::before {
       display: none !important;
     }
 
-    // Submenu flyout (collapsed sidebar)
-    .nav-main > .nav-main-item {
-      position: relative;
+    .nav-main > .nav-main-item > .nav-main-submenu {
+      display: none !important;
+    }
 
-      &:has(> .nav-main-submenu) {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      > .nav-main-submenu {
-        display: none !important;
-        position: absolute;
-        left: calc(100% + 6px);
-        top: 0;
-        width: 14rem;
-        min-width: 14rem;
-        margin: 0;
-        padding: 0.375rem 0;
-        z-index: 1100;
-        background: #ffffff;
-        border: 1px solid #e6ebf1;
-        border-radius: 0.625rem;
-        box-shadow: 0 8px 28px rgba(10, 37, 64, 0.14);
-        list-style: none;
-
-        .nav-main-link-name,
-        .nav-main-link-badge {
-          display: inline-block !important;
-          opacity: 1 !important;
-          width: auto !important;
-          overflow: visible !important;
-          margin: 0 !important;
-        }
-
-        .nav-main-link {
-          width: auto !important;
-          min-width: 0 !important;
-          height: auto !important;
-          min-height: 2.375rem !important;
-          margin: 0.0625rem 0.375rem !important;
-          padding: 0.5rem 0.75rem !important;
-          justify-content: flex-start !important;
-          border-radius: 0.5rem;
-
-          .nav-main-link-icon {
-            width: 1rem !important;
-            min-width: 1rem !important;
-            margin-right: 0.5rem !important;
-            font-size: 0.875rem !important;
-          }
-        }
-
-        .nav-main-link.nav-main-link-submenu::before {
-          display: block !important;
-        }
-      }
-
-      &.open > .nav-main-submenu {
-        display: block !important;
-      }
+    .ep-nav-item-wrap,
+    .nav-main > .nav-main-item > a.nav-main-link {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .nav-main-link,
@@ -1203,6 +1170,51 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
       transform: none !important;
     }
   }
+}
+
+// Mini sidebar flyout panel (Teleport to body)
+.ep-nav-mini-flyout-panel {
+  position: fixed;
+  z-index: 2000;
+  width: 16.25rem;
+  min-width: 16.25rem;
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e6ebf1;
+  border-radius: 0.625rem;
+  box-shadow: 0 12px 36px rgba(10, 37, 64, 0.2);
+}
+
+.ep-nav-mini-flyout-panel__title {
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #697386;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e6ebf1;
+}
+
+.ep-nav-mini-flyout-panel__link {
+  display: block;
+  padding: 0.625rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #3c4257;
+  text-decoration: none;
+  transition: background-color 0.12s ease, color 0.12s ease;
+
+  &:hover,
+  &:focus {
+    background: rgba(99, 91, 255, 0.1);
+    color: #635bff;
+  }
+}
+
+.ep-nav-mini-flyout-panel__empty {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
 }
 
 // ─── Form layout (single column) ─────────────────────────────────────────────
@@ -1628,20 +1640,24 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
     }
   }
 
-  &.sidebar-mini.sidebar-o #sidebar .nav-main > .nav-main-item > .nav-main-submenu {
+  .ep-nav-mini-flyout-panel {
     background: #252b45;
     border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  }
 
-    .nav-main-link {
-      color: #c5cad6;
+  .ep-nav-mini-flyout-panel__title {
+    color: #9aa3b8;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
 
-      &:hover,
-      &:focus,
-      &.active {
-        color: #f0f2f7;
-        background: rgba(99, 91, 255, 0.18);
-      }
+  .ep-nav-mini-flyout-panel__link {
+    color: #c5cad6;
+
+    &:hover,
+    &:focus {
+      color: #f0f2f7;
+      background: rgba(99, 91, 255, 0.22);
     }
   }
 

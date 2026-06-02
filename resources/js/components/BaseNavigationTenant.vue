@@ -1,36 +1,12 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
+import BaseNavigationTenant from "@/components/BaseNavigationTenant.vue";
 
-// Main store and Route
 const store = useTemplateStore();
 const route = useRoute();
 
-function isSidebarMiniDesktop() {
-  return window.innerWidth >= 992 && store.settings.sidebarMini;
-}
-
-function closeMiniFlyouts() {
-  document
-    .querySelectorAll("#sidebar .nav-main > .nav-main-item.open")
-    .forEach((item) => item.classList.remove("open"));
-}
-
-function onDocumentClick(event) {
-  if (!isSidebarMiniDesktop()) {
-    return;
-  }
-
-  const sidebar = document.getElementById("sidebar");
-  if (sidebar?.contains(event.target)) {
-    return;
-  }
-
-  closeMiniFlyouts();
-}
-
-// Component properties
 const props = defineProps({
   nodes: {
     type: Array,
@@ -39,172 +15,271 @@ const props = defineProps({
   subMenu: {
     type: Boolean,
     default: false,
-    description: "If true, a submenu will be rendered",
   },
   dark: {
     type: Boolean,
     default: false,
-    description: "Dark mode for menu",
   },
   horizontal: {
     type: Boolean,
     default: false,
-    description: "Horizontal menu in large screen width",
   },
   horizontalHover: {
     type: Boolean,
     default: false,
-    description: "Hover mode for horizontal menu",
   },
   horizontalCenter: {
     type: Boolean,
     default: false,
-    description: "Center mode for horizontal menu",
   },
   horizontalJustify: {
     type: Boolean,
     default: false,
-    description: "Justify mode for horizontal menu",
   },
   disableClick: {
     type: Boolean,
     default: false,
-    description:
-      "Disables submenu click on 2+ level when we are in horizontal and hover mode",
   },
 });
 
-// Set CSS classes accordingly
-const classContainer = computed(() => {
-  return {
-    "nav-main": !props.subMenu,
-    "nav-main-submenu": props.subMenu,
-    "nav-main-dark": props.dark,
-    "nav-main-horizontal": props.horizontal,
-    "nav-main-hover": props.horizontalHover,
-    "nav-main-horizontal-center": props.horizontalCenter,
-    "nav-main-horizontal-justify": props.horizontalJustify,
-  };
+const windowWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1200);
+
+const isMiniNav = computed(
+  () => windowWidth.value >= 992 && store.settings.sidebarMini
+);
+
+const flyout = reactive({
+  visible: false,
+  title: "",
+  items: [],
+  top: 0,
+  left: 0,
 });
 
-// Checks if a submenu path is part of the URL path
-function subIsActive(paths) {
-  const activePaths = Array.isArray(paths) ? paths : [paths];
+const flyoutStyle = computed(() => ({
+  top: `${flyout.top}px`,
+  left: `${flyout.left}px`,
+}));
 
-  return activePaths.some((path) => {
-    return route.path.indexOf(path) === 0; // current path starts with this path string
-  });
+function isSidebarMiniDesktop() {
+  return isMiniNav.value;
 }
 
-// Main menu toggling and mobile functionality
-function linkClicked(e, submenu) {
-  if (submenu) {
-    // Get closest li element
-    let el = e.target.closest("li");
+function visibleSubItems(node) {
+  return (node.sub || []).filter((entry) => entry.attributes?.show !== false);
+}
 
-    // Check if we are in a large screen, have horizontal navigation and hover is enabled
+function closeFlyout() {
+  flyout.visible = false;
+  flyout.title = "";
+  flyout.items = [];
+}
+
+function openFlyout(triggerEl, node) {
+  closeFlyout();
+
+  const rect = triggerEl.getBoundingClientRect();
+  const menuWidth = 260;
+  let left = rect.right + 8;
+  const top = Math.max(8, Math.min(rect.top, window.innerHeight - 80));
+
+  if (left + menuWidth > window.innerWidth - 8) {
+    left = Math.max(8, rect.left - menuWidth - 8);
+  }
+
+  flyout.title = node.name;
+  flyout.items = visibleSubItems(node);
+  flyout.top = top;
+  flyout.left = left;
+  flyout.visible = true;
+}
+
+function subIsActive(paths) {
+  const activePaths = Array.isArray(paths) ? paths : [paths];
+  return activePaths.some((path) => route.path.indexOf(path) === 0);
+}
+
+const classContainer = computed(() => ({
+  "nav-main": !props.subMenu,
+  "nav-main-submenu": props.subMenu,
+  "nav-main-dark": props.dark,
+  "nav-main-horizontal": props.horizontal,
+  "nav-main-hover": props.horizontalHover,
+  "nav-main-horizontal-center": props.horizontalCenter,
+  "nav-main-horizontal-justify": props.horizontalJustify,
+}));
+
+function linkClicked(e, submenu, node) {
+  if (submenu && isSidebarMiniDesktop()) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (flyout.visible && flyout.title === node.name) {
+      closeFlyout();
+      return;
+    }
+
+    openFlyout(e.currentTarget, node);
+    return;
+  }
+
+  if (submenu) {
+    const el = e.target.closest("li");
+
     if (
       !(
         window.innerWidth > 991 &&
         ((props.horizontal && props.horizontalHover) || props.disableClick)
       )
     ) {
-      if (isSidebarMiniDesktop()) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (el.classList.contains("open")) {
-          el.classList.remove("open");
-        } else {
-          closeMiniFlyouts();
-          el.classList.add("open");
-        }
-        return;
-      }
-
       if (el.classList.contains("open")) {
-        // If submenu is open, close it..
         el.classList.remove("open");
       } else {
-        // .. else if submenu is closed, close all other (same level) submenus first before open it
         Array.from(el.closest("ul").children).forEach((element) => {
           element.classList.remove("open");
         });
-
         el.classList.add("open");
       }
     }
-  } else {
-    // If we are in mobile, close the sidebar
-    if (window.innerWidth < 992) {
-      store.sidebar({ mode: "close" });
-    }
+    return;
+  }
 
-    if (isSidebarMiniDesktop()) {
-      closeMiniFlyouts();
-    }
+  if (window.innerWidth < 992) {
+    store.sidebar({ mode: "close" });
+  }
+
+  if (isSidebarMiniDesktop()) {
+    closeFlyout();
+  }
+}
+
+function onFlyoutLinkClick() {
+  closeFlyout();
+  if (window.innerWidth < 992) {
+    store.sidebar({ mode: "close" });
+  }
+}
+
+function onDocumentClick(event) {
+  const panel = document.querySelector(".ep-nav-mini-flyout-panel");
+  if (panel?.contains(event.target)) {
+    return;
+  }
+
+  if (isSidebarMiniDesktop()) {
+    closeFlyout();
+  }
+}
+
+function onResize() {
+  windowWidth.value = window.innerWidth;
+  if (!isSidebarMiniDesktop()) {
+    closeFlyout();
   }
 }
 
 onMounted(() => {
   document.addEventListener("click", onDocumentClick);
+  window.addEventListener("resize", onResize);
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("click", onDocumentClick);
+  window.removeEventListener("resize", onResize);
 });
 </script>
 
 <template>
   <ul :class="classContainer">
     <template v-for="(node, index) in nodes" :key="`node-${index}`">
-      <li v-if="node.attributes.show" :key="`node-${index}`" :class="{
-        'nav-main-heading': node.heading,
-        'nav-main-item': !node.heading,
-        open:
-          node.sub && node.subActivePaths
-            ? subIsActive(node.subActivePaths)
-            : false,
-      }">
-        <!-- Heading -->
+      <li
+        v-if="node.attributes.show"
+        :class="{
+          'nav-main-heading': node.heading,
+          'nav-main-item': !node.heading,
+          open:
+            !isMiniNav &&
+            node.sub &&
+            node.subActivePaths &&
+            subIsActive(node.subActivePaths),
+        }"
+      >
         {{ node.heading ? node.name : "" }}
-        <!-- Normal Link -->
-        <div v-if="!node.heading && !node.sub" @click="linkClicked($event)">
-          <RouterLink :to="node.to && node.to !== '#' ? { name: node.to } : '#'" class="nav-main-link"
+
+        <div v-if="!node.heading && !node.sub" class="ep-nav-item-wrap" @click="linkClicked($event)">
+          <RouterLink
+            :to="node.to && node.to !== '#' ? { name: node.to } : '#'"
+            class="nav-main-link"
             :title="node.name"
-            :active-class="node.to && node.to !== '#' ? 'active' : ''">
+            :active-class="node.to && node.to !== '#' ? 'active' : ''"
+          >
             <i v-if="node.icon" :class="`nav-main-link-icon ${node.icon}`"></i>
-            <span v-if="node.name" class="nav-main-link-name">
+            <span v-if="node.name && !subMenu" class="nav-main-link-name ep-nav-top-label">
               {{ node.name }}
             </span>
-            <span v-if="node.badge" class="nav-main-link-badge badge rounded-pill" :class="
-              node['badge-variant']
-                ? `bg-${node['badge-variant']}`
-                : 'bg-primary'
-            ">{{ node.badge }}</span>
+            <span
+              v-if="node.badge"
+              class="nav-main-link-badge badge rounded-pill ep-nav-top-label"
+              :class="node['badge-variant'] ? `bg-${node['badge-variant']}` : 'bg-primary'"
+            >
+              {{ node.badge }}
+            </span>
           </RouterLink>
         </div>
-        <!-- END Normal Link -->
 
-        <!-- Submenu Link -->
-        <a v-else-if="!node.heading && node.sub" href="#" class="nav-main-link nav-main-link-submenu"
+        <a
+          v-else-if="!node.heading && node.sub"
+          href="#"
+          class="nav-main-link nav-main-link-submenu"
           :title="node.name"
-          @click.prevent="linkClicked($event, true)">
+          @click.prevent="linkClicked($event, true, node)"
+        >
           <i v-if="node.icon" :class="`nav-main-link-icon ${node.icon}`"></i>
-          <span v-if="node.name" class="nav-main-link-name">{{
-              node.name
-          }}</span>
-          <span v-if="node.badge" class="nav-main-link-badge badge rounded-pill" :class="
-            node['badge-variant']
-              ? `bg-${node['badge-variant']}`
-              : 'bg-primary'
-          ">{{ node.badge }}</span>
+          <span v-if="node.name && !subMenu" class="nav-main-link-name ep-nav-top-label">
+            {{ node.name }}
+          </span>
+          <span
+            v-if="node.badge"
+            class="nav-main-link-badge badge rounded-pill ep-nav-top-label"
+            :class="node['badge-variant'] ? `bg-${node['badge-variant']}` : 'bg-primary'"
+          >
+            {{ node.badge }}
+          </span>
         </a>
-        <!-- END Submenu Link -->
 
-        <BaseNavigation v-if="node.sub" :nodes="node.sub" sub-menu
-          :disable-click="props.horizontal && props.horizontalHover" />
+        <BaseNavigationTenant
+          v-if="node.sub && !isMiniNav"
+          :nodes="node.sub"
+          sub-menu
+          :disable-click="props.horizontal && props.horizontalHover"
+        />
       </li>
     </template>
   </ul>
+
+  <Teleport v-if="!subMenu" to="body">
+    <div
+      v-if="flyout.visible && isMiniNav"
+      class="ep-nav-mini-flyout-panel"
+      :style="flyoutStyle"
+      role="menu"
+      :aria-label="flyout.title"
+      @click.stop
+    >
+      <div class="ep-nav-mini-flyout-panel__title">{{ flyout.title }}</div>
+      <RouterLink
+        v-for="(entry, idx) in flyout.items"
+        :key="`flyout-${idx}-${entry.to}`"
+        :to="entry.to && entry.to !== '#' ? { name: entry.to } : '#'"
+        class="ep-nav-mini-flyout-panel__link"
+        role="menuitem"
+        @click="onFlyoutLinkClick"
+      >
+        {{ entry.name }}
+      </RouterLink>
+      <div v-if="!flyout.items.length" class="ep-nav-mini-flyout-panel__empty text-muted">
+        Sin opciones
+      </div>
+    </div>
+  </Teleport>
 </template>
