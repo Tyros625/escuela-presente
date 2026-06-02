@@ -38,7 +38,7 @@
                   style="min-width: 220px"
                 >
                   <div class="px-2 py-2 mb-1">
-                    <div class="fw-semibold text-dark">{{ userDisplayName }}</div>
+                    <div class="fw-semibold">{{ userDisplayName }}</div>
                     <div class="text-muted fs-sm">{{ userStore.getUser?.role || "—" }}</div>
                   </div>
                   <div class="dropdown-divider my-1"></div>

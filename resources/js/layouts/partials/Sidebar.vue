@@ -100,7 +100,7 @@ onMounted(() => {
       <div class="content-header">
         <slot name="header">
           <!-- Logo -->
-          <EpBrandLogo :to="{ name: 'landing' }" link-class="smini-hide" />
+          <EpBrandLogo :to="{ name: 'landing' }" link-class="smini-hidden smini-hide" />
           <EpBrandLogo
             :to="{ name: 'landing' }"
             variant="mini"

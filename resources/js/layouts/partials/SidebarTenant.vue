@@ -16,19 +16,29 @@
       <!-- Side Header -->
       <div class="content-header ep-sidebar-header">
         <slot name="header">
-          <!-- Logo -->
-          <EpBrandLogo
-            :to="{ name: 'landing' }"
-            link-class="smini-hide"
-          />
-          <EpBrandLogo
-            :to="{ name: 'landing' }"
-            variant="mini"
-            link-class="smini-visible"
-          />
+          <div class="ep-sidebar-header-brand">
+            <EpBrandLogo
+              :to="{ name: 'landing' }"
+              link-class="smini-hidden smini-hide"
+            />
+            <div class="ep-sidebar-header-compact smini-visible">
+              <EpBrandLogo :to="{ name: 'landing' }" variant="mini" />
+              <button
+                type="button"
+                class="ep-sidebar-collapse ep-sidebar-collapse--mini d-none d-lg-inline-flex"
+                @click="store.sidebarMini({ mode: 'toggle' })"
+                title="Expandir menú"
+                aria-label="Expandir menú"
+              >
+                <i
+                  class="fa-solid fa-chevron-right ep-sidebar-collapse-icon is-collapsed"
+                ></i>
+              </button>
+            </div>
+          </div>
         </slot>
 
-        <div class="ep-sidebar-header-actions">
+        <div class="ep-sidebar-header-actions smini-hide">
           <button
             type="button"
             class="ep-sidebar-collapse d-none d-lg-inline-flex"

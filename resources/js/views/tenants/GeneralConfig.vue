@@ -4,8 +4,7 @@
   <div class="content">
     <BaseBlock title="Configuración General" class="h-100">
       <form @submit.prevent="updateData">
-        <div class="row push">
-          <div class="col-lg-8 col-xl-5">
+        <div class="ep-form-stack">
             <div class="mb-4">
               <label class="form-label">CCT</label>
               <input
@@ -163,13 +162,7 @@
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row items-push">
-          <div class="col-lg-4">
-            <p class="fs-sm text-muted">Datos Fiscales</p>
-          </div>
-          <div class="col-lg-8">
+          <h3 class="ep-form-section-title">Datos Fiscales</h3>
             <div class="row mb-4">
               <div class="col-6">
                 <label class="form-label">Nombre Facturación</label>
@@ -226,13 +219,7 @@
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row items-push">
-          <div class="col-lg-4">
-            <p class="fs-sm text-muted">Precios (MXN)</p>
-          </div>
-          <div class="col-lg-8">
+          <h3 class="ep-form-section-title">Precios (MXN)</h3>
             <div class="row mb-4">
               <div class="col-4">
                 <label class="form-label">Credencial</label>
@@ -262,13 +249,7 @@
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row items-push">
-          <div class="col-lg-4">
-            <p class="fs-sm text-muted">Mensajes Personalizados</p>
-          </div>
-          <div class="col-lg-8">
+          <h3 class="ep-form-section-title">Mensajes Personalizados</h3>
             <div class="row mb-4">
               <div class="col-12">
                 <label class="form-label">Incidencias WhatsApp</label>
@@ -281,13 +262,7 @@
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row items-push">
-          <div class="col-lg-4">
-            <p class="fs-sm text-muted">Configure the School Schedule:</p>
-          </div>
-          <div class="col-lg-8">
+          <h3 class="ep-form-section-title">Horario escolar</h3>
             <div
               v-for="shift in scheduleShifts"
               :key="`school-${shift.key}`"
@@ -326,19 +301,11 @@
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row items-push">
-          <div class="col-lg-4">
-            <p class="fs-sm text-muted">
-              Configure the Tardiness Schedule for Students:
-            </p>
-            <p class="fs-sm text-muted">
+          <h3 class="ep-form-section-title">Horario de retardo</h3>
+            <p class="fs-sm text-muted mb-3">
               Los alumnos que registren asistencia después de esta hora se
               considerarán en retardo.
             </p>
-          </div>
-          <div class="col-lg-8">
             <div
               v-for="shift in scheduleShifts"
               :key="`tardiness-${shift.key}`"
@@ -371,13 +338,7 @@
                 />
               </div>
             </div>
-          </div>
-        </div>
-        <div class="row push">
-          <div class="col-lg-4"></div>
-
-          <div class="col-lg-8 col-xl-5">
-            <div class="mb-4">
+            <div class="mb-4 mt-4">
               <button
                 type="submit"
                 class="btn btn-primary"
@@ -388,7 +349,6 @@
                 Actualizar
               </button>
             </div>
-          </div>
         </div>
       </form>
     </BaseBlock>
