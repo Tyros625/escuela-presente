@@ -25,14 +25,12 @@
               <EpBrandLogo :to="{ name: 'landing' }" variant="mini" />
               <button
                 type="button"
-                class="ep-sidebar-collapse ep-sidebar-collapse--mini d-none d-lg-inline-flex"
+                class="ep-sidebar-expand-btn d-none d-lg-inline-flex"
                 @click="store.sidebarMini({ mode: 'toggle' })"
                 title="Expandir menú"
                 aria-label="Expandir menú"
               >
-                <i
-                  class="fa-solid fa-chevron-right ep-sidebar-collapse-icon is-collapsed"
-                ></i>
+                <i class="fa-solid fa-angles-right" aria-hidden="true"></i>
               </button>
             </div>
           </div>
@@ -41,15 +39,12 @@
         <div class="ep-sidebar-header-actions smini-hide">
           <button
             type="button"
-            class="ep-sidebar-collapse d-none d-lg-inline-flex"
+            class="ep-sidebar-toggle-btn d-none d-lg-inline-flex"
             @click="store.sidebarMini({ mode: 'toggle' })"
-            :title="store.settings.sidebarMini ? 'Expandir menú' : 'Contraer menú'"
-            :aria-label="store.settings.sidebarMini ? 'Expandir menú' : 'Contraer menú'"
+            title="Contraer menú"
+            aria-label="Contraer menú"
           >
-            <i
-              class="fa-solid fa-chevron-left ep-sidebar-collapse-icon"
-              :class="{ 'is-collapsed': store.settings.sidebarMini }"
-            ></i>
+            <i class="fa-solid fa-angles-left" aria-hidden="true"></i>
           </button>
           <button
             type="button"

@@ -609,8 +609,50 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
   width: 100%;
 }
 
-.ep-sidebar-collapse--mini {
-  flex-shrink: 0;
+// Expand control (mini sidebar)
+.ep-sidebar-expand-btn {
+  width: 2.5rem;
+  height: 1.625rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(99, 91, 255, 0.28);
+  border-radius: 0.5rem;
+  background: rgba(99, 91, 255, 0.08);
+  color: #635bff;
+  font-size: 0.8125rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &:focus {
+    background: rgba(99, 91, 255, 0.16);
+    border-color: rgba(99, 91, 255, 0.45);
+    color: #4f46e5;
+  }
+}
+
+// Collapse control (expanded sidebar)
+.ep-sidebar-toggle-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e6ebf1;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #697386;
+  font-size: 0.75rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &:focus {
+    background: #f6f9fc;
+    border-color: #cfd7df;
+    color: #635bff;
+  }
 }
 
 // ─── Brand logo (sidebar) ────────────────────────────────────────────────────
@@ -750,7 +792,6 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
   gap: 0.375rem;
 }
 
-.ep-sidebar-collapse,
 .ep-sidebar-close {
   width: 2rem;
   height: 2rem;
@@ -770,15 +811,6 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
     border-color: #cfd7df;
     color: #0a2540;
   }
-}
-
-.ep-sidebar-collapse-icon {
-  font-size: 0.75rem;
-  transition: transform 0.2s ease;
-}
-
-.ep-sidebar-collapse-icon.is-collapsed {
-  transform: rotate(180deg);
 }
 
 .ep-sidebar-user {
@@ -933,22 +965,12 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
 }
 
 @include media-breakpoint-up(lg) {
-  // Cancel OneUI slide transform so mini icons stay centered
-  .sidebar-mini.sidebar-o #sidebar {
-    transform: translate3d(0, 0, 0) !important;
-
-    .content-header,
-    .content-side {
-      transform: none !important;
-    }
-  }
-
-  // Fixed icon-only mini sidebar: click toggles, no hover slide-out
-  .sidebar-mini.sidebar-o #sidebar.ep-sidebar-shell {
+  // Mini sidebar — override OneUI slide + side-scroll fixed 260px width
+  #page-container.sidebar-mini.sidebar-o #sidebar.ep-sidebar-shell {
     width: $sidebar-mini-width !important;
     max-width: $sidebar-mini-width !important;
-    overflow-x: visible;
-    transform: translateX(0) translateY(0) translateZ(0) !important;
+    overflow-x: hidden;
+    transform: translate3d(0, 0, 0) !important;
     transition: width 0.15s ease;
 
     .content-header,
@@ -959,10 +981,6 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
       max-width: 100% !important;
       transform: none !important;
       transition: none !important;
-    }
-
-    .content-header.ep-sidebar-header {
-      overflow: visible;
     }
 
     &:hover,
@@ -986,7 +1004,7 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
     }
 
     .smini-visible {
-      display: inline-flex !important;
+      display: flex !important;
     }
 
     .smini-visible-block {
@@ -1002,7 +1020,8 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
       align-items: center;
       justify-content: flex-start;
       gap: 0;
-      padding: 0.75rem 0.25rem !important;
+      padding: 0.625rem 0.375rem !important;
+      min-height: auto;
       overflow: visible;
     }
 
@@ -1013,30 +1032,50 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
 
     .ep-sidebar-header-compact {
       display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
     }
 
     .ep-sidebar-header-actions {
       display: none !important;
     }
 
-    .ep-sidebar-collapse--mini {
+    .ep-sidebar-expand-btn {
       display: inline-flex !important;
     }
 
-    .ep-brand--mini {
-      margin: 0 auto;
+    .ep-brand__glyph {
+      width: 2.25rem;
+      height: 2.25rem;
+      font-size: 0.75rem;
     }
 
-    #sidebar .nav-main {
-      padding: 0;
+    .content-side {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    .nav-main {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding: 0.25rem 0 !important;
       width: 100%;
-      align-items: center;
     }
 
-    #sidebar .nav-main-item {
+    .nav-main-item {
       width: 100%;
       display: flex;
       justify-content: center;
+      padding: 0;
+      margin: 0.125rem 0;
+
+      > div {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
     }
 
     .nav-main > .nav-main-item > .nav-main-submenu {
@@ -1055,18 +1094,34 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
 
     .nav-main-link,
     .nav-main-link.nav-main-link-submenu {
-      width: 2.5rem;
-      min-width: 2.5rem;
-      margin-left: auto;
-      margin-right: auto;
+      width: 2.75rem !important;
+      min-width: 2.75rem !important;
+      height: 2.75rem !important;
+      min-height: 2.75rem !important;
+      margin: 0 auto !important;
       padding: 0 !important;
       justify-content: center;
+      align-items: center;
+      border-radius: 0.625rem;
 
       .nav-main-link-icon {
-        width: auto;
+        width: 1.25rem !important;
+        min-width: 1.25rem !important;
         margin: 0 !important;
+        font-size: 1.125rem !important;
+        line-height: 1;
         text-align: center;
       }
+    }
+  }
+
+  // side-scroll forces 260px inner width — cancel in mini mode
+  #page-container.sidebar-mini.sidebar-o.side-scroll #sidebar.ep-sidebar-shell {
+    .content-header,
+    .content-side {
+      width: 100% !important;
+      max-width: 100% !important;
+      transform: none !important;
     }
   }
 }
@@ -1296,7 +1351,32 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
     color: #8b95a8;
   }
 
-  .ep-sidebar-collapse,
+  .ep-sidebar-expand-btn {
+    background: rgba(99, 91, 255, 0.18);
+    border-color: rgba(99, 91, 255, 0.35);
+    color: #a5b4fc;
+
+    &:hover,
+    &:focus {
+      background: rgba(99, 91, 255, 0.28);
+      border-color: rgba(99, 91, 255, 0.5);
+      color: #c7d2fe;
+    }
+  }
+
+  .ep-sidebar-toggle-btn {
+    background: #252b45;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #c5cad6;
+
+    &:hover,
+    &:focus {
+      background: #2f3654;
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #a5b4fc;
+    }
+  }
+
   .ep-sidebar-close,
   .ep-icon-btn,
   .ep-theme-toggle,
