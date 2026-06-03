@@ -135,7 +135,7 @@
 					>
 						<i class="fa fa-cog fa-spin me-1" v-if="isSaving"></i>
 						<i class="fa-solid fa-floppy-disk me-1" v-else></i>
-						Guardar asignaciones
+						Guardar grupo
 					</button>
 				</div>
 			</div>
@@ -149,6 +149,7 @@ import { onBeforeRouteLeave } from 'vue-router';
 import Swal from 'sweetalert2';
 import api from '@/services/api';
 import SubjectAssignmentGradeTable from '@/components/SubjectAssignmentGradeTable.vue';
+import { cellKey, parseCellKey } from '@/utils/subjectAssignment';
 
 const CYCLE_STORAGE_KEY = 'subject-assignment-school-cycle-id';
 
@@ -165,10 +166,6 @@ const stats = ref({
 });
 const isLoading = ref(false);
 const isSaving = ref(false);
-
-function cellKey(groupId, specialtyId) {
-	return `${groupId}_${specialtyId}`;
-}
 
 const hasChanges = computed(() => {
 	const keys = new Set([
@@ -217,10 +214,14 @@ function buildChanges() {
 			continue;
 		}
 
-		const [groupId, specialtyId] = key.split('_');
+		const parsed = parseCellKey(key);
+		if (!parsed) {
+			continue;
+		}
+
 		changes.push({
-			academic_group_id: Number(groupId),
-			specialty_id: Number(specialtyId),
+			academic_group_id: parsed.groupId,
+			specialty_id: parsed.specialtyId,
 			teacher_id: current,
 		});
 	}

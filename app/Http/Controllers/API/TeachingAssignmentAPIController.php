@@ -54,7 +54,12 @@ class TeachingAssignmentAPIController extends AppBaseController
                 continue;
             }
 
-            [$groupId, $specialtyId] = array_map('intval', explode('_', (string) $key, 2));
+            $parsed = $matrixService->parseCellKey((string) $key);
+            if ($parsed === null) {
+                continue;
+            }
+
+            [$groupId, $specialtyId] = $parsed;
 
             $subjectLinks[] = [
                 'teacher_id' => (int) $assignment['teacher_id'],

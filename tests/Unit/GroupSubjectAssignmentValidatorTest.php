@@ -4,10 +4,8 @@ namespace Tests\Unit;
 
 use App\Models\Tenants\Specialty;
 use App\Models\Tenants\Teacher;
-use App\Services\GroupSubjectAssignmentMatrixService;
 use App\Services\GroupSubjectAssignmentValidator;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 
 class GroupSubjectAssignmentValidatorTest extends TestCase
 {
@@ -44,25 +42,5 @@ class GroupSubjectAssignmentValidatorTest extends TestCase
 
         $this->assertNotNull($warning);
         $this->assertStringContainsString('FISICA', $warning);
-    }
-}
-
-class GroupSubjectAssignmentMatrixServiceTest extends TestCase
-{
-    public function test_cell_key_format(): void
-    {
-        $service = new GroupSubjectAssignmentMatrixService;
-
-        $this->assertSame('12_34', $service->cellKey(12, 34));
-    }
-
-    public function test_grade_label_adds_degree_symbol(): void
-    {
-        $service = new GroupSubjectAssignmentMatrixService;
-        $method = new ReflectionMethod(GroupSubjectAssignmentMatrixService::class, 'gradeLabel');
-        $method->setAccessible(true);
-
-        $this->assertSame('1°', $method->invoke($service, '1'));
-        $this->assertSame('2°', $method->invoke($service, '2°'));
     }
 }

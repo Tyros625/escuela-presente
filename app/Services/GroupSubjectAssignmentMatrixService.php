@@ -10,6 +10,8 @@ use Illuminate\Support\Collection;
 
 class GroupSubjectAssignmentMatrixService
 {
+    public const CELL_KEY_SEPARATOR = ':';
+
     public function build(int $schoolCycleId): array
     {
         $grades = Grade::query()
@@ -21,6 +23,7 @@ class GroupSubjectAssignmentMatrixService
             ->where('school_cycle_id', $schoolCycleId)
             ->with(['grade', 'section'])
             ->get()
+            ->filter(fn (AcademicGroup $group) => ! SinGrupoAcademicGroupService::isSinGrupoGroup($group))
             ->groupBy('grade_id');
 
         $specialtiesByGrade = Specialty::query()
@@ -28,8 +31,8 @@ class GroupSubjectAssignmentMatrixService
                 $query->where('school_cycle_id', $schoolCycleId)
                     ->orWhereNull('school_cycle_id');
             })
-            ->orderBy('description')
             ->get()
+            ->filter(fn (Specialty $specialty) => ! TeachingScheduleRules::isServicioSpecialty($specialty))
             ->groupBy('grade_id');
 
         $assignments = GroupSubjectAssignment::query()
@@ -56,17 +59,16 @@ class GroupSubjectAssignmentMatrixService
         $filledCells = 0;
 
         foreach ($grades as $grade) {
-            $gradeGroups = ($groups[$grade->id] ?? collect())
-                ->sortBy(fn (AcademicGroup $group) => $group->section?->description ?? $group->name ?? '')
-                ->values();
+            $gradeGroups = $this->resolveGroupsForGrade($groups[$grade->id] ?? collect());
 
             if ($gradeGroups->isEmpty()) {
                 continue;
             }
 
-            $gradeSpecialties = ($specialtiesByGrade[$grade->id] ?? collect())
-                ->sortBy('description')
-                ->values();
+            $gradeSpecialties = GroupSubjectAssignmentCatalog::sortForGrade(
+                ($specialtiesByGrade[$grade->id] ?? collect())->values(),
+                $grade
+            );
 
             if ($gradeSpecialties->isEmpty()) {
                 continue;
@@ -86,21 +88,23 @@ class GroupSubjectAssignmentMatrixService
             $totalCells += $cells;
             $filledCells += $filled;
 
+            $expectedSubjects = GroupSubjectAssignmentCatalog::expectedSubjectCount($grade);
+
             $gradeBlocks[] = [
                 'grade_id' => $grade->id,
                 'grade_label' => $this->gradeLabel($grade->description),
+                'expected_subject_count' => $expectedSubjects,
                 'groups' => $gradeGroups->map(fn (AcademicGroup $group) => [
                     'id' => $group->id,
                     'name' => $group->name,
-                    'group_label' => $group->name ?? trim(
-                        ($group->grade?->description ?? '').' '.($group->section?->description ?? '')
-                    ),
+                    'group_label' => $this->groupLabel($group),
                     'shift' => $group->shift,
                 ])->all(),
                 'specialties' => $gradeSpecialties->map(fn (Specialty $specialty) => [
                     'id' => $specialty->id,
                     'description' => $specialty->description,
                     'code' => $specialty->code,
+                    'column_label' => GroupSubjectAssignmentCatalog::columnLabel($specialty),
                     'hours_per_week' => max(1, (int) ($specialty->hours_per_week ?? 1)),
                 ])->all(),
             ];
@@ -122,7 +126,62 @@ class GroupSubjectAssignmentMatrixService
 
     public function cellKey(int $groupId, int $specialtyId): string
     {
-        return "{$groupId}_{$specialtyId}";
+        return "{$groupId}".self::CELL_KEY_SEPARATOR."{$specialtyId}";
+    }
+
+    /**
+     * @return array{0: int, 1: int}|null
+     */
+    public function parseCellKey(string $key): ?array
+    {
+        if (str_contains($key, self::CELL_KEY_SEPARATOR)) {
+            [$groupId, $specialtyId] = explode(self::CELL_KEY_SEPARATOR, $key, 2);
+
+            return [(int) $groupId, (int) $specialtyId];
+        }
+
+        if (str_contains($key, '_')) {
+            [$groupId, $specialtyId] = explode('_', $key, 2);
+
+            return [(int) $groupId, (int) $specialtyId];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  Collection<int, AcademicGroup>  $groups
+     * @return Collection<int, AcademicGroup>
+     */
+    private function resolveGroupsForGrade(Collection $groups): Collection
+    {
+        return $groups
+            ->groupBy(fn (AcademicGroup $group) => $group->section_id ?? 'name:'.$group->name)
+            ->map(function (Collection $sectionGroups) {
+                return $sectionGroups
+                    ->sortBy(fn (AcademicGroup $group) => $group->shift === 'morning' ? 0 : 1)
+                    ->first();
+            })
+            ->sortBy(fn (AcademicGroup $group) => $group->section?->description ?? $group->name ?? '')
+            ->values();
+    }
+
+    private function groupLabel(AcademicGroup $group): string
+    {
+        $key = AcademicGroupColorService::groupKey($group);
+
+        if ($key !== '' && $key !== 'SG') {
+            return $key;
+        }
+
+        $fromName = trim((string) ($group->name ?? ''));
+        if ($fromName !== '') {
+            return $fromName;
+        }
+
+        return trim(
+            ($group->grade?->description ?? '').' '.($group->section?->description ?? '')
+        );
     }
 
     private function gradeLabel(string $description): string

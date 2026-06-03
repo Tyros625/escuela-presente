@@ -10,8 +10,11 @@ use App\Models\Tenants\Specialty;
 use App\Models\Tenants\Teacher;
 use App\Services\GroupSubjectAssignmentMatrixService;
 use App\Services\GroupSubjectAssignmentValidator;
+use App\Services\SinGrupoAcademicGroupService;
+use App\Services\TeachingScheduleRules;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GroupSubjectAssignmentAPIController extends AppBaseController
 {
@@ -39,71 +42,90 @@ class GroupSubjectAssignmentAPIController extends AppBaseController
         $cleared = 0;
         $warnings = [];
 
-        foreach ($changes as $change) {
-            $group = AcademicGroup::with('grade')->findOrFail($change['academic_group_id']);
-            $specialty = Specialty::findOrFail($change['specialty_id']);
+        try {
+            DB::transaction(function () use (
+                $changes,
+                $schoolCycleId,
+                $validator,
+                &$saved,
+                &$cleared,
+                &$warnings
+            ) {
+                foreach ($changes as $change) {
+                    $group = AcademicGroup::with('grade')->findOrFail($change['academic_group_id']);
+                    $specialty = Specialty::findOrFail($change['specialty_id']);
 
-            if ((int) $group->school_cycle_id !== $schoolCycleId) {
-                return $this->sendError(
-                    "El grupo {$group->name} no pertenece al período escolar seleccionado.",
-                    422
-                );
-            }
+                    if (SinGrupoAcademicGroupService::isSinGrupoGroup($group)) {
+                        throw new \RuntimeException('No se pueden asignar materias al grupo SIN GRUPO.');
+                    }
 
-            if ($specialty->grade_id !== null && (int) $specialty->grade_id !== (int) $group->grade_id) {
-                return $this->sendError(
-                    "La materia {$specialty->description} no corresponde al grado del grupo.",
-                    422
-                );
-            }
+                    if (TeachingScheduleRules::isServicioSpecialty($specialty)) {
+                        throw new \RuntimeException('SERVICIO se asigna desde Horarios, no desde esta matriz.');
+                    }
 
-            $existing = GroupSubjectAssignment::query()
-                ->where('academic_group_id', $group->id)
-                ->where('specialty_id', $specialty->id)
-                ->first();
+                    if ((int) $group->school_cycle_id !== $schoolCycleId) {
+                        throw new \RuntimeException(
+                            "El grupo {$group->name} no pertenece al período escolar seleccionado."
+                        );
+                    }
 
-            $teacherId = $change['teacher_id'] ?? null;
+                    if ($specialty->grade_id !== null && (int) $specialty->grade_id !== (int) $group->grade_id) {
+                        throw new \RuntimeException(
+                            "La materia {$specialty->description} no corresponde al grado del grupo."
+                        );
+                    }
 
-            if ($teacherId === null) {
-                if ($existing !== null) {
-                    $existing->delete();
-                    $cleared++;
+                    $existing = GroupSubjectAssignment::query()
+                        ->where('academic_group_id', $group->id)
+                        ->where('specialty_id', $specialty->id)
+                        ->first();
+
+                    $teacherId = $change['teacher_id'] ?? null;
+
+                    if ($teacherId === null) {
+                        if ($existing !== null) {
+                            $existing->delete();
+                            $cleared++;
+                        }
+
+                        continue;
+                    }
+
+                    $teacher = Teacher::with('subject')->findOrFail($teacherId);
+
+                    $hoursError = $validator->validateTeacherHours(
+                        $teacher,
+                        $specialty,
+                        $existing?->id
+                    );
+
+                    if ($hoursError !== null) {
+                        throw new \RuntimeException($hoursError);
+                    }
+
+                    $subjectWarning = $validator->validateTeacherSubjectMatch($teacher, $specialty);
+                    if ($subjectWarning !== null) {
+                        $warnings[] = $subjectWarning;
+                    }
+
+                    GroupSubjectAssignment::updateOrCreate(
+                        [
+                            'academic_group_id' => $group->id,
+                            'specialty_id' => $specialty->id,
+                        ],
+                        [
+                            'teacher_id' => $teacher->id,
+                            'school_cycle_id' => $schoolCycleId,
+                            'assignment_type' => 'manual',
+                            'is_active' => true,
+                        ]
+                    );
+
+                    $saved++;
                 }
-
-                continue;
-            }
-
-            $teacher = Teacher::with('subject')->findOrFail($teacherId);
-
-            $hoursError = $validator->validateTeacherHours(
-                $teacher,
-                $specialty,
-                $existing?->id
-            );
-
-            if ($hoursError !== null) {
-                return $this->sendError($hoursError, 422);
-            }
-
-            $subjectWarning = $validator->validateTeacherSubjectMatch($teacher, $specialty);
-            if ($subjectWarning !== null) {
-                $warnings[] = $subjectWarning;
-            }
-
-            GroupSubjectAssignment::updateOrCreate(
-                [
-                    'academic_group_id' => $group->id,
-                    'specialty_id' => $specialty->id,
-                ],
-                [
-                    'teacher_id' => $teacher->id,
-                    'school_cycle_id' => $schoolCycleId,
-                    'assignment_type' => 'manual',
-                    'is_active' => true,
-                ]
-            );
-
-            $saved++;
+            });
+        } catch (\RuntimeException $exception) {
+            return $this->sendError($exception->getMessage(), 422);
         }
 
         $message = "Se guardaron {$saved} asignación(es).";
